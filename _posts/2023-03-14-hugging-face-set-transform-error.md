@@ -43,6 +43,9 @@ def _remove_unused_columns(self, dataset: "datasets.Dataset", description: Optio
 
 def get_train_dataloader(self) -> DataLoader:
     ...
+    if is_datasets_available() and isinstance(train_dataset, datasets.Dataset):
+            train_dataset = self._remove_unused_columns(train_dataset, description="training")
+    ...
 
 ...
 
