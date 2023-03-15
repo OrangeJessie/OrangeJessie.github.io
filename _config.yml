@@ -22,9 +22,8 @@ author: 橘子豆
 navbar-links:
   About Me: "aboutme"
   Tags:
-    - Beautiful Jekyll: "https://beautifuljekyll.com"
-    - Learn markdown: "https://www.markdowntutorial.com/"
-#   Author's home: "https://deanattali.com"
+    - code: "https://orangejessie.github.io/tags/#code"
+    - HuggingFace: "https://orangejessie.github.io/tags/#HuggingFace"
 
 ################
 # --- Logo --- #
@@ -32,7 +31,7 @@ navbar-links:
 
 # Image to show in the navigation bar - works best with a square image
 # Remove this parameter if you don't want an image in the navbar
-avatar: "/assets/img/beatiful_fighter.png"
+avatar: "/assets/img/beautiful_fighter.png"
 
 # By default, the image is cut into a circle. You can disable this behaviour by setting 'round-avatar: false'
 round-avatar: true
