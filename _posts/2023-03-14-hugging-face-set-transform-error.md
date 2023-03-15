@@ -6,10 +6,14 @@ tags: [code,HuggingFace]
 comments: true
 ---
 
-使用HuggingFace训练CLIP时，使用on-the-fly的image transformer。
+HuggingFace训练CLIP时，通过set_transform函数实现对batch进行image transformer。set_transform会在调用__getitem__的时候执行[1]，优点在于：
+1. set_transform方法可以在训练时动态地应用变换，而不需要提前保存变换后的图像，这可以节省存储空间和计算时间；
+2. 在一个batch上执行transform有一些优势，例如可以实现更复杂的数据增强方法，如mixup、cutmix等，这些方法需要在一个batch内部进行样本的混合或者裁剪；
 
-- set_transform方法可以在训练时动态地应用变换，而不需要提前保存变换后的图像，这可以节省存储空间和计算时间；
-- 在一个batch上执行transform有一些优势，例如可以实现更复杂的数据增强方法，如mixup、cutmix等，这些方法需要在一个batch内部进行样本的混合或者裁剪；
+
+引用[1]
+> This function is applied right before returning the objects in __getitem__.
+> Set getitem return format using this transform. The transform is applied on-the-fly on batches when getitem is called. 
 
 
 ```
@@ -27,11 +31,7 @@ train_dataset.set_transform(transform_images)
  KeyError: 'image'
 ```
 
-打印出来发现image字段在training开始之前输入trainer的还是有的，传到transform_images函数中就没有了。set_transform会在调用__getitem__的时候执行
-
-> This function is applied right before returning the objects in __getitem__.
-> Set getitem return format using this transform. The transform is applied on-the-fly on batches when getitem is called. 
-
+打印出来发现image字段在training开始之前输入trainer的还是有的，传到transform_images函数中就没有了。
 
 于是查看了下trainer.py的源码，发现实际是在获取epoch数据的时候执行image_transformer，在此之前的data_loader里面有个_remove_unused_columns函数，会将不需要的columns删除，image字段就是在这一步被删除了。
 
