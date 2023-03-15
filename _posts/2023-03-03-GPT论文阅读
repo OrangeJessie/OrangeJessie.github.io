@@ -1,0 +1,172 @@
+# GPT论文阅读
+## 1.Improving Language Understandingby Generative Pre-Training
+Time: 2018.6
+    NLU包含了很多任务，比如文字蕴含、QA、语义相似度评估、文本分类等，大量文本是没有标签的，对特定任务有标签的数据很少，预训练的方法在word embedding方法下验证了其有效性，但目前的预训练都是在词层面，因此本文用无标签数据训练生成式预训练模型，去学习语言更高层的表示。GPT1提出了一种新的方法来训练模型——无监督的预训练+有监督的精调，模型结构采用transformer，使模型能处理更长的文本。
+限制：仍然需要精调，下游任务需要构造特定格式的输入数据。
+### 1.1 模型结构
+#### 1.1.1 无监督的pre-train
+    在无监督数据集上，用前k个词预测下一个词，目标是最大化似然函数
+    
+	k是文本窗口的大小，已知第i个词前的k个词的概率，求第i个词的概率，用随机梯度下降来最大化似然函数。其中P为模型输出的概率，在本文中采用multi-layer transformer decoder作为语言模型，decoder与encoder相比，self-attention是masked，此处采用decoder的原因是生成式模型不能将后面的词暴露给前面的词。
+
+    其中是文本token vector，n是层数，We是embedding矩阵，Wp是位置编码矩阵。
+#### 1.1.2 有监督的fine-tuning
+	在这个阶段，针对有监督的数据集，用上一步中的pre-train模型去掉softmax层，计算输入数据x的向量表示，再添加一层线性层来用输出向量预测标签y
+
+	似然函数变为
+
+	语言模型预训练在其中起的作用是1. 泛化精调模型，2. 加速收敛。在特定情况下，优化目标为L1和L2，用lambda来调节预训练模型占比，这样能在不过多降低模型泛化能力的同时，增强在特定任务上的效果
+
+#### 1.1.3 任务的输入数据格式
+    由于不同的任务输入数据格式是不同的，过去在模型最上层对特定的任务会使用特定的结构。在本文中，将所有任务的输入数据都格式化为一个序列，这样就不需要再对模型做额外的改动。下图左边是pre-train模型结构，右边是fine-tuning时数据输入的结构。
+
+### 1.2 实验
+#### 1.2.1 数据集	
+    pre-train使用的数据集：
+	    1. BooksCorpus 74 million
+	    2. Billion Word Benchmark  1 billion
+	fine-tuning任务使用的数据集：	
+#### 1.2.2 实验细节
+	pre-train和fine-tuning实验参数设置，在fine-tuning阶段没有额外说明的参数与pre-train阶段相同，此处参数并不完整，更详细的请参考论文。
+- - - 
+阶段	参数	设置
+Pre-train	模型结构	12-layer decoder-only transformer
+	优化器	Adam
+	学习率	前2000次更新从0线性增加到最大2.5e-4
+	字典	Bytepair encoding(BPE) vocabulary
+	MiniBatch	100 epoches, batch_size=64 randomly sampled
+	激活函数	Gaussian Error Linear Unit (GELU)
+	正则	L2，with w= 0.01on all non bias or gain weights
+	参数量	117 million
+Fine-tuning	Dropout	分类任务中设置为0.1
+	学习率	大部分任务6.25e-5,  decay
+	Batch size	32, 3 epoches
+
+## 2.Language Models are Unsupervised Multitask Learners
+Time: 2019.2
+	语言模型能从无监督的数据中学习，应用到多种下游任务中，而不需要再进行精调，模型量级对于提升zero-shot效果很重要。机器学习的通常方法是，用成千上万的训练数据去训练模型，让模型得到泛化性，同理，如果要让语言模型在多任务上得到很好的泛化性，那么需要更多的(dataset, objective)对。本文发现语言模型在zero-shot时，能在下游任务上表现很好。
+	训练方法是给语言模型多种task和input，输出output，建模为p(output|input, task)，举个例子：翻译(translate tofrench, english text, french text)，回答问题 (answer the question, document,question, answer)。
+限制：下游任务的输入数据格式经过一定的设计，但不包含GPT-1中的特殊字符，而是用更接近自然语言的方式。
+### 2.1 训练数据
+	1. 在Reddit网站上网友评分3 karma以上的网络数据Common Craw
+	2. Webtext, 8 million documents，40 GB文本数据，移除Wikipedia
+### 2.2 输入表示
+采用BPE(Byte Pair Encoding)编码方式，采用byte-level BPE，除了空格，不允许跨character merge(比如dog!  dog.)。BPE将常见的词用整体表示，而罕见词用子结构表示。
+优点：
+对于罕见词，不需要用<ukn>符号来表示，而可以在词表中找到子符号。
+不允许跨符号merge增加了压缩效率
+### 2.3 模型
+	模型上沿用了GPT-1，做了一些微改，论文中没有很具体地说明。文本长度从512增加到1024，batch大小增加到512，在参数上比GPT-1多了一个量级。
+### 2.4 实验
+	在多个下游任务上做zero-shot测试，包括语言模型、阅读理解、总结、翻译、问答上都取得了超过sota的效果。以下仅举例部分实验。
+#### 2.4.1 语言模型
+
+指标含义：
+PPL是在已知字符集的情况下，预测句子是怎么样的概率，字符集可以是character，也可以是word，PPL越小，模型效果越好。
+
+BPC(bits per character)和BPB(bits per byte)是用来衡量压缩率的指标。
+压缩率为
+BPB是，对于ASCII Extended characters来说，BPB与BPC相等。
+LAMBADA测试模型对长文本依赖关系的建模能力，CBT测试模型对10类不同词的区分，包括名词、实体、动词等。
+#### 2.4.2 常识推断
+
+### 2.5 Code
+	模型开源：https://huggingface.co/gpt2
+
+## 3.Language Models are Few-Shot Learners
+Time: 2020.5
+GPT-3是一个175billion参数的自回归模型。Few-shot的意思是，对于所有的任务，GPT-3能够不做精调和梯度更新，只需要提供一些样例。
+### 3.1 Introduction
+	介绍了为什么本文要采用Few-shot的测试方式，以及随着模型规模的增大，模型效果的变化。
+#### 3.1.1 实验发现
+随着模型规模和给出的样例增大，能很大程度地提升模型效果，尤其是在175B模型上。
+
+	随着模型规模增大，三种不同设定下能达到的效果，可以观察到一个有趣的pattern，随着模型量级增大，few-shot，one-shot，和zero-shot之间的gap也增大了，可能说明更大的模型是更好的学习者。
+
+#### 3.1.2 Few-shot和Fine-tuning对比
+Fine-tuning的优点在于能够通过精调来在特定任务上获得很好的效果，缺点在于，1. 下游任务需要收集大量标注数据，2. 模型对于与训练集分布不同的数据泛化能力差，3. 模型很可能利用数据集中虚假的特征，4. 在与人类效果对比时并不公平，因为精调使用了大量训练集中的数据。
+Few-shot的优点在于下游任务需要的标注数据大大减少，并且泛化能力更好，但是目前few-shot还不能达到精调的最优效果。
+
+### 3.2 模型结构
+	GPT-3模型与GPT-2一样，训练了不同大小的模型，175B的模型与其他模型相比，Batch size增大，层数增多，head数增加了一倍多。Learning rate 随模型增大降低，Batch size随模型增大而增大。dmodel是bottleneck层的unit数，所有模型的context window都是2048tokens。
+
+### 3.3 训练数据
+	Common Crawl数据集，是互联网爬取数据，原始数据集大小为1千亿词，但是质量参差不齐，因此采用优化：
+1.用GPT-2中的高质量数据集WordText、Wikipedia等作为正样本，Common Crawl作为负样本，训练一个逻辑回归分类模型，在Common Crawl中根据模型打分来采样训练数据。random.pareto(9)>1-document score时，将样本采样到dataset
+2.模糊去重，减少冗余，以避免overfitting。去除一些high overlap的文档，并将WordText从Common Crawl中去掉。降低了10%的数据集大小
+3.加入其他高质量数据集，提升数据多样性。
+
+	在训练过程中，Common Crawl被采样的概率比其他高质量数据更低，尽管数据量大很多，但是实际占比训练数据60%。
+### 3.4 结果
+	参数量更大的模型能够在验证集上达到更小loss，在计算前期，模型loss快速下降，计算量增大两个数量级后，模型效率降低。
+
+在各种语言任务下的效果，仅举例部分：
+Lambada给定前面的句子，预测最后一个word。Few-shot对效果有很明显的增强作用。
+	在TriviaQA任务中，Few-shot的模型超过了Fine-tuned的sota模型。
+
+	Winogrande，判断代词指的是哪个词的任务。
+
+### 3.5 Limitation
+1.在文本合成和一些nlp任务上表现不足够好。
+2.在预训练时样本效率低，预训练仍然需要大量的文本数据。
+3.Few-shot并不确定是真的学到了新任务还是识别到了已知的任务。
+4.Inference昂贵。
+5.对于训练集中没有出现过的文本，不能很好地处理，比如code。
+
+## 4.Training language models to follow instructions with human feedback
+Time: 2022.3
+语言模型量级变得更大并不会使模型更理解用户的意图，模型生成的内容可能是没用的，有毒的或者虚假的。这是因为模型训练的目标是预测下一个token，与follow用户指令不相同。
+本文的研究表明，用人类反馈来精调模型，能使模型变得更理解用户意图。
+	主要的发现：
+1.相比175B的GPT-3，标注员更喜欢1.3B的InstructGPT的输出；
+2.InstructGPT真实性有提升，在close-domain任务中更少编造输入中没有的信息；
+3.减少了有毒的输出，但没有减少偏见；
+4.融合原始模型目标和精调目标(PPO-ptx)，减少模型原始目标效果降低(各种公开数据集效果)；
+5.InstructGPT对训练集中没有出现过的指令有泛化能力，能follow不同语言的指令；
+6.InstructGPT仍然会犯简单的错误。
+### 4.1 模型
+	训练过程分为3步
+
+#### 4.1.1 SFT
+从prompt集中采样一些prompt，标注员根据prompt写出回答用于精调SFT模型，目标是使生成的句子概率最大。
+#### 4.1.2 RM
+对同一个prompt，用模型生成多个回答，标注员对从中采样的回答进行排序，用生成的回答和排序的结果作为训练数据，训练一个Reward Model。RM用了6B的模型，节省资源且175B模型不稳定。
+	采用对比学习的方式，一个prompt生成K(4-9)个回答，标注员两两对比好坏（读懂题意需要时间，可以生成更多答案降低平均每个排序的时间成本），将一个prompt生成的所有样本对CK2放在一个batch中训练，防止过拟合（如果将每一个样本对作为一个单独的数据训练，会使每个回答影响梯度更新K-1次，而在一个batch里只会影响一次梯度更新）。
+	损失函数采用交叉熵
+
+#### 4.1.3 PPO
+用强化学习PPO算法精调SFT，随机采样的prompt，模型生成一个回复，将prompt和回复用RM得到reward。RL模型是从SFT初始化而来，目标函数第一项是最大化reward值，第二项控制RL分布和SFT分布差异，第三项融合精调梯度，使模型不会在原始数据集上效果变差过多。
+
+### 4.2 数据集生成
+	采样prompt时，去重了有很长的重复子串的prompt，且对一个user_id，限制最多采样200条，并根据user_id来划分了训练集、验证集和测试集。
+	SFT数据含有13k条训练prompt数据：1. 标注员随意想的任务和回答，保证任务的多样性；2. 标注员想一些指令性的问题和回答pair；3. 标记员根据用户真实例子想一些类似的prompt。
+	RM含有33k训练prompt数据，PPO含有31k训练prompt数据。
+
+数据集中超过96%是英语，但是仍然能处理其他语言的指令。
+文章中还提到了如何手机人类数据的细节，如果有标注需求可以参考。
+### 4.3 评估方法
+	在评估模型效果时，目标是Helpful、Honest、Harmless。Helpful通过标注员标注来评价，但是和用户真正的意图是有偏差的。Honest通过完成lose-domain的任务和TruthfulQA来评估。Harmless通过标注员标注potential harmful来评价。
+### 4.4 结果
+#### 4.4.1 API prompt
+	评价指标是与SFT 175B模型相比的胜率，GPT-3效果最差，但是通过prompt可以显著提高效果。经过SFT和PPO的1.3B模型效果好于GPT-3 175B，小模型通过精调和强化学习能在特定领域超过大模型的表现。
+
+下图左边是提交给GPT-3的prompt集上的结果，右边是提交到InstructGPT的prompt集上的结果，上面是held-out labeler标注，下面是参与训练集的labeler标注。
+在同样的prompt集上，SFT在Training worker比在Heldout worker上表现更好，PPO虽然对这种现象有所改善，但还是存在。
+
+	在有明确指令的任务和遵循显式约束的任务中，模型取得了较大的提升，减少了虚假信息。
+
+#### 4.4.2 公开NLP数据集
+	InstructGPT在真实性上有明显提升，三个柱状从左到右分别是模型规模1.3B、6B、175B。PPO-ptx 1.3B模型效果差于GPT-3 1.3B，其他情况下InstructGPT都相比GPT-3有提升。
+
+	InstructGPT在有毒性上降低了，但在有偏性上没有显著变化。当被指示respectful和safe时，InstructGPT比GPT-3表现更好一些，但是在没有指示的时候，没有明显提升。
+
+### 4.5 Code
+https://github.com/LAION-AI/Open-Assistant
+
+
+
+
+
+
+
+
