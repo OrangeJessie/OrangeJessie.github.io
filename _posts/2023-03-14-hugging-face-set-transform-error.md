@@ -26,6 +26,8 @@ train_dataset.set_transform(transform_images)
 
 打印出来发现image字段在training开始之前输入trainer的还是有的，传到transform_images函数中就没有了。set_transform会在调用__getitem__的时候执行
 > This function is applied right before returning the objects in __getitem__.
+
+
 于是查看了下trainer.py的源码，发现实际是在获取epoch数据的时候执行image_transformer，在此之前的data_loader里面有个_remove_unused_columns函数，会将不需要的columns删除，image字段就是在这一步被删除了。
 
 ```
