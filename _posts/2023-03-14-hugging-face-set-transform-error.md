@@ -10,11 +10,9 @@ HuggingFace训练CLIP时，通过set_transform函数实现对batch进行image tr
 1. set_transform方法可以在训练时动态地应用变换，而不需要提前保存变换后的图像，这可以节省存储空间和计算时间；
 2. 在一个batch上执行transform有一些优势，例如可以实现更复杂的数据增强方法，如mixup、cutmix等，这些方法需要在一个batch内部进行样本的混合或者裁剪；
 
-
-引用[1]
+[1]
 > This function is applied right before returning the objects in __getitem__.
 >
-> 
 > Set getitem return format using this transform. The transform is applied on-the-fly on batches when getitem is called. 
 
 
