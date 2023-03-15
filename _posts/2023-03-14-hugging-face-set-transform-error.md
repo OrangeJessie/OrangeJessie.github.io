@@ -13,6 +13,8 @@ HuggingFace训练CLIP时，通过set_transform函数实现对batch进行image tr
 
 引用[1]
 > This function is applied right before returning the objects in __getitem__.
+>
+> 
 > Set getitem return format using this transform. The transform is applied on-the-fly on batches when getitem is called. 
 
 
