@@ -2,9 +2,9 @@
 layout: post
 title: Training CLIP image KeyError when using HuggingFace set_transform
 subtitle: on-the-fly transform error
-gh-repo: daattali/beautiful-jekyll
+gh-repo: https://github.com/OrangeJessie
 gh-badge: [star, fork, follow]
-tags: [code]
+tags: [code,HuggingFace]
 comments: true
 ---
 
