@@ -9,5 +9,7 @@ Thumbs.db
 ehthumbs.db
 
 Gemfile.lock
+.bundle/
+vendor/bundle/
 
 beautiful-jekyll-theme-*.gem

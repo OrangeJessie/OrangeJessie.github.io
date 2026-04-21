@@ -10,7 +10,7 @@
 ############################
 
 # Name of website
-title: 橘子豆的算法工坊
+title: 橘子豆的个人博客
 
 # Your name to show in the footer
 author: 橘子豆
@@ -20,10 +20,10 @@ author: 橘子豆
 ###############################################
 
 navbar-links:
-  About Me: "aboutme"
-  Tags:
-    - code: "https://orangejessie.github.io/tags/#code"
-    - HuggingFace: "https://orangejessie.github.io/tags/#HuggingFace"
+  首页: ""
+  论文解读: "papers"
+  职场那些事儿: "career"
+  关于我: "aboutme"
 
 ################
 # --- Logo --- #
@@ -74,7 +74,7 @@ social-network-links:
 
 # If you want your website to generate an RSS feed, provide a description
 # The URL for the feed will be https://<your_website>/feed.xml
-rss-description: This website is a virtual proof that I'm awesome
+rss-description: 记录论文解读、工程实践与职场思考
 
 ###########################
 # --- General options --- #
@@ -89,10 +89,10 @@ share-links-active:
 
 # How to display the link to your website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "MyWebsite.com"
+url-pretty: "orangejessie.github.io"
 
 # Excerpt word length - Truncate the excerpt of each post on the feed page to the specified number of words
-excerpt_length: 50
+excerpt_length: 32
 
 # Whether or not to show an excerpt for every blog post in the feed page
 feed_show_excerpt: true
@@ -120,17 +120,17 @@ navbar-var-length: false
 
 # Personalize the colours in your website. Colour values can be any valid CSS colour
 
-navbar-col: "#EAEAEA"
-navbar-text-col: "#404040"
-navbar-border-col: "#DDDDDD"
-page-col: "#FFFFFF"
-text-col: "#404040"
-link-col: "#008AFF"
-hover-col: "#0085A1"
-footer-col: "#EAEAEA"
-footer-text-col: "#777777"
-footer-link-col: "#404040"
-footer-hover-col: "#0085A1"
+navbar-col: "#f7efe5"
+navbar-text-col: "#3c3026"
+navbar-border-col: "#eadccd"
+page-col: "#fcf8f1"
+text-col: "#342923"
+link-col: "#b75c35"
+hover-col: "#8f3d1f"
+footer-col: "#211b17"
+footer-text-col: "#d5c9bf"
+footer-link-col: "#fff4ea"
+footer-hover-col: "#f4b48e"
 
 # Alternatively, the navbar, footer, and page background can be set to an image
 # instead of colour
@@ -140,11 +140,11 @@ footer-hover-col: "#0085A1"
 #page-img: "/assets/img/bgimage.png"
 
 # Suggest a colour for mobile browsers to use as the browser's theme. This is only supported by a few mobile browsers.
-#mobile-theme-col: "#0085A1"
+mobile-theme-col: "#f7efe5"
 
 # For any extra visual customization, you can include additional CSS files in every page on your site. List any custom CSS files here
-#site-css:
-#  - "/assets/css/custom-styles.css"
+site-css:
+  - "/assets/css/custom-styles.css"
 
 # If you have common JavaScript files that should be included in every page, list them here
 #site-js:

@@ -1,0 +1,42 @@
+---
+layout: page
+---
+
+{% assign section_posts = site.posts | where: "section", page.section %}
+{% assign date_format = site.date_format | default: "%Y.%m.%d" %}
+
+<div class="section-page-shell">
+  {% if page.intro %}
+    <div class="section-page-intro">
+      <p>{{ page.intro }}</p>
+    </div>
+  {% endif %}
+
+  {{ content }}
+
+  {% if section_posts.size > 0 %}
+    <div class="section-post-grid" role="list">
+      {% for post in section_posts %}
+        <article class="section-post-card" role="listitem">
+          <div class="section-post-card__eyebrow">{{ post.section_label | default: page.title }}</div>
+          <h2 class="section-post-card__title">
+            <a href="{{ post.url | relative_url }}">{{ post.title | strip_html }}</a>
+          </h2>
+          <p class="section-post-card__summary">
+            {{ post.summary | default: post.excerpt | strip_html | truncate: 130 }}
+          </p>
+          <div class="section-post-card__meta">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
+            {% if post.tags.size > 0 %}
+              <span>{{ post.tags | join: " / " }}</span>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="section-empty-state">
+      {{ page.empty_text | default: "内容正在整理中，稍后补充。" }}
+    </div>
+  {% endif %}
+</div>
