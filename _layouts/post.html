@@ -2,18 +2,58 @@
 layout: base
 ---
 
-{% include header.html type="post" %}
+{% assign date_format = site.date_format | default: "%Y.%m.%d" %}
+{% assign word_count = page.content | strip_html | number_of_words %}
+{% assign reading_time = word_count | divided_by: 200 %}
+{% if reading_time < 1 %}
+  {% assign reading_time = 1 %}
+{% endif %}
+{% assign comments_enabled = false %}
+{% if site.disqus or site.fb_comment_id or site.commentbox %}
+  {% assign comments_enabled = true %}
+{% endif %}
+{% if site.staticman.repository and site.staticman.branch %}
+  {% assign comments_enabled = true %}
+{% endif %}
+{% if site.utterances.repository and site.utterances.issue-term %}
+  {% assign comments_enabled = true %}
+{% endif %}
+{% if site.giscus.repository and site.giscus.hostname %}
+  {% assign comments_enabled = true %}
+{% endif %}
 
-<div class="{% if page.full-width %} container-fluid {% else %} container-md {% endif %}">
-  <div class="row">
-    <div class="{% if page.full-width %} col {% else %} col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 {% endif %}">
+<main class="report-post-page" role="main">
+  <div class="report-post-shell">
+    <header class="report-post-hero">
+      <div class="report-post-hero__eyebrow">{{ page.section_label | default: "Article" }}</div>
+      <h1>{{ page.title | strip_html }}</h1>
+      {% if page.subtitle %}
+        <p class="report-post-hero__subtitle">{{ page.subtitle | strip_html }}</p>
+      {% endif %}
+
+      <div class="report-post-hero__meta">
+        <span class="report-pill report-pill--teal">{{ page.date | date: date_format }}</span>
+        <span class="report-pill report-pill--soft">{{ reading_time }} 分钟阅读</span>
+        {% if page.tags.size > 0 %}
+          <span class="report-pill report-pill--purple">{{ page.tags.size }} 个标签</span>
+        {% endif %}
+      </div>
+
+      {% if page.tags.size > 0 %}
+        <div class="report-post-hero__tags">
+          {% for tag in page.tags %}
+            <a class="report-pill report-pill--tag" href="{{ '/tags' | relative_url }}#{{- tag -}}">{{- tag -}}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </header>
 
       {% if page.gh-repo %}
         {% assign gh_split =  page.gh-repo | split:'/'  %}
         {% assign gh_user =  gh_split[0]  %}
         {% assign gh_repo =  gh_split[1]  %}
 
-        <div id="header-gh-btns">
+        <div class="report-post-gh">
           {% if page.gh-badge.size > 0 %}
             {% for badge in page.gh-badge %}
               {% case badge %}
@@ -32,28 +72,21 @@ layout: base
       {% endif %}
 
       {% if page.before-content %}
-        <div class="before-content">
+        <div class="report-post-before">
           {% for file in page.before-content %}
             {% include {{ file }} %}
           {% endfor %}
         </div>
       {% endif %}
 
-      <article role="main" class="blog-post">
-        {{ content }}
-      </article>
-
-      {% if page.tags.size > 0 %}
-        <div class="blog-tags">
-          <span>Tags:</span>
-          {% for tag in page.tags %}
-            <a href="{{ '/tags' | relative_url }}#{{- tag -}}">{{- tag -}}</a>
-          {% endfor %}
-        </div>
-      {% endif %}
+      <div class="report-post-body">
+        <article class="report-post-content">
+          {{ content }}
+        </article>
+      </div>
 
       {% if page.after-content %}
-        <div class="after-content">
+        <div class="report-post-after">
           {% for file in page.after-content %}
             {% include {{ file }} %}
           {% endfor %}
@@ -61,22 +94,34 @@ layout: base
       {% endif %}
 
       {% if page.social-share %}
-        {% include social-share.html %}
+        <div class="report-post-share">
+          {% include social-share.html %}
+        </div>
       {% endif %}
 
-      <ul class="pagination blog-pager">
+      <ul class="pagination blog-pager report-post-nav">
         {% if page.previous.url %}
-        <li class="page-item previous">
-          <a class="page-link" href="{{ page.previous.url | relative_url }}" data-toggle="tooltip" data-placement="top" title="{{page.previous.title | strip_html | xml_escape}}">&larr; Previous Post</a>
+        <li class="page-item previous report-post-nav__item">
+          <a class="page-link report-post-nav__link" href="{{ page.previous.url | relative_url }}" data-toggle="tooltip" data-placement="top" title="{{page.previous.title | strip_html | xml_escape}}">
+            <span class="report-post-nav__label">上一篇</span>
+            <strong>{{ page.previous.title | strip_html }}</strong>
+          </a>
         </li>
         {% endif %}
         {% if page.next.url %}
-        <li class="page-item next">
-          <a class="page-link" href="{{ page.next.url | relative_url }}" data-toggle="tooltip" data-placement="top" title="{{page.next.title | strip_html | xml_escape}}">Next Post &rarr;</a>
+        <li class="page-item next report-post-nav__item">
+          <a class="page-link report-post-nav__link" href="{{ page.next.url | relative_url }}" data-toggle="tooltip" data-placement="top" title="{{page.next.title | strip_html | xml_escape}}">
+            <span class="report-post-nav__label">下一篇</span>
+            <strong>{{ page.next.title | strip_html }}</strong>
+          </a>
         </li>
         {% endif %}
       </ul>
-      {% include comments.html %}
-    </div>
+
+      {% if page.comments and comments_enabled %}
+        <div class="report-post-comments">
+          {% include comments.html %}
+        </div>
+      {% endif %}
   </div>
-</div>
+</main>
