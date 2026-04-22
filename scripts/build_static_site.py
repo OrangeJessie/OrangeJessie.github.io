@@ -514,12 +514,17 @@ def render_post_card(post: Post) -> str:
 
 
 def render_post_list_item(post: Post) -> str:
-    tags = "".join(f"<span>{html.escape(tag)}</span>" for tag in post.tags)
+    tags = " · ".join(html.escape(tag) for tag in post.tags)
+    meta_tail = (
+        f'<span class="article-list-item__sep">/</span><div class="article-list-item__tags">{tags}</div>'
+        if tags
+        else ""
+    )
     return f"""
     <article class="article-list-item">
       <div class="article-list-item__meta">
         <time datetime="{post.date.date().isoformat()}">{format_date(post.date)}</time>
-        <div class="article-list-item__tags">{tags}</div>
+        {meta_tail}
       </div>
       <h2><a href="{post.url}">{html.escape(post.title)}</a></h2>
       <p>{html.escape(post.summary)}</p>
