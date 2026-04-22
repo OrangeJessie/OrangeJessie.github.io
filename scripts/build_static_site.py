@@ -9,7 +9,6 @@ import subprocess
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -20,7 +19,7 @@ CONTENT_PAGES = CONTENT_ROOT / "pages"
 SITE = {
     "title": "橘子豆的个人博客",
     "author": "橘子豆",
-    "description": "记录论文解读、工程实践与职场思考",
+    "description": "记录论文解读、AI工具与经验分享",
     "email": "976448731@qq.com",
     "github": "https://github.com/OrangeJessie",
     "avatar": "/assets/img/beautiful_fighter.png",
@@ -29,9 +28,16 @@ SITE = {
 NAV = [
     ("首页", "/"),
     ("论文解读", "/papers/"),
-    ("职场那些事儿", "/career/"),
+    ("AI工具", "/ai-tools/"),
+    ("经验分享", "/experience/"),
     ("关于我", "/aboutme/"),
     ("标签", "/tags/"),
+]
+
+SECTION_ORDER = [
+    ("papers", "/papers/"),
+    ("ai-tools", "/ai-tools/"),
+    ("experience", "/experience/"),
 ]
 
 PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart"
@@ -236,7 +242,17 @@ def remove_output(target: Path) -> None:
 
 
 def clean_generated_outputs(posts: list["Post"]) -> None:
-    for relative in ["index.html", "404.html", ".nojekyll", "aboutme", "papers", "career", "tags"]:
+    for relative in [
+        "index.html",
+        "404.html",
+        ".nojekyll",
+        "aboutme",
+        "papers",
+        "ai-tools",
+        "experience",
+        "career",
+        "tags",
+    ]:
         remove_output(ROOT / relative)
 
     for child in ROOT.iterdir():
@@ -311,42 +327,38 @@ def render_post_card(post: Post) -> str:
     """
 
 
-def render_home(posts: list[Post]) -> str:
-    papers = [post for post in posts if post.section == "papers"]
-    career = [post for post in posts if post.section == "career"]
-
-    def render_preview(items: Iterable[Post]) -> str:
-        return "".join(render_post_card(post) for post in list(items)[:3])
+def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> str:
+    section_posts = {key: [post for post in posts if post.section == key] for key, _ in SECTION_ORDER}
+    cards = []
+    for index, (section_key, href) in enumerate(SECTION_ORDER, start=1):
+        meta = section_pages[section_key].meta
+        cards.append(
+            f"""
+            <article class="topic-card">
+              <div class="topic-card__index">{index:02d}</div>
+              <h3>{html.escape(str(meta.get("title", section_key)))}</h3>
+              <p>{html.escape(str(meta.get("subtitle", "")))}</p>
+              <div class="topic-card__meta">
+                <span>{len(section_posts[section_key])} 篇内容</span>
+                <a href="{href}">进入板块</a>
+              </div>
+            </article>
+            """
+        )
 
     body = f"""
     <section class="site-shell home-hero">
       <div class="home-hero__panel">
         <div class="home-hero__copy">
           <div class="eyebrow">PERSONAL BLOG</div>
-          <h1>把论文、工程和职场思考，写成真正能读下去的内容</h1>
-          <p class="lead">这里暂时专注两类主题：一类是把复杂论文拆开讲清楚，另一类是把一线工作里的踩坑、复盘和成长，写成更真实的记录。</p>
-          <div class="button-row">
-            <a class="button button--primary" href="/papers/">进入论文解读</a>
-            <a class="button button--secondary" href="/career/">进入职场那些事儿</a>
-          </div>
+          <h1>把论文、工具和经验，整理成能长期沉淀的个人内容</h1>
+          <p class="lead">这个 blog 现在聚焦三条主线：论文解读负责拆清楚方法与实验，AI工具记录能真正提升效率的用法，经验分享沉淀那些做事过程中值得复用的判断和过程。</p>
         </div>
         <aside class="home-hero__aside">
           <img class="profile-avatar" src="{SITE['avatar']}" alt="{html.escape(SITE['author'])}">
           <div class="glass-card">
             <strong>{html.escape(SITE['author'])}</strong>
-            <p>关注算法、工程实践和表达方式，想把“看懂”和“说清楚”这两件事都做好。</p>
-          </div>
-          <div class="mini-grid">
-            <div class="mini-card">
-              <span>论文解读</span>
-              <strong>{len(papers)}</strong>
-              <p>经典模型、方法拆解、实验脉络。</p>
-            </div>
-            <div class="mini-card">
-              <span>职场那些事儿</span>
-              <strong>{len(career)}</strong>
-              <p>工程踩坑、工作复盘、成长记录。</p>
-            </div>
+            <p>关注算法、AI应用和表达方式，想把“看懂”“用上”“讲明白”这三件事都做好。</p>
           </div>
         </aside>
       </div>
@@ -356,45 +368,10 @@ def render_home(posts: list[Post]) -> str:
       <div class="section-head">
         <div>
           <div class="eyebrow">CONTENT MAP</div>
-          <h2>先把长期会持续写的两类内容打磨出来</h2>
+          <h2>首页只保留三个入口，内容各自沉淀到对应板块</h2>
         </div>
       </div>
-      <div class="topic-grid">
-        <article class="topic-card">
-          <div class="topic-card__index">01</div>
-          <h3>论文解读</h3>
-          <p>不堆术语，重点写清楚问题背景、核心方法、关键实验和我自己的理解。</p>
-          <a href="/papers/">查看这个板块</a>
-        </article>
-        <article class="topic-card">
-          <div class="topic-card__index">02</div>
-          <h3>职场那些事儿</h3>
-          <p>把一线开发、问题排查、协作沟通和成长复盘，沉淀成有温度的职业记录。</p>
-          <a href="/career/">查看这个板块</a>
-        </article>
-      </div>
-    </section>
-
-    <section class="site-shell section-block">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">LATEST IN PAPERS</div>
-          <h2>论文解读</h2>
-        </div>
-        <a class="section-link" href="/papers/">查看全部</a>
-      </div>
-      <div class="listing-grid">{render_preview(papers)}</div>
-    </section>
-
-    <section class="site-shell section-block section-block--last">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">LATEST AT WORK</div>
-          <h2>职场那些事儿</h2>
-        </div>
-        <a class="section-link" href="/career/">查看全部</a>
-      </div>
-      <div class="listing-grid">{render_preview(career)}</div>
+      <div class="topic-grid">{''.join(cards)}</div>
     </section>
     """
     return page_shell(
@@ -414,6 +391,10 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
     title = str(page_meta.get("title", section_key))
     subtitle = str(page_meta.get("subtitle", ""))
     intro = str(page_meta.get("intro", ""))
+    empty_text = str(page_meta.get("empty_text", "这个板块正在整理中，很快会补充内容。"))
+    listing_html = "".join(render_post_card(post) for post in posts)
+    if not listing_html:
+        listing_html = f'<div class="empty-state"><p>{html.escape(empty_text)}</p></div>'
     body = f"""
     <section class="site-shell page-hero">
       <div class="eyebrow">SECTION</div>
@@ -425,7 +406,7 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
         <p>{html.escape(intro)}</p>
       </div>
       <div class="listing-grid">
-        {''.join(render_post_card(post) for post in posts)}
+        {listing_html}
       </div>
     </section>
     """
@@ -630,7 +611,13 @@ def build() -> None:
     clean_generated_outputs(posts)
     about_page = load_markdown_page("about.md")
     papers_page = load_markdown_page("papers.md")
-    career_page = load_markdown_page("career.md")
+    ai_tools_page = load_markdown_page("ai-tools.md")
+    experience_page = load_markdown_page("experience.md")
+    section_pages = {
+        "papers": papers_page,
+        "ai-tools": ai_tools_page,
+        "experience": experience_page,
+    }
 
     tag_map: dict[str, list[Post]] = {}
     for post in posts:
@@ -639,15 +626,19 @@ def build() -> None:
 
     ordered_tags = {tag: tag_map[tag] for tag in sorted(tag_map)}
 
-    write_text("index.html", render_home(posts))
+    write_text("index.html", render_home(section_pages, posts))
     write_text("aboutme/index.html", render_about(about_page.meta, about_page.body_html))
     write_text(
         "papers/index.html",
         render_section("papers", papers_page.meta, [p for p in posts if p.section == "papers"]),
     )
     write_text(
-        "career/index.html",
-        render_section("career", career_page.meta, [p for p in posts if p.section == "career"]),
+        "ai-tools/index.html",
+        render_section("ai-tools", ai_tools_page.meta, [p for p in posts if p.section == "ai-tools"]),
+    )
+    write_text(
+        "experience/index.html",
+        render_section("experience", experience_page.meta, [p for p in posts if p.section == "experience"]),
     )
     write_text("tags/index.html", render_tags(ordered_tags))
     write_text("404.html", render_404())

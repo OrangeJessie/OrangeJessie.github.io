@@ -304,7 +304,10 @@ pre {
   font-weight: 700;
 }
 
-.topic-grid,
+.topic-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .listing-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -337,6 +340,31 @@ pre {
 
 .topic-card a {
   font-weight: 700;
+}
+
+.topic-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.topic-card__meta span {
+  color: var(--gray);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.topic-card__meta a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: var(--dark-teal);
+  font-size: 0.9rem;
 }
 
 .listing-card__eyebrow {
@@ -408,6 +436,21 @@ pre {
 .prose-card {
   padding: 22px 24px;
   border-radius: var(--radius-md);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 28px 24px;
+  border: 1px dashed rgba(15, 42, 63, 0.16);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.72);
+  text-align: center;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--dark-gray);
+  line-height: 1.8;
 }
 
 .tag-cloud {
