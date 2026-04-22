@@ -513,6 +513,20 @@ def render_post_card(post: Post) -> str:
     """
 
 
+def render_post_list_item(post: Post) -> str:
+    tags = "".join(f"<span>{html.escape(tag)}</span>" for tag in post.tags)
+    return f"""
+    <article class="article-list-item">
+      <div class="article-list-item__meta">
+        <time datetime="{post.date.date().isoformat()}">{format_date(post.date)}</time>
+        <div class="article-list-item__tags">{tags}</div>
+      </div>
+      <h2><a href="{post.url}">{html.escape(post.title)}</a></h2>
+      <p>{html.escape(post.summary)}</p>
+    </article>
+    """
+
+
 def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> str:
     cards = []
     for index, section_key in enumerate(SECTION_ORDER, start=1):
@@ -568,22 +582,18 @@ def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> st
 def render_section(section_key: str, page_meta: dict[str, object], posts: list[Post]) -> str:
     title = str(page_meta.get("title", section_key))
     subtitle = str(page_meta.get("subtitle", ""))
-    intro = str(page_meta.get("intro", ""))
     empty_text = str(page_meta.get("empty_text", "这个板块正在整理中，很快会补充内容。"))
-    listing_html = "".join(render_post_card(post) for post in posts)
+    listing_html = "".join(render_post_list_item(post) for post in posts)
     if not listing_html:
         listing_html = f'<div class="empty-state"><p>{html.escape(empty_text)}</p></div>'
+    subtitle_html = f"<p>{html.escape(subtitle)}</p>" if subtitle else ""
     body = f"""
-    <section class="site-shell page-hero">
-      <div class="eyebrow">SECTION</div>
+    <section class="site-shell page-hero page-hero--archive">
       <h1>{html.escape(title)}</h1>
-      <p>{html.escape(subtitle)}</p>
+      {subtitle_html}
     </section>
-    <section class="site-shell section-list">
-      <div class="intro-card">
-        <p>{html.escape(intro)}</p>
-      </div>
-      <div class="listing-grid">
+    <section class="site-shell article-index">
+      <div class="article-list">
         {listing_html}
       </div>
     </section>

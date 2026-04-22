@@ -488,6 +488,11 @@ pre {
   text-align: center;
 }
 
+.page-hero--archive {
+  padding-top: 22px;
+  padding-bottom: 12px;
+}
+
 .page-hero--compact {
   padding-top: 48px;
 }
@@ -500,6 +505,69 @@ pre {
 .section-list,
 .tags-page {
   padding-top: 18px;
+}
+
+.article-index {
+  padding-top: 8px;
+}
+
+.article-list {
+  display: block;
+}
+
+.article-list-item {
+  padding: 24px 0 28px;
+  border-bottom: 1px solid rgba(188, 204, 214, 0.7);
+}
+
+.article-list-item:first-child {
+  padding-top: 0;
+}
+
+.article-list-item h2 {
+  margin: 10px 0 10px;
+  color: var(--navy);
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  letter-spacing: -0.03em;
+}
+
+.article-list-item h2 a {
+  color: inherit;
+}
+
+.article-list-item p {
+  margin: 0;
+  max-width: 900px;
+  color: var(--dark-gray);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+.article-list-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  color: var(--gray);
+  font-size: 0.88rem;
+}
+
+.article-list-item__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.article-list-item__tags span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f2f7f9;
+  color: var(--dark-gray);
+  font-size: 0.8rem;
 }
 
 .intro-card,
@@ -1116,6 +1184,15 @@ pre {
   .paper-card {
     padding: 22px 18px;
     border-radius: 20px;
+  }
+
+  .article-list-item {
+    padding: 20px 0 24px;
+  }
+
+  .article-list-item h2 {
+    margin-top: 8px;
+    font-size: 1.25rem;
   }
 
   .report-article:has(.article-overview-card),
