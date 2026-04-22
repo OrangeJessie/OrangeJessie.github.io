@@ -9,15 +9,15 @@ tags: [recsys,retrieval,multi-interest]
 
 ## 论文对比
 
-| 论文 | 主要解决问题 | 模型结构关键词 | 样本构造 | 实验结论 |
-| --- | --- | --- | --- | --- |
-| MIND 2019 | 单一 user vector 难以表示多兴趣 | dynamic routing、multi-interest extractor、label-aware attention | 用户行为序列 + target item 监督 | 在公开数据集和 Tmall 工业数据上优于 SOTA，并已上线 |
-| ComiRec 2020 | 多兴趣召回既要准确也要可控地兼顾多样性 | multi-interest module、aggregation module、controllable factor | 序列推荐设置，预测 next item | 在 Amazon / Taobao 上显著优于 baseline |
-| SINE 2021 | 多兴趣方法难处理大规模概念原型与稀疏兴趣激活 | sparse-interest module、interest aggregation | 用户行为序列预测 next item | 在公开 benchmark 和工业数据上有明显提升 |
-| Octopus 2020 | 多通道兴趣表示容易引入无关候选且成本高 | elastic channels、grouping head、quota allocation | user behavior 建模 candidate generation | 在工业与公开数据上验证有效性 |
-| REMI 2023 | 多兴趣学习更大的瓶颈在训练而非结构本身 | IHN、routing regularization | sampled softmax 训练框架 | 论文报告不同采样策略和消融实验均有收益 |
-| PinnerSage 2020 | 单 embedding 不能完整表达用户多兴趣 | hierarchical clustering、Ward、Medoid、cluster importance | 用户近 90 天行为聚类 | 线上线下实验都优于 single embedding 方法 |
-| DAT 2021 | 双塔缺少交互且类别不平衡 | AMM、CAL、dual augmented two-tower | 大规模 retrieval 数据 | 离线和在线 A/B 都有提升 |
+| 论文 | 主要解决问题 | 待改进方向 |
+| --- | --- | --- |
+| MIND 2019 | 单一 user vector 难以表示多兴趣 | 胶囊网络与动态路由计算开销大 |
+| ComiRec 2020 | 多兴趣召回既要准确也要可控地兼顾多样性 | aggregation 模块和多样性控制带来额外部署复杂度 |
+| SINE 2021 | 多兴趣方法难处理大规模概念原型与稀疏兴趣激活 | 依赖概念原型池与稀疏激活设计 |
+| Octopus 2020 | 多通道兴趣表示容易引入无关候选且成本高 | quota 分配与弹性通道增加 serving 成本 |
+| REMI 2023 | 多兴趣学习更大的瓶颈在训练而非结构本身 | 训练框架更复杂，需要 negative mining 和 regularization |
+| PinnerSage 2020 | 单 embedding 不能完整表达用户多兴趣 | 聚类复杂度高，异构行为难处理 |
+| DAT 2021 | 双塔缺少交互且类别不平衡 | 额外辅助向量和对齐损失增加训练复杂度 |
 
 ## 阿里 MIND 2019
 
@@ -81,11 +81,6 @@ tags: [recsys,retrieval,multi-interest]
   <figcaption>ComiRec 结构图：先进行 multi-interest extraction，再在 serving 侧通过 aggregation module 平衡精度与多样性。</figcaption>
 </figure>
 
-### 样本构造
-
-- 论文在 sequential recommendation 设置下预测 next item。
-- 原笔记记录的数据集包括 Amazon 和 Taobao。
-
 ### 关键信息
 
 - 论文提供 Dynamic Routing 与 Self-Attention 两种多兴趣提取方式。
@@ -118,10 +113,6 @@ tags: [recsys,retrieval,multi-interest]
   <figcaption>SINE 结构图：从 concept pool 中做 sparse activation，再通过 intention selector 完成兴趣聚合。</figcaption>
 </figure>
 
-### 样本构造
-
-- 按 sequential recommendation 设置，用行为序列预测下一个 item。
-
 ### 关键信息
 
 - SINE 的核心不是简单增加 interest 数量，而是从大原型池中做 sparse activation。
@@ -151,10 +142,6 @@ tags: [recsys,retrieval,multi-interest]
   <img src="/assets/post-media/retrieval-methods/octopus-framework.png" alt="Octopus 框架图">
   <figcaption>Octopus 框架图：通过 channel activation 和 grouped attentive aggregation 生成弹性的多通道用户表示。</figcaption>
 </figure>
-
-### 样本构造
-
-- 论文明确围绕 user behavior 建模 candidate generation。
 
 ### 关键信息
 
@@ -256,10 +243,6 @@ tags: [recsys,retrieval,multi-interest]
   <img src="/assets/post-media/retrieval-methods/dat-architecture.png" alt="DAT 模型结构图">
   <figcaption>DAT 结构图：在双塔检索框架上增加辅助向量、mimic loss 与 category alignment loss。</figcaption>
 </figure>
-
-### 样本构造
-
-- 论文面向大规模 online retrieval。
 
 ### 关键信息
 

@@ -26,6 +26,117 @@ SITE = {
     "avatar": "/assets/img/beautiful_fighter.png",
 }
 
+PAPER_SOURCES: dict[str, dict[str, str]] = {
+    "Learning Deep Structured Semantic Models for Web Search using Clickthrough Data": {
+        "source_name": "Microsoft Research",
+        "source_url": "https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/",
+        "excerpt": "It uses a DNN to map high-dimensional sparse text features into low-dimensional dense features in a semantic space.",
+    },
+    "Deep Neural Networks for YouTube Recommendations": {
+        "source_name": "Google Research",
+        "source_url": "https://research.google/pubs/pub45530/",
+        "excerpt": "Deep candidate generation model architecture showing embedded sparse features concatenated with dense features.",
+    },
+    "Sampling-bias-corrected neural modeling for large corpus item recommendations": {
+        "source_name": "Google Research",
+        "source_url": "https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/",
+    },
+    "Embedding-based Retrieval in Facebook Search": {
+        "source_name": "KDD 2020",
+        "source_url": "https://www.kdd.org/kdd2020/accepted-papers/view/embedding-based-retrieval-in-facebook-search.html",
+        "excerpt": "Besides the query text, it is important to take into account the searcher’s context to provide relevant results.",
+    },
+    "MOBIUS: Towards the Next Generation of Query-Ad Matching in Baidu’s Sponsored Search": {
+        "source_name": "KDD 2019",
+        "source_url": "https://www.kdd.org/kdd2019/accepted-papers/view/mobius-towards-the-next-generation-of-query-ad-matching-in-baidus-sponsored",
+    },
+    "Deep Match to Rank Model for Personalized Click-Through Rate Prediction": {
+        "source_name": "AAAI 2020",
+        "source_url": "https://doi.org/10.1609/aaai.v34i01.5346",
+        "excerpt": "Existing works in the field of CTR prediction mainly focus on user representation and pay less attention on representing the relevance between user and item.",
+    },
+    "Deep Retrieval: Learning A Retrievable Structure for Large-Scale Recommendations": {
+        "source_name": "arXiv",
+        "source_url": "https://arxiv.org/abs/2007.07203",
+        "excerpt": "We present Deep Retrieval (DR), to learn a retrievable structure directly with user-item interaction data.",
+    },
+    "Multi-Interest Network with Dynamic Routing for Recommendation at Tmall": {
+        "source_name": "CIKM 2019",
+        "source_url": "https://researchportal.hkust.edu.hk/en/publications/multi-interest-network-with-dynamic-routing-for-recommendation-at-2",
+        "excerpt": "We approach the learning of user representations from a different view, by representing a user with multiple representation vectors.",
+    },
+    "Controllable Multi-Interest Framework for Recommendation": {
+        "source_name": "arXiv",
+        "source_url": "https://arxiv.org/abs/2005.09347",
+        "excerpt": "Our multi-interest module captures multiple interests from user behavior sequences.",
+    },
+    "Sparse-Interest Network for Sequential Recommendation": {
+        "source_name": "WSDM 2021",
+        "source_url": "https://doi.org/10.1145/3437963.3441811",
+    },
+    "Octopus: Comprehensive and Elastic User Representation for the Generation of Recommendation Candidates": {
+        "source_name": "Microsoft Research",
+        "source_url": "https://www.microsoft.com/en-us/research/?p=683799",
+        "excerpt": "Octopus also generates multiple vectors for the comprehensive representation of user’s diverse interests.",
+    },
+    "Rethinking Multi-Interest Learning for Candidate Matching in Recommender Systems": {
+        "source_name": "RecSys 2023",
+        "source_url": "https://researchportal.hkust.edu.hk/en/publications/rethinking-multi-interest-learning-for-candidate-matching-in-reco-2",
+        "excerpt": "This work revisits the training framework and uncovers two major problems hindering the expressiveness of learned multi-interest representations.",
+    },
+    "PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest": {
+        "source_name": "KDD 2020",
+        "source_url": "https://www.kdd.org/kdd2020/accepted-papers/view/pinnersage-multi-modal-user-embedding-framework-for-recommendations-at-pint.html",
+        "excerpt": "Most prior work infers a single high dimensional embedding to represent a user.",
+    },
+    "A Dual Augmented Two-tower Model for Online Large-scale Recommendation": {
+        "source_name": "DLP-KDD 2021",
+        "source_url": "https://dlp-kdd.github.io/assets/pdf/DLP-KDD_2021_paper_4.pdf",
+        "excerpt": "The model suffers from lack of information interaction between the two towers.",
+    },
+    "Mixed Negative Sampling for Learning Two-tower Neural Networks in Recommendations": {
+        "source_name": "Google Research",
+        "source_url": "https://research.google/pubs/mixed-negative-sampling-for-learning-two-tower-neural-networks-in-recommendations/",
+        "excerpt": "MNS uses a mixture of batch and uniformly sampled negatives to tackle the selection bias of implicit user feedback.",
+    },
+    "Decoupled Contrastive Learning": {
+        "source_name": "OpenReview",
+        "source_url": "https://openreview.net/forum?id=sxpUavxXE0v",
+        "excerpt": "We identify a noticeable negative-positive-coupling (NPC) effect in the widely used cross-entropy loss.",
+    },
+    "ProtoNCE": {
+        "source_name": "OpenReview",
+        "source_url": "https://openreview.net/forum?id=KmykpuSrjcq",
+        "paper_title": "Prototypical Contrastive Learning of Unsupervised Representations",
+        "excerpt": "PCL bridges contrastive learning with clustering and proposes ProtoNCE loss.",
+    },
+    "Debiased Contrastive Learning": {
+        "source_name": "arXiv",
+        "source_url": "https://arxiv.org/abs/2007.00224",
+        "excerpt": "Without access to labels, dissimilar points are typically taken to be randomly sampled datapoints.",
+    },
+    "Contrastive Learning with Hard Negative Samples": {
+        "source_name": "OpenReview",
+        "source_url": "https://openreview.net/forum?id=CR1XOQ0UTh-",
+        "excerpt": "Learning contrastive representations benefits from hard negative samples.",
+    },
+    "Understanding Dimensional Collapse in Contrastive Self-supervised Learning": {
+        "source_name": "OpenReview",
+        "source_url": "https://openreview.net/forum?id=YevsQ05DEN7",
+        "excerpt": "Here, we show that dimensional collapse also happens in contrastive learning.",
+    },
+    "Learning Tree-based Deep Model for Recommender Systems": {
+        "source_name": "KDD 2018",
+        "source_url": "https://www.kdd.org/kdd2018/accepted-papers/view/learning-tree-based-deep-model-for-recommender-systems",
+        "excerpt": "We propose a novel tree-based method which can provide logarithmic complexity w.r.t. corpus size.",
+    },
+    "Recommender Forest for Efficient Retrieval": {
+        "source_name": "NeurIPS 2022",
+        "source_url": "https://papers.nips.cc/paper_files/paper/2022/hash/fe2fe749d329627f161484876630c689-Abstract-Conference.html",
+        "excerpt": "We propose the Recommender Forest (a.k.a., RecForest), which jointly learns latent embedding and index.",
+    },
+}
+
 NAV = [
     ("首页", "/"),
     ("关于我", "/aboutme/"),
@@ -174,6 +285,63 @@ def remove_missing_images(content_html: str, source_dir: Path) -> str:
     return pattern.sub(replace, content_html)
 
 
+def render_citation_note(title: str, meta: dict[str, str]) -> str:
+    display_title = meta.get("paper_title", title)
+    excerpt = meta.get("excerpt", "").strip()
+    excerpt_html = (
+        f'<p class="citation-note__excerpt">"{html.escape(excerpt)}"</p>'
+        if excerpt
+        else ""
+    )
+    return (
+        '<div class="citation-row">'
+        '<details class="citation-note">'
+        '<summary>原文</summary>'
+        '<div class="citation-note__card">'
+        f'<div class="citation-note__source">{html.escape(meta["source_name"])}</div>'
+        f'<p class="citation-note__title">{html.escape(display_title)}</p>'
+        f"{excerpt_html}"
+        f'<a href="{html.escape(meta["source_url"])}" target="_blank" rel="noreferrer">查看原文</a>'
+        "</div>"
+        "</details>"
+        "</div>"
+    )
+
+
+def inject_paper_citations(content_html: str) -> str:
+    updated = content_html
+    for title, meta in PAPER_SOURCES.items():
+        title_html = html.escape(title)
+        pattern = re.compile(
+            rf"(<blockquote>\s*<p>{re.escape(title_html)}</p>\s*</blockquote>)",
+            re.S,
+        )
+        updated = pattern.sub(
+            lambda match: match.group(1) + render_citation_note(title, meta),
+            updated,
+            count=1,
+        )
+    return updated
+
+
+def wrap_paper_cards(content_html: str) -> str:
+    h2_sections = re.split(r"(?=<h2\b)", content_html)
+    if len(h2_sections) < 3 or "论文对比" not in content_html:
+        return content_html
+
+    leading = h2_sections[0]
+    wrapped: list[str] = []
+    for chunk in h2_sections[1:]:
+        heading_match = re.search(r"<h2\b[^>]*>(.*?)</h2>", chunk, re.S | re.I)
+        if not heading_match:
+            wrapped.append(chunk)
+            continue
+        heading_text = strip_tags(heading_match.group(1))
+        card_class = "article-overview-card" if heading_text == "论文对比" else "paper-card"
+        wrapped.append(f'<section class="{card_class}">{chunk}</section>')
+    return leading + "".join(wrapped)
+
+
 def wrap_tables(content_html: str) -> str:
     return re.sub(
         r"(<table[\s\S]*?</table>)",
@@ -212,6 +380,8 @@ def add_heading_ids_and_toc(content_html: str) -> tuple[str, str]:
 
     items = []
     for level, anchor, text in headings:
+        if level != 2 or text == "论文对比":
+            continue
         items.append(
             f'<li class="toc-level-{level}"><a href="#{html.escape(anchor)}">{html.escape(text)}</a></li>'
         )
@@ -228,6 +398,8 @@ def add_heading_ids_and_toc(content_html: str) -> tuple[str, str]:
 def markdown_to_html(markdown_text: str, source_dir: Path) -> tuple[str, str]:
     html_fragment = run_pandoc(clean_markdown(markdown_text))
     html_fragment = remove_missing_images(html_fragment, source_dir)
+    html_fragment = inject_paper_citations(html_fragment)
+    html_fragment = wrap_paper_cards(html_fragment)
     html_fragment = wrap_tables(html_fragment)
     html_fragment, toc_html = add_heading_ids_and_toc(html_fragment)
     return html_fragment, toc_html

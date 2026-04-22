@@ -9,11 +9,11 @@ tags: [recsys,retrieval,indexing]
 
 ## 论文对比
 
-| 论文 | 主要解决问题 | 模型结构关键词 | 样本构造 | 实验结论 |
-| --- | --- | --- | --- | --- |
-| TDM 2018 | 大规模 item corpus 下无法对所有 item 做精细打分 | tree-based retrieval、top-down traversal | 用户行为与树节点监督 | 两个真实大规模数据集和淘宝线上实验都优于传统方法 |
-| Deep Retrieval 2020 | embedding + ANN 两步法存在结构与目标不一致 | discrete latent structure、beam search | user-item interactions（如 clicks） | 兼顾高精度和高效率检索 |
-| RecForest 2022 | 表示学习与 ANN 索引解耦，导致准确率损失 | multiple k-ary trees、encoder-decoder routing、beam search | 论文围绕 user context + item index 联合学习 | 在 5 个推荐数据集上兼顾准确率和效率，并且训练更简单 |
+| 论文 | 主要解决问题 | 待改进方向 |
+| --- | --- | --- |
+| TDM 2018 | 大规模 item corpus 下无法对所有 item 做精细打分 | 树结构学习与更新成本较高 |
+| Deep Retrieval 2020 | embedding + ANN 两步法存在结构与目标不一致 | 离散结构学习与 beam search 训练更复杂 |
+| RecForest 2022 | 表示学习与 ANN 索引解耦，导致准确率损失 | 多树索引和 decoder routing 增加建模复杂度 |
 
 ## 阿里 TDM 2018
 
@@ -70,10 +70,6 @@ tags: [recsys,retrieval,indexing]
 - latent codes 是模型参数的一部分，会和其他神经网络参数一起联合学习。
 - 检索时通过 beam search 在结构上做搜索。
 
-### 样本构造
-
-- 论文摘要明确写到：使用 user-item interaction data，例如 clicks。
-
 ### 关键信息
 
 - DR 的关键思想是：把“可检索结构”本身纳入学习，而不是后处理。
@@ -105,10 +101,6 @@ tags: [recsys,retrieval,indexing]
   <img src="/assets/post-media/retrieval-methods/recforest-architecture.png" alt="RecForest 模型结构图">
   <figcaption>RecForest 结构图：encoder-decoder 检索网络与多棵平衡树索引联合学习。</figcaption>
 </figure>
-
-### 样本构造
-
-- 官方摘要聚焦“user context + item set”联合学习，没有展开更细采样设计。
 
 ### 关键信息
 

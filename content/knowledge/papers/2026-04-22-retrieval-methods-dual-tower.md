@@ -9,15 +9,15 @@ tags: [recsys,retrieval,dual-tower]
 
 ## 论文对比
 
-| 论文 | 主要解决问题 | 模型结构关键词 | 样本构造 | 实验结论 |
-| --- | --- | --- | --- | --- |
-| DSSM 2013 | 语义匹配难以覆盖 query-document 深层语义 | 双塔语义投影、word hashing、cosine similarity | clickthrough 数据，点击文档为正样本 | 在真实 Web ranking 数据上优于当时 latent semantic baselines |
-| YouTubeDNN 2016 | 超大规模视频推荐的 candidate generation 与 ranking | candidate generation DNN、user embedding、sampled softmax | 用户观看序列构造监督信号，负样本通过采样获得 | 论文强调深度学习带来显著线上效果提升 |
-| Google 双塔 2019 | in-batch negative 的采样偏差会伤害大规模召回 | two-tower、item content tower、logQ correction | streaming data + in-batch negatives | 离线与在线实验都支持 sampling bias correction 有效 |
-| Facebook 双塔 2020 | 社交搜索需要同时建模文本与搜索者上下文 | 独立 query/document encoder、ANN 检索、hard mining | click / impression / hard negative / hard positive | 多个 vertical 上取得显著线上收益 |
-| MOBIUS 2019 | matching 层只看相关性，商业指标在 ranking 层才引入，导致整体回报不足 | matching + CTR 目标、active learning、ANN / MIPS | billions of query-ad pairs，主动学习补 bad cases | 作为百度广告召回系统首版落地，提升商业回报与检索效率 |
-| DMR 2020 | CTR 预测中缺少显式 user-item relevance 建模 | User-to-Item、Item-to-Item、match-to-rank | 基于 CTR prediction 数据训练 | 在 public + industrial datasets 上显著优于 baseline |
-| Deep Retrieval 2020 | ANN 两步法依赖欧式空间假设，结构学习与检索解耦 | discrete latent codes、beam search、joint structure learning | user-item interaction（如 clicks） | 在大规模推荐中同时兼顾准确率与子线性检索效率 |
+| 论文 | 主要解决问题 | 待改进方向 |
+| --- | --- | --- |
+| DSSM 2013 | 语义匹配难以覆盖 query-document 深层语义 | 对复杂上下文和多兴趣表达能力有限 |
+| YouTubeDNN 2016 | 超大规模视频推荐的 candidate generation 与 ranking | 视频侧特征利用不足 |
+| Google 双塔 2019 | in-batch negative 的采样偏差会伤害大规模召回 | 依赖采样概率估计与 correction 调参 |
+| Facebook 双塔 2020 | 社交搜索需要同时建模文本与搜索者上下文 | hard sample 挖掘和系统优化成本高 |
+| MOBIUS 2019 | matching 层只看相关性，商业指标在 ranking 层才引入，导致整体回报不足 | 训练与在线检索链路更复杂 |
+| DMR 2020 | CTR 预测中缺少显式 user-item relevance 建模 | 更偏 rank 侧 relevance 建模，召回泛化有限 |
+| Deep Retrieval 2020 | ANN 两步法依赖欧式空间假设，结构学习与检索解耦 | 结构学习与 beam search 训练更复杂 |
 
 ## 微软 DSSM 2013
 
@@ -216,10 +216,6 @@ tags: [recsys,retrieval,dual-tower]
 - 包含 User-to-Item Network 和 Item-to-Item Network 两条子网络，分别刻画两种 user-item relevance。
 - 再结合传统 rec model features 输入到 MLP 做 CTR prediction。
 
-### 样本构造
-
-- 论文基于 CTR prediction 数据训练。
-
 ### 关键信息
 
 - User-to-Item relevance 通过 embedding space 内积表示。
@@ -249,10 +245,6 @@ tags: [recsys,retrieval,dual-tower]
 - candidate items 被编码到 discrete latent space。
 - candidate latent codes 与其他网络参数一起联合学习。
 - 检索时使用 beam search。
-
-### 样本构造
-
-- 论文摘要明确给出：使用 user-item interaction data，例如 clicks。
 
 ### 关键信息
 

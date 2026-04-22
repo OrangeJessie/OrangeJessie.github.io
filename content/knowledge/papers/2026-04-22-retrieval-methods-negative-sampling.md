@@ -9,14 +9,14 @@ tags: [recsys,retrieval,negative-sampling]
 
 ## 论文对比
 
-| 论文 | 主要解决问题 | 模型结构关键词 | 样本构造 | 实验结论 |
-| --- | --- | --- | --- | --- |
-| MNS 2020 | in-batch negative 有选择偏差且采样分布不灵活 | mixed negative sampling、two-tower retrieval | batch negatives + random sampled negatives | 原笔记认为能同时减轻偏差并提升采样灵活性 |
-| DCL 2022 | InfoNCE 对 batch size 敏感，强依赖大量负样本 | decoupled contrastive objective | 标准 contrastive pairs，去掉正负耦合项 | 小 batch 下收益更明显 |
-| ProtoNCE 2021 | 直接用 instance negatives 可能不够稳定 | prototype、EM、concentration | prototype 替代实例级负样本 | 原笔记保留为思路性方法，未展开数值 |
-| Debias CL 2020 | 随机负样本里混入 false negatives | debiased objective、class prior correction | 从整体样本库采样，再做偏差修正 | 在多模态 benchmark 上优于当时 SOTA |
-| CLHNS 2021 | 想要 hard negatives，但又不能显著引入伪负样本 | hardness-controlled negative sampling | 无监督 hard negative sampling | 提升下游表现，且额外开销很低 |
-| DirectCLR 2022 | contrastive learning 也会发生 dimensional collapse | no projector、direct representation optimization | 标准对比学习设置 | 在 ImageNet 上优于带 projector 的 SimCLR |
+| 论文 | 主要解决问题 | 待改进方向 |
+| --- | --- | --- |
+| MNS 2020 | in-batch negative 有选择偏差且采样分布不灵活 | 需要额外索引库采样与混合策略设计 |
+| DCL 2022 | InfoNCE 对 batch size 敏感，强依赖大量负样本 | 主要改 loss，对结构建模帮助有限 |
+| ProtoNCE 2021 | 直接用 instance negatives 可能不够稳定 | 依赖 prototype / clustering 质量 |
+| Debias CL 2020 | 随机负样本里混入 false negatives | 需要先验估计，超参数敏感 |
+| CLHNS 2021 | 想要 hard negatives，但又不能显著引入伪负样本 | 依赖分布假设，下游收益不总是稳定 |
+| DirectCLR 2022 | contrastive learning 也会发生 dimensional collapse | 主要解决表示塌缩，对任务构造本身改动有限 |
 
 ## 谷歌 MNS 2020
 
@@ -66,11 +66,6 @@ tags: [recsys,retrieval,negative-sampling]
 
 - DCL 不是重新设计 encoder，而是改 contrastive objective。
 - 核心思想是把正负样本耦合项从损失里拆掉。
-
-### 样本构造
-
-- 仍然使用标准的 contrastive 正负样本对。
-- 变化点在 loss，而不是重新定义数据构造流程。
 
 ### 关键信息
 
@@ -181,11 +176,6 @@ tags: [recsys,retrieval,negative-sampling]
 
 - 基于对 collapse dynamics 的理论分析，论文提出 DirectCLR。
 - DirectCLR 直接优化 representation space，而不是依赖可训练 projector。
-
-### 样本构造
-
-- 保持标准 contrastive learning 的正负样本设置。
-- 改动点是表示空间的优化方式。
 
 ### 关键信息
 
