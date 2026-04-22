@@ -352,7 +352,9 @@ def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> st
           <img class="profile-avatar" src="{SITE['avatar']}" alt="{html.escape(SITE['author'])}">
           <div class="home-profile__body">
             <h1>{html.escape(SITE['author'])}</h1>
-            <p>关注算法、AI应用和表达方式，想把“看懂”“用上”“讲明白”这三件事都做好。</p>
+            <p>沪漂算法女工，搜广推+ai search</p>
+            <p>论文 | 职场 | 项目 | 有关ai的想法以及其他</p>
+            <p>文明 | 饥荒缺氧泰拉瑞亚 | 星露谷农夫 | LOL金铲铲 等游戏六级爱好者</p>
           </div>
         </div>
       </div>
