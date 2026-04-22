@@ -642,6 +642,18 @@ pre {
   padding: 34px 38px;
 }
 
+.report-article:has(.article-overview-card),
+.report-article:has(.paper-card) {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .prose {
   color: var(--dark-gray);
   font-size: 15px;
@@ -656,6 +668,11 @@ pre {
   border-radius: 26px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 252, 0.98) 100%);
   box-shadow: 0 18px 40px rgba(15, 42, 63, 0.06);
+}
+
+.report-article:has(.article-overview-card) .article-overview-card,
+.report-article:has(.paper-card) .paper-card {
+  margin-bottom: 0;
 }
 
 .paper-card {
@@ -1099,6 +1116,11 @@ pre {
   .paper-card {
     padding: 22px 18px;
     border-radius: 20px;
+  }
+
+  .report-article:has(.article-overview-card),
+  .report-article:has(.paper-card) {
+    padding: 0;
   }
 
   .citation-note__card {

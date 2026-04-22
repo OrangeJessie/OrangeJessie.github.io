@@ -82,7 +82,7 @@
 </section><section class="paper-card"><h2 id="谷歌-mns-2020">谷歌 MNS 2020</h2>
 <blockquote>
 <p>Mixed Negative Sampling for Learning Two-tower Neural Networks in Recommendations</p>
-</blockquote><div class="citation-row"><details class="citation-note"><summary>原文</summary><div class="citation-note__card"><div class="citation-note__source">Google Research</div><p class="citation-note__title">Mixed Negative Sampling for Learning Two-tower Neural Networks in Recommendations</p><p class="citation-note__excerpt">"MNS uses a mixture of batch and uniformly sampled negatives to tackle the selection bias of implicit user feedback."</p><a href="https://research.google/pubs/mixed-negative-sampling-for-learning-two-tower-neural-networks-in-recommendations/" target="_blank" rel="noreferrer">查看原文</a></div></details></div>
+</blockquote><div class="citation-row"><details class="citation-note"><summary>论文链接</summary><div class="citation-note__card"><div class="citation-note__source">Google Research</div><p class="citation-note__title">Mixed Negative Sampling for Learning Two-tower Neural Networks in Recommendations</p><p class="citation-note__excerpt">"MNS uses a mixture of batch and uniformly sampled negatives to tackle the selection bias of implicit user feedback."</p><a href="https://research.google/pubs/mixed-negative-sampling-for-learning-two-tower-neural-networks-in-recommendations/" target="_blank" rel="noreferrer">打开论文原文</a></div></details></div>
 <h3 id="解决问题">解决问题</h3>
 <ul>
 <li>in-batch negative sampling 存在选择偏差，不是所有 item 都有机会成为负样本。</li>
@@ -118,7 +118,7 @@ MNS 结构图：将 batch 内样本与索引库额外采样样本共同拼入 lo
 </section><section class="paper-card"><h2 id="dcl-2022">DCL 2022</h2>
 <blockquote>
 <p>Decoupled Contrastive Learning</p>
-</blockquote><div class="citation-row"><details class="citation-note"><summary>原文</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Decoupled Contrastive Learning</p><p class="citation-note__excerpt">"We identify a noticeable negative-positive-coupling (NPC) effect in the widely used cross-entropy loss."</p><a href="https://openreview.net/forum?id=sxpUavxXE0v" target="_blank" rel="noreferrer">查看原文</a></div></details></div>
+</blockquote><div class="citation-row"><details class="citation-note"><summary>论文链接</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Decoupled Contrastive Learning</p><p class="citation-note__excerpt">"We identify a noticeable negative-positive-coupling (NPC) effect in the widely used cross-entropy loss."</p><a href="https://openreview.net/forum?id=sxpUavxXE0v" target="_blank" rel="noreferrer">打开论文原文</a></div></details></div>
 <h3 id="解决问题-1">解决问题</h3>
 <ul>
 <li>InfoNCE 对 batch size 非常敏感。</li>
@@ -148,7 +148,7 @@ DCL 论文中的关键观察：batch size 越大，NPC 因子的波动越小，�
 </section><section class="paper-card"><h2 id="protonce-2021">ProtoNCE 2021</h2>
 <blockquote>
 <p>ProtoNCE</p>
-</blockquote><div class="citation-row"><details class="citation-note"><summary>原文</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Prototypical Contrastive Learning of Unsupervised Representations</p><p class="citation-note__excerpt">"PCL bridges contrastive learning with clustering and proposes ProtoNCE loss."</p><a href="https://openreview.net/forum?id=KmykpuSrjcq" target="_blank" rel="noreferrer">查看原文</a></div></details></div>
+</blockquote><div class="citation-row"><details class="citation-note"><summary>论文链接</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Prototypical Contrastive Learning of Unsupervised Representations</p><p class="citation-note__excerpt">"PCL bridges contrastive learning with clustering and proposes ProtoNCE loss."</p><a href="https://openreview.net/forum?id=KmykpuSrjcq" target="_blank" rel="noreferrer">打开论文原文</a></div></details></div>
 <h3 id="解决问题-2">解决问题</h3>
 <ul>
 <li>只依赖 instance-level negatives，可能不够稳定，也不一定能利用潜在聚类结构。</li>
@@ -169,7 +169,7 @@ DCL 论文中的关键观察：batch size 越大，NPC 因子的波动越小，�
 </section><section class="paper-card"><h2 id="debias-cl-2020">Debias CL 2020</h2>
 <blockquote>
 <p>Debiased Contrastive Learning</p>
-</blockquote><div class="citation-row"><details class="citation-note"><summary>原文</summary><div class="citation-note__card"><div class="citation-note__source">arXiv</div><p class="citation-note__title">Debiased Contrastive Learning</p><p class="citation-note__excerpt">"Without access to labels, dissimilar points are typically taken to be randomly sampled datapoints."</p><a href="https://arxiv.org/abs/2007.00224" target="_blank" rel="noreferrer">查看原文</a></div></details></div>
+</blockquote><div class="citation-row"><details class="citation-note"><summary>论文链接</summary><div class="citation-note__card"><div class="citation-note__source">arXiv</div><p class="citation-note__title">Debiased Contrastive Learning</p><p class="citation-note__excerpt">"Without access to labels, dissimilar points are typically taken to be randomly sampled datapoints."</p><a href="https://arxiv.org/abs/2007.00224" target="_blank" rel="noreferrer">打开论文原文</a></div></details></div>
 <h3 id="解决问题-3">解决问题</h3>
 <ul>
 <li>随机采到的负样本里会混入 same-label negatives，也就是 false negatives。</li>
@@ -202,7 +202,7 @@ DCL 论文中的关键观察：batch size 越大，NPC 因子的波动越小，�
 </section><section class="paper-card"><h2 id="clhns-2021">CLHNS 2021</h2>
 <blockquote>
 <p>Contrastive Learning with Hard Negative Samples</p>
-</blockquote><div class="citation-row"><details class="citation-note"><summary>原文</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Contrastive Learning with Hard Negative Samples</p><p class="citation-note__excerpt">"Learning contrastive representations benefits from hard negative samples."</p><a href="https://openreview.net/forum?id=CR1XOQ0UTh-" target="_blank" rel="noreferrer">查看原文</a></div></details></div>
+</blockquote><div class="citation-row"><details class="citation-note"><summary>论文链接</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Contrastive Learning with Hard Negative Samples</p><p class="citation-note__excerpt">"Learning contrastive representations benefits from hard negative samples."</p><a href="https://openreview.net/forum?id=CR1XOQ0UTh-" target="_blank" rel="noreferrer">打开论文原文</a></div></details></div>
 <h3 id="解决问题-4">解决问题</h3>
 <ul>
 <li>对比学习希望利用更难的负样本，但又不能依赖监督相似度标签。</li>
@@ -231,7 +231,7 @@ DCL 论文中的关键观察：batch size 越大，NPC 因子的波动越小，�
 </section><section class="paper-card"><h2 id="directclr-2022">DirectCLR 2022</h2>
 <blockquote>
 <p>Understanding Dimensional Collapse in Contrastive Self-supervised Learning</p>
-</blockquote><div class="citation-row"><details class="citation-note"><summary>原文</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Understanding Dimensional Collapse in Contrastive Self-supervised Learning</p><p class="citation-note__excerpt">"Here, we show that dimensional collapse also happens in contrastive learning."</p><a href="https://openreview.net/forum?id=YevsQ05DEN7" target="_blank" rel="noreferrer">查看原文</a></div></details></div>
+</blockquote><div class="citation-row"><details class="citation-note"><summary>论文链接</summary><div class="citation-note__card"><div class="citation-note__source">OpenReview</div><p class="citation-note__title">Understanding Dimensional Collapse in Contrastive Self-supervised Learning</p><p class="citation-note__excerpt">"Here, we show that dimensional collapse also happens in contrastive learning."</p><a href="https://openreview.net/forum?id=YevsQ05DEN7" target="_blank" rel="noreferrer">打开论文原文</a></div></details></div>
 <h3 id="解决问题-5">解决问题</h3>
 <ul>
 <li>对比学习虽然避免了 complete collapse，但仍然会发生 dimensional collapse。</li>
@@ -250,11 +250,6 @@ DCL 论文中的关键观察：batch size 越大，NPC 因子的波动越小，�
 <h3 id="实验结论-4">实验结论</h3>
 <ul>
 <li>OpenReview / 论文摘要明确给出：在 ImageNet 上，DirectCLR 优于带 trainable linear projector 的 SimCLR。</li>
-</ul>
-<h3 id="其他">其他</h3>
-<ul>
-<li><a href="https://cloud.tencent.com/developer/article/2313165" class="uri">https://cloud.tencent.com/developer/article/2313165</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/642797247" class="uri">https://zhuanlan.zhihu.com/p/642797247</a></li>
 </ul></section></article>
     </section>
     <section class="site-shell post-nav-grid">

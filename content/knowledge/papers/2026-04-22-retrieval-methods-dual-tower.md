@@ -226,10 +226,6 @@ tags: [recsys,retrieval,dual-tower]
 
 - 论文摘要明确给出：在 public 和 industrial datasets 上显著优于 state-of-the-art baselines。
 
-### 参考代码
-
-- <https://github.com/lvze92/DMR>
-
 ## 字节 Deep Retrieval 2020
 
 > Deep Retrieval: Learning A Retrievable Structure for Large-Scale Recommendations

@@ -56,11 +56,6 @@ tags: [recsys,retrieval,multi-interest]
 - 官方摘要明确写到：在多个公开 benchmark 和一个大规模 Tmall 工业数据集上，MIND 优于 state-of-the-art。
 - 论文同时说明该方法已在 Mobile Tmall 首页主流量上线。
 
-### 参考链接
-
-- <https://github.com/shenweichen/DeepMatch/blob/master/deepmatch/models/mind.py>
-- <https://zhuanlan.zhihu.com/p/145283113>
-
 ## 阿里 ComiRec 2020
 
 > Controllable Multi-Interest Framework for Recommendation
@@ -219,10 +214,6 @@ tags: [recsys,retrieval,multi-interest]
 ### 实验结论
 
 - KDD 官方摘要明确给出：线上和线下 A/B 实验都表明 PinnerSage 显著优于 single embedding methods。
-
-### 参考链接
-
-- <https://blog.csdn.net/turkeym4/article/details/103150759>
 
 ## 美团 DAT 2021
 

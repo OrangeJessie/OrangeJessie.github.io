@@ -185,8 +185,3 @@ tags: [recsys,retrieval,negative-sampling]
 ### 实验结论
 
 - OpenReview / 论文摘要明确给出：在 ImageNet 上，DirectCLR 优于带 trainable linear projector 的 SimCLR。
-
-### 其他
-
-- <https://cloud.tencent.com/developer/article/2313165>
-- <https://zhuanlan.zhihu.com/p/642797247>

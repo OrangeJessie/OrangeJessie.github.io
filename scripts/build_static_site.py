@@ -296,12 +296,12 @@ def render_citation_note(title: str, meta: dict[str, str]) -> str:
     return (
         '<div class="citation-row">'
         '<details class="citation-note">'
-        '<summary>原文</summary>'
+        '<summary>论文链接</summary>'
         '<div class="citation-note__card">'
         f'<div class="citation-note__source">{html.escape(meta["source_name"])}</div>'
         f'<p class="citation-note__title">{html.escape(display_title)}</p>'
         f"{excerpt_html}"
-        f'<a href="{html.escape(meta["source_url"])}" target="_blank" rel="noreferrer">查看原文</a>'
+        f'<a href="{html.escape(meta["source_url"])}" target="_blank" rel="noreferrer">打开论文原文</a>'
         "</div>"
         "</details>"
         "</div>"
