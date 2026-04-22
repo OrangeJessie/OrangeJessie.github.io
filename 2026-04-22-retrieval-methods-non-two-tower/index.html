@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>召回方法整理：非双塔结构 | 橘子豆的AI工坊</title>
+  <meta name="description" content="整理召回方法文档中“非双塔结构”部分的论文与笔记内容，仅做排版整理。">
+  <meta name="author" content="橘子豆">
+  <link rel="icon" href="/assets/img/beautiful_fighter.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  
+</head>
+<body class="page-post">
+  <header class="site-header">
+    <div class="site-shell site-header__inner">
+      <a class="site-brand" href="/">橘子豆的AI工坊</a>
+      <nav class="site-nav"><a href="/">首页</a><a href="/aboutme/">关于我</a><a href="/contact/">Contact</a></nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    
+    <section class="site-shell report-hero">
+      <div class="eyebrow">论文解读</div>
+      <h1>召回方法整理：非双塔结构</h1>
+      <p class="report-hero__subtitle">TDM、Deep Retrieval、RecForest</p>
+      <div class="report-meta">
+        <span>2026.04.22</span>
+        <span>3 个标签</span>
+      </div>
+      <div class="report-tags"><a href='/tags/#tag-recsys'>recsys</a><a href='/tags/#tag-retrieval'>retrieval</a><a href='/tags/#tag-indexing'>indexing</a></div>
+    </section>
+    <section class="site-shell report-layout">
+      <aside class="article-toc"><div class="article-toc__title">目录</div><ul><li class="toc-level-2"><a href="#阿里-tdm-2018-kdd">阿里 TDM 2018 KDD</a></li><li class="toc-level-3"><a href="#解决问题">解决问题</a></li><li class="toc-level-3"><a href="#模型结构">模型结构</a></li><li class="toc-level-3"><a href="#损失函数">损失函数</a></li><li class="toc-level-3"><a href="#召回方法">召回方法</a></li><li class="toc-level-3"><a href="#树的构建">树的构建</a></li><li class="toc-level-3"><a href="#训练步骤">训练步骤</a></li><li class="toc-level-3"><a href="#效果">效果</a></li><li class="toc-level-2"><a href="#字节-dr-2021">字节 DR 2021</a></li><li class="toc-level-2"><a href="#微软-recforest-2022-nips">微软 RecForest 2022 NIPS</a></li><li class="toc-level-3"><a href="#解决问题-1">解决问题</a></li><li class="toc-level-3"><a href="#模型结构-1">模型结构</a></li><li class="toc-level-3"><a href="#ann-索引">ANN 索引</a></li></ul></aside>
+      <article class="report-article prose"><h2 id="阿里-tdm-2018-kdd">阿里 TDM 2018 KDD</h2>
+<p>Learning Tree-based Deep Model for Recommender Systems</p>
+<h3 id="解决问题">解决问题</h3>
+<p>user 和 item 之间没有交叉，减少 item 候选数量</p>
+<h3 id="模型结构">模型结构</h3>
+<p>树的叶子节点为 item，其余节点为 item 的集合，树的双亲节点概率取子节点中最大的概率：</p>
+<h3 id="损失函数">损失函数</h3>
+<p>叶子节点为正样本，所有到根节点的节点都为正样本，每一层的其他节点随机采样作为负样本。</p>
+<h3 id="召回方法">召回方法</h3>
+<p>每一层只需要算选中的 node 下的 item，减少了大量的 candidate。</p>
+<h3 id="树的构建">树的构建</h3>
+<p>初始化：随机排序 category，并将 category 下的 item 随机排序（如果 item 属于多个</p>
+<p>category，随机给一个），然后将这些 item 分为两部分直到不可以再分（二叉树举例），作为初</p>
+<p>始化的树。</p>
+<p>学习：K-means 聚类。</p>
+<h3 id="训练步骤">训练步骤</h3>
+<ol type="1">
+<li><p>Construct an initial tree and train the model till converging;</p></li>
+<li><p>Learn to get a new tree structure in basis of trained leaf nodes’ embeddings;</p></li>
+<li><p>Train the model again with the learnt new tree structure.</p></li>
+</ol>
+<h3 id="效果">效果</h3>
+<h2 id="字节-dr-2021">字节 DR 2021</h2>
+<p>Deep Retrieval: Learning A Retrievable Structure for Large-Scale Recommendations</p>
+<h2 id="微软-recforest-2022-nips">微软 RecForest 2022 NIPS</h2>
+<p>Recommender Forest for Efficient Retrieval</p>
+<h3 id="解决问题-1">解决问题</h3>
+<p>索引构建和学习向量表达是解耦的，可能引入不一致。</p>
+<h3 id="模型结构-1">模型结构</h3>
+<h3 id="ann-索引">ANN 索引</h3>
+<ol type="1">
+<li><p>树方法，如 KD-tree</p></li>
+<li><p>哈希方法，如 Local Sensitive Hashing (LSH)</p></li>
+<li><p>矢量量化方法，如 Product Quantization (PQ)</p></li>
+<li><p>近邻图方法，如 Hierarchical Navigable Small World (HNSW) HNSW</p></li>
+</ol></article>
+    </section>
+    <section class="site-shell post-nav-grid">
+      
+            <a class="post-nav-card" href="/2026-04-22-retrieval-methods-negative-sampling/">
+              <span>上一篇</span>
+              <strong>召回方法整理：负采样</strong>
+            </a>
+            
+    </section>
+    
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-shell site-footer__inner">
+      <div>
+        <p>已识乾坤大，犹怜草木青</p>
+      </div>
+      <div class="site-footer__links">
+        <a href="https://github.com/OrangeJessie" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
