@@ -34,7 +34,7 @@ NAV = [
 
 SECTION_ORDER = ["papers", "ai-tools", "experience", "game-space"]
 
-PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart"
+PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart+autolink_bare_uris"
 
 
 @dataclass
@@ -120,8 +120,15 @@ def run_pandoc(markdown_text: str) -> str:
 
 
 def clean_markdown(markdown_text: str) -> str:
-    cleaned = markdown_text.replace("{% toc %}", "")
+    cleaned = markdown_text.replace("\f", "\n")
+    cleaned = cleaned.replace("{% toc %}", "")
     cleaned = re.sub(r"\{\{.*?\}\}", "", cleaned, flags=re.S)
+    url_chunk = r"[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]"
+    url_continuation = r"[A-Za-z0-9][A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]*"
+    wrapped_url_pattern = re.compile(rf"https?://{url_chunk}+(?:\s*\n\s*(?!https?://){url_continuation})+")
+    cleaned = wrapped_url_pattern.sub(lambda match: re.sub(r"\s+", "", match.group(0)), cleaned)
+    bare_url_pattern = re.compile(rf"(?<![<\\(\\[\"'=])(?P<url>https?://{url_chunk}+)")
+    cleaned = bare_url_pattern.sub(lambda match: f"<{match.group('url')}>", cleaned)
     cleaned = re.sub(r"(?<!\n)(\s#{2,6}\s)", r"\n\n\1", cleaned)
     lines = cleaned.strip().splitlines()
     normalized: list[str] = []

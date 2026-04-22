@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>召回方法整理：负采样 | 橘子豆的AI工坊</title>
-  <meta name="description" content="整理召回方法文档中“负采样”部分的论文与笔记内容，仅做排版整理。">
+  <meta name="description" content="整理召回方法文档中“负采样”部分的论文与笔记内容，并按论文笔记结构重新整理排版。">
   <meta name="author" content="橘子豆">
   <link rel="icon" href="/assets/img/beautiful_fighter.png">
   <link rel="stylesheet" href="/assets/css/site.css">
@@ -31,110 +31,143 @@
       <div class="report-tags"><a href='/knowledge/tags/#tag-recsys'>recsys</a><a href='/knowledge/tags/#tag-retrieval'>retrieval</a><a href='/knowledge/tags/#tag-negative-sampling'>negative-sampling</a></div>
     </section>
     <section class="site-shell report-layout">
-      <aside class="article-toc"><div class="article-toc__title">目录</div><ul><li class="toc-level-2"><a href="#谷歌-mns-acm2020">谷歌 MNS ACM2020</a></li><li class="toc-level-3"><a href="#解决的问题">解决的问题</a></li><li class="toc-level-3"><a href="#mixed-negative-sampling">Mixed Negative Sampling</a></li><li class="toc-level-3"><a href="#评估结果">评估结果</a></li><li class="toc-level-3"><a href="#fncl去除掉伪负样本">FNCL：去除掉伪负样本</a></li><li class="toc-level-2"><a href="#dcl-2022-iclr">DCL 2022 ICLR</a></li><li class="toc-level-3"><a href="#解决的问题-1">解决的问题</a></li><li class="toc-level-3"><a href="#需要大量负样本">2. 需要大量负样本</a></li><li class="toc-level-3"><a href="#推导">推导</a></li><li class="toc-level-2"><a href="#protonce-2021-iclr">ProtoNCE 2021 ICLR</a></li><li class="toc-level-2"><a href="#dcl-2020-neurips">DCL 2020 NeurIPS</a></li><li class="toc-level-3"><a href="#代码">代码</a></li><li class="toc-level-3"><a href="#推导过程">推导过程</a></li><li class="toc-level-2"><a href="#clhns-2021-iclr">CLHNS 2021 ICLR</a></li><li class="toc-level-3"><a href="#代码-1">代码</a></li><li class="toc-level-3"><a href="#推导过程-1">推导过程</a></li><li class="toc-level-2"><a href="#directclr-2022-iclr-fb">DirectCLR 2022 ICLR FB</a></li><li class="toc-level-3"><a href="#代码-2">代码</a></li><li class="toc-level-3"><a href="#其他">其他</a></li><li class="toc-level-3"><a href="#对比">对比</a></li><li class="toc-level-3"><a href="#self-attentive-sequential-recommendation">Self-Attentive Sequential Recommendation</a></li></ul></aside>
-      <article class="report-article prose"><h2 id="谷歌-mns-acm2020">谷歌 MNS ACM2020</h2>
+      <aside class="article-toc"><div class="article-toc__title">目录</div><ul><li class="toc-level-2"><a href="#谷歌-mns-2020">谷歌 MNS 2020</a></li><li class="toc-level-3"><a href="#解决的问题">解决的问题</a></li><li class="toc-level-3"><a href="#mixed-negative-sampling">Mixed Negative Sampling</a></li><li class="toc-level-3"><a href="#相关方法">相关方法</a></li><li class="toc-level-2"><a href="#dcl-2022-iclr">DCL 2022 ICLR</a></li><li class="toc-level-3"><a href="#解决的问题-1">解决的问题</a></li><li class="toc-level-3"><a href="#推导">推导</a></li><li class="toc-level-3"><a href="#实验结果">实验结果</a></li><li class="toc-level-2"><a href="#protonce-2021-iclr">ProtoNCE 2021 ICLR</a></li><li class="toc-level-2"><a href="#debias-cl-2020-neurips">Debias CL 2020 NeurIPS</a></li><li class="toc-level-3"><a href="#解决的问题-2">解决的问题</a></li><li class="toc-level-3"><a href="#方法">方法</a></li><li class="toc-level-3"><a href="#存在的问题">存在的问题</a></li><li class="toc-level-3"><a href="#推导过程">推导过程</a></li><li class="toc-level-3"><a href="#实验结果-1">实验结果</a></li><li class="toc-level-2"><a href="#clhns-2021-iclr">CLHNS 2021 ICLR</a></li><li class="toc-level-3"><a href="#解决的问题-3">解决的问题</a></li><li class="toc-level-3"><a href="#方法-1">方法</a></li><li class="toc-level-3"><a href="#存在的问题-1">存在的问题</a></li><li class="toc-level-3"><a href="#推导过程-1">推导过程</a></li><li class="toc-level-3"><a href="#实验结果-2">实验结果</a></li><li class="toc-level-2"><a href="#directclr-2022-iclr">DirectCLR 2022 ICLR</a></li><li class="toc-level-3"><a href="#其他">其他</a></li><li class="toc-level-3"><a href="#对比">对比</a></li><li class="toc-level-2"><a href="#self-attentive-sequential-recommendation">Self-Attentive Sequential Recommendation</a></li></ul></aside>
+      <article class="report-article prose"><h2 id="谷歌-mns-2020">谷歌 MNS 2020</h2>
+<blockquote>
 <p>Mixed Negative Sampling for Learning Two-tower Neural Networks in Recommendations</p>
+</blockquote>
 <h3 id="解决的问题">解决的问题</h3>
 <ol type="1">
-<li><p>batch 内负采样存在选择偏差：没有点击的样本不会成为负样本</p></li>
-<li><p>调整采样分布时缺少灵活性：采样分布取决于训练数据，不能灵活调整，可能和真实分布存在</p></li>
+<li><p>batch 内负采样存在选择偏差：没有点击的样本不会成为负样本。</p></li>
+<li><p>调整采样分布时缺少灵活性：采样分布取决于训练数据，不能灵活调整，可能与真实分布存在较大差异。</p></li>
 </ol>
-<p>较大差异</p>
 <h3 id="mixed-negative-sampling">Mixed Negative Sampling</h3>
-<p>点击数据生成 logits 矩阵 ， 是从 item 库中随机抽样的样本，和 query 生成 logits 矩</p>
-<p>阵 ，横向拼接形成 的矩阵。</p>
-<p>减少了选择偏差，每个样本都有机会成为负样本，并且可以通过调整 更加灵活地调整数据集。</p>
-<h3 id="评估结果">评估结果</h3>
-<p>infoNCE 的改进</p>
-<p>ProtoNCE[63], DCL[71], DirectNCE[72], SCL[8], FNCL[35]</p>
-<p>DirectNCE: 只取前 d 个维度计算损失</p>
-<p>SCL: 面向有监督学习</p>
-<h3 id="fncl去除掉伪负样本">FNCL：去除掉伪负样本</h3>
+<p>点击数据生成一组 logits 矩阵；另一组 logits 来自从 item 库中随机抽样的样本，再与 query 组合。两部分横向拼接，形成更大的训练矩阵。</p>
+<p>原笔记里的结论是：</p>
+<ul>
+<li>这种做法减少了选择偏差，因为每个样本都有机会成为负样本。</li>
+<li>同时可以通过调整采样策略，更灵活地调整数据分布。</li>
+</ul>
+<h3 id="相关方法">相关方法</h3>
+<p>infoNCE 的改进方法包括：</p>
+<ul>
+<li>ProtoNCE[63]</li>
+<li>DCL[71]</li>
+<li>DirectNCE[72]</li>
+<li>SCL[8]</li>
+<li>FNCL[35]</li>
+</ul>
+<p>其中：</p>
+<ul>
+<li>DirectNCE：只取前 <code>d</code> 个维度计算损失。</li>
+<li>SCL：面向有监督学习。</li>
+<li>FNCL：目标是去除伪负样本。</li>
+</ul>
 <h2 id="dcl-2022-iclr">DCL 2022 ICLR</h2>
-<p>Decoupled Contrastive Learning.pdf</p>
+<blockquote>
+<p>Decoupled Contrastive Learning</p>
+</blockquote>
 <h3 id="解决的问题-1">解决的问题</h3>
 <ol type="1">
-<li>InfoNCE 对 batch_size 敏感</li>
+<li><p>InfoNCE 对 batch size 敏感。</p></li>
+<li><p>需要大量负样本。</p></li>
 </ol>
-<h3 id="需要大量负样本">2. 需要大量负样本</h3>
 <h3 id="推导">推导</h3>
-<p>在损失函数的梯度中可以分解出一个正负样本耦合(NPC)的因子</p>
-<p>其中 NPC 因子</p>
-<p>图 a，随着 batch_size 增大，变异系数减小，NPC 波动减小，NPC 增大；图 b，随着 batch_size</p>
-<p>增大，NPC 有更大的概率为 1。</p>
-<p>基于此，本文在损失函数中去掉正负样本耦合的部分：</p>
-<p>增加了权重系数，使当正样本之间隔得越远时，具有越大的权重</p>
-<p>其中</p>
-<p>实验结果</p>
-<p>在 batch_size 越小的时候，效果比带有 NPC 的好越多。</p>
+<ul>
+<li>在损失函数的梯度中，可以分解出一个正负样本耦合（NPC）因子。</li>
+<li>图 a：随着 batch size 增大，变异系数减小，NPC 波动减小，NPC 增大。</li>
+<li>图 b：随着 batch size 增大，NPC 更容易接近 1。</li>
+</ul>
+<p>基于这个观察，本文在损失函数中去掉了正负样本耦合的部分，并增加权重系数，使正样本之间隔得越远时具有更大的权重。</p>
+<h3 id="实验结果">实验结果</h3>
+<ul>
+<li>batch size 越小时，去掉 NPC 的效果比带 NPC 的提升更明显。</li>
+</ul>
 <h2 id="protonce-2021-iclr">ProtoNCE 2021 ICLR</h2>
-<p>用原型 prototype 替代负样本，集中程度代替温度系数。使用 EM 算法估计 prototype 的分布参数。</p>
-<h2 id="dcl-2020-neurips">DCL 2020 NeurIPS</h2>
-<p>Debias Contrastive Learning.pdf</p>
-<h3 id="代码">代码</h3>
-<p>解决的问题：采样的样本中有伪负样本，会带来 performance 降低方法：用先验的样本类概率和正样本&amp;样本的采样概率来替代负样本采样概率，设计纠偏损失函数存在的问题：</p>
+<p>用原型 prototype 替代负样本，用集中程度代替温度系数；通过 EM 算法估计 prototype 的分布参数。</p>
+<h2 id="debias-cl-2020-neurips">Debias CL 2020 NeurIPS</h2>
+<blockquote>
+<p>Debias Contrastive Learning</p>
+</blockquote>
+<h3 id="解决的问题-2">解决的问题</h3>
+<p>采样样本中包含伪负样本，会导致 performance 降低。</p>
+<h3 id="方法">方法</h3>
+<p>用先验的样本类概率，以及正样本和样本的采样概率，来替代负样本采样概率，并据此设计纠偏损失函数。</p>
+<h3 id="存在的问题">存在的问题</h3>
 <ol type="1">
-<li><p>需要做类先验概率的预估（超参数的选择对效果影响大）</p></li>
-<li><p>假设数据的类是均匀分布</p></li>
+<li><p>需要预估类先验概率，超参数选择对结果影响较大。</p></li>
+<li><p>假设数据的类是均匀分布。</p></li>
 </ol>
 <h3 id="推导过程">推导过程</h3>
-<p>● 原始损失函数</p>
-<p>● 理想无偏损失函数</p>
-<p>假设存在潜在类标签分配函数 h，可以将样本分类，假设分类符合均匀分布正例类 c 的概率𝜌(𝑛) = 𝑛+ ，其他类的概率为𝜏− = 1 − 𝑛+</p>
-<p>采样到数据𝑛′来自正例同一类的概率：</p>
-<p>采样到数据𝑛′来自正例不同类的概率：</p>
-<p>𝑛其中 Q 是权重系数，假设 Q=N。在实际中，不能从不同类样本中负采样，𝑛− 只能从整个数据集𝑛𝑛 中采样，因此𝑛𝑛− 有𝜏+ 的概率来自于正样本同一个类。</p>
-<p>● 分析有偏损失函数与无偏损失函数之间的 gap 和影响</p>
-<p>有偏损失函数的下界</p>
+<h4 id="原始损失函数与理想无偏损失函数">原始损失函数与理想无偏损失函数</h4>
+<p>假设存在潜在类标签分配函数 <code>h</code>，可以将样本分类；并假设分类符合均匀分布。正例类 <code>c</code> 的概率是 <code>ρ(n) = n+</code>，其他类的概率是 <code>τ- = 1 - n+</code>。</p>
+<ul>
+<li>采样到数据 <code>n'</code> 来自正例同一类的概率。</li>
+<li>采样到数据 <code>n'</code> 来自正例不同类的概率。</li>
+</ul>
+<p>原笔记还记录：其中 <code>Q</code> 是权重系数，假设 <code>Q = N</code>。但在实际中，不能只从不同类样本中负采样，负样本只能从整个数据集采样，因此其中有 <code>τ+</code> 的概率来自于正样本同一类。</p>
+<h4 id="分析有偏损失函数与无偏损失函数之间的-gap">分析有偏损失函数与无偏损失函数之间的 gap</h4>
+<p>原笔记里的结论是：</p>
 <ol type="1">
-<li>当无偏损失函数值越小（负样本乘项越小），第二项的值越大，使有偏和无偏损失函数之</li>
+<li><p>当无偏损失函数值越小（负样本乘项越小），第二项值越大，因此有偏和无偏损失函数之间的 gap 越大。</p></li>
+<li><p>优化有偏和无偏损失函数得到的数据表达差异很大。</p></li>
 </ol>
-<p>间的 gap 越大</p>
-<ol start="2" type="1">
-<li>优化有偏和无偏的损失函数得到的数据表达差异很大</li>
-</ol>
-<p>因此希望实际损失函数能更接近无偏损失函数。</p>
-<p>● 推导得到更接近无偏损失函数的损失函数</p>
-<p>与正样本不同类中负采样的概率是未知的，根据条件概率可得到采样数据𝑛′的概率</p>
-<p>那么从与正样本不同类中采样的概率为</p>
-<p>代入无偏的损失函数</p>
-<p>在这个损失函数中，我们仍然从整个样本库中负采样，但新增了一项正样本类中采样，继续化简得到</p>
-<p>其中𝜏+ 是超参数。</p>
-<p>● 伪代码实现纠偏损失函数</p>
-<p>实验结果</p>
+<p>因此希望实际损失函数更接近无偏损失函数。</p>
+<h4 id="推导更接近无偏损失函数的实际损失">推导更接近无偏损失函数的实际损失</h4>
+<ul>
+<li>与正样本不同类中负采样的概率是未知的，可以根据条件概率得到采样数据 <code>n'</code> 的概率。</li>
+<li>从与正样本不同类中采样的概率可以进一步代入无偏损失函数。</li>
+<li>最终仍然从整个样本库中负采样，但新增了一项从正样本类中采样的补偿项。</li>
+<li>其中 <code>τ+</code> 是超参数。</li>
+</ul>
+<h3 id="实验结果-1">实验结果</h3>
 <ol type="1">
-<li><p>超参数𝜏+ 对实验结果影响较大，难以选择</p></li>
-<li><p>负样本数 N 在某个特定范围内，效果最好</p></li>
-<li><p>正样本数 M 越大效果越好</p></li>
+<li><p>超参数 <code>τ+</code> 对结果影响较大，难以选择。</p></li>
+<li><p>负样本数 <code>N</code> 在某个特定范围内效果最好。</p></li>
+<li><p>正样本数 <code>M</code> 越大效果越好。</p></li>
 </ol>
 <h2 id="clhns-2021-iclr">CLHNS 2021 ICLR</h2>
+<blockquote>
 <p>Contrastive Learning with Hard Negative Samples</p>
-<h3 id="代码-1">代码</h3>
-<p>解决的问题：采样负样本时构造难负样本，并平衡其样本难度和伪负样本方法：假设负样本服从 von Mises–Fisher 分布，对损失函数进行化简，通过对集中参数𝛽的调整增大难负样本的权重。存在的问题：</p>
+</blockquote>
+<h3 id="解决的问题-3">解决的问题</h3>
+<p>采样负样本时，希望构造难负样本，同时平衡负样本难度和伪负样本问题。</p>
+<h3 id="方法-1">方法</h3>
+<p>假设负样本服从 von Mises-Fisher 分布，对损失函数进行化简，通过调整集中参数 <code>β</code> 来增大难负样本的权重。</p>
+<h3 id="存在的问题-1">存在的问题</h3>
 <ol type="1">
-<li><p>需要做类先验概率的预估（超参数的选择对效果影响大）</p></li>
-<li><p>假设数据的类是均匀分布</p></li>
-<li><p>在下游任务中效果并不是都好</p></li>
+<li><p>需要做类先验概率预估，超参数选择对结果影响较大。</p></li>
+<li><p>假设数据的类是均匀分布。</p></li>
+<li><p>在下游任务中效果不一定都更好。</p></li>
 </ol>
 <h3 id="推导过程-1">推导过程</h3>
-<p>● 好的难负样本的标准</p>
-<p>● 假设负样本从 von Mises–Fisher 分布的数据中采样</p>
-<p>𝑛𝑛 是 von Mises–Fisher 分布，𝛽 ≥ 0是集中参数。</p>
-<p>𝑛(𝑛) ≠ 𝑛(𝑛− )满足第一个原则，𝛽𝑛(𝑛)𝑛 𝑛(𝑛− )满足第二个原则，正负样本距离越近，𝛽增大被采样的概率权重。</p>
-<p>从负样本中采样的概率可以表示为从所有样本&amp;正样本中采样</p>
-<p>因此，损失函数可以表示为</p>
-<p>● 伪代码实现构造难负样本损失函数</p>
-<p>实验结果</p>
-<h2 id="directclr-2022-iclr-fb">DirectCLR 2022 ICLR FB</h2>
-<p>Understanding Dimensional Collapse in Contrastive Self-supervised Learning.pdf</p>
-<h3 id="代码-2">代码</h3>
+<h4 id="好的难负样本标准">好的难负样本标准</h4>
+<p>原笔记先讨论了“什么是好的 hard negative”。</p>
+<h4 id="假设负样本来自-von-mises-fisher-分布">假设负样本来自 von Mises-Fisher 分布</h4>
+<ul>
+<li><code>β &gt;= 0</code> 是集中参数。</li>
+<li>当正负样本距离越近时，<code>β</code> 越大，被采样的概率权重越高。</li>
+<li>从负样本中采样的概率，可以表示成从所有样本和正样本中共同采样。</li>
+<li>因此可以将损失函数进一步改写。</li>
+</ul>
+<h3 id="实验结果-2">实验结果</h3>
+<p>原笔记记录了对应实验结果，但没有在提取文本中保留具体数值。</p>
+<h2 id="directclr-2022-iclr">DirectCLR 2022 ICLR</h2>
+<blockquote>
+<p>Understanding Dimensional Collapse in Contrastive Self-supervised Learning</p>
+</blockquote>
 <h3 id="其他">其他</h3>
-<p>https://cloud.tencent.com/developer/article/2313165</p>
+<ul>
+<li><a href="https://cloud.tencent.com/developer/article/2313165" class="uri">https://cloud.tencent.com/developer/article/2313165</a></li>
+</ul>
 <h3 id="对比">对比</h3>
-<p>https://zhuanlan.zhihu.com/p/642797247</p>
-<h3 id="self-attentive-sequential-recommendation">Self-Attentive Sequential Recommendation</h3>
-<p>BERT4Rec: Sequential Recommendation with Bidirectional Encoder Representations from</p>
-<p>Transformer</p></article>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/642797247" class="uri">https://zhuanlan.zhihu.com/p/642797247</a></li>
+</ul>
+<h2 id="self-attentive-sequential-recommendation">Self-Attentive Sequential Recommendation</h2>
+<blockquote>
+<p>BERT4Rec: Sequential Recommendation with Bidirectional Encoder Representations from Transformer</p>
+</blockquote></article>
     </section>
     <section class="site-shell post-nav-grid">
       
