@@ -2,6 +2,10 @@
 
 这是一个纯静态博客仓库。
 
+线上地址：
+
+- [https://orangejessie.github.io/](https://orangejessie.github.io/)
+
 页面发布方式：
 
 - GitHub Pages 直接托管仓库根目录里的 HTML / CSS / JS
@@ -9,16 +13,21 @@
 
 ## 仓库结构
 
-- `content/posts/*.md`
-  - 文章内容源
 - `content/pages/*.md`
   - 页面内容源
+- `content/knowledge/papers/*.md`
+- `content/knowledge/ai-tools/*.md`
+- `content/knowledge/experience/*.md`
+- `content/knowledge/game-space/*.md`
+  - 各个知识模块的文章内容源，按模块分目录管理
 - `scripts/build_static_site.py`
   - 静态站生成脚本，读取 `content/` 下的 Markdown，调用 `pandoc` 生成最终页面
 - `assets/css/site.css`
   - 主样式文件
-- `index.html` `404.html` `aboutme/` `contact/` `papers/` `ai-tools/` `experience/` `game-space/` `tags/` `2023-*/`
-  - 生成后的最终静态页面
+- `index.html` `404.html` `aboutme/` `contact/`
+  - 首页和基础页面
+- `knowledge/papers/` `knowledge/ai-tools/` `knowledge/experience/` `knowledge/game-space/` `knowledge/tags/`
+  - 生成后的知识模块页、文章页和标签页
 - `.nojekyll`
   - 告诉 GitHub Pages 直接按静态文件托管，不走 Jekyll 处理
 

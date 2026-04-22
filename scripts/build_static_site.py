@@ -13,8 +13,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT_ROOT = ROOT / "content"
-CONTENT_POSTS = CONTENT_ROOT / "posts"
+CONTENT_KNOWLEDGE = CONTENT_ROOT / "knowledge"
 CONTENT_PAGES = CONTENT_ROOT / "pages"
+KNOWLEDGE_BASE_URL = "/knowledge"
 
 SITE = {
     "title": "橘子豆的AI工坊",
@@ -31,12 +32,7 @@ NAV = [
     ("Contact", "/contact/"),
 ]
 
-SECTION_ORDER = [
-    ("papers", "/papers/"),
-    ("ai-tools", "/ai-tools/"),
-    ("experience", "/experience/"),
-    ("game-space", "/game-space/"),
-]
+SECTION_ORDER = ["papers", "ai-tools", "experience", "game-space"]
 
 PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart"
 
@@ -72,6 +68,18 @@ class Post:
     source_path: Path
     html: str
     toc: str
+
+
+def section_url(section_key: str) -> str:
+    return f"{KNOWLEDGE_BASE_URL}/{section_key}/"
+
+
+def tags_url() -> str:
+    return f"{KNOWLEDGE_BASE_URL}/tags/"
+
+
+def post_url(section_key: str, slug: str) -> str:
+    return f"{KNOWLEDGE_BASE_URL}/{section_key}/{slug}/"
 
 
 def parse_front_matter(text: str) -> tuple[dict[str, object], str]:
@@ -244,6 +252,7 @@ def clean_generated_outputs(posts: list["Post"]) -> None:
         "index.html",
         "404.html",
         ".nojekyll",
+        "knowledge",
         "aboutme",
         "contact",
         "papers",
@@ -327,12 +336,12 @@ def render_post_card(post: Post) -> str:
 
 def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> str:
     cards = []
-    for index, (section_key, href) in enumerate(SECTION_ORDER, start=1):
+    for index, section_key in enumerate(SECTION_ORDER, start=1):
         meta = section_pages[section_key].meta
         intro = str(meta.get("intro", meta.get("subtitle", ""))).strip()
         cards.append(
             f"""
-            <a class="topic-card topic-card--link" href="{href}">
+            <a class="topic-card topic-card--link" href="{section_url(section_key)}">
               <div class="topic-card__index">{index:02d}</div>
               <div class="topic-card__body">
                 <div class="topic-card__heading">
@@ -405,9 +414,9 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
             title=f"{title} | {SITE['title']}",
             subtitle=subtitle,
             body_html=body,
-            path=f"/{section_key}/",
+            path=section_url(section_key),
             description=subtitle,
-            active_nav=f"/{section_key}/",
+            active_nav=section_url(section_key),
             body_class="page-section",
         )
     )
@@ -484,16 +493,16 @@ def render_tags(tag_map: dict[str, list[Post]]) -> str:
             title=f"标签 | {SITE['title']}",
             subtitle="",
             body_html=body,
-            path="/tags/",
+            path=tags_url(),
             description="博客标签索引",
-            active_nav="/tags/",
+            active_nav=tags_url(),
             body_class="page-tags",
         )
     )
 
 
 def render_post(post: Post, previous_post: Post | None, next_post: Post | None) -> str:
-    tag_html = "".join(f"<a href='/tags/#tag-{html.escape(tag)}'>{html.escape(tag)}</a>" for tag in post.tags)
+    tag_html = "".join(f"<a href='{tags_url()}#tag-{html.escape(tag)}'>{html.escape(tag)}</a>" for tag in post.tags)
 
     nav_cards = []
     if previous_post:
@@ -571,9 +580,10 @@ def render_404() -> str:
 
 def load_posts() -> list[Post]:
     posts: list[Post] = []
-    for path in sorted(CONTENT_POSTS.glob("*.md")):
+    for path in sorted(CONTENT_KNOWLEDGE.glob("*/*.md")):
         raw_text = path.read_text(encoding="utf-8")
         meta, markdown_body = parse_front_matter(raw_text)
+        section_key = path.parent.relative_to(CONTENT_KNOWLEDGE).parts[0]
         date_part = path.stem[:10]
         date_value = datetime.strptime(date_part, "%Y-%m-%d")
         html_fragment, toc_html = markdown_to_html(markdown_body, path.parent)
@@ -584,9 +594,9 @@ def load_posts() -> list[Post]:
                 summary=str(meta.get("summary", "")),
                 date=date_value,
                 tags=list(meta.get("tags", [])),
-                section=str(meta.get("section", "")),
-                section_label=str(meta.get("section_label", meta.get("section", ""))),
-                url=f"/{path.stem}/",
+                section=section_key,
+                section_label=str(meta.get("section_label", section_key)),
+                url=post_url(section_key, path.stem),
                 source_path=path,
                 html=html_fragment,
                 toc=toc_html,
@@ -651,22 +661,22 @@ def build() -> None:
         ),
     )
     write_text(
-        "papers/index.html",
+        "knowledge/papers/index.html",
         render_section("papers", papers_page.meta, [p for p in posts if p.section == "papers"]),
     )
     write_text(
-        "ai-tools/index.html",
+        "knowledge/ai-tools/index.html",
         render_section("ai-tools", ai_tools_page.meta, [p for p in posts if p.section == "ai-tools"]),
     )
     write_text(
-        "experience/index.html",
+        "knowledge/experience/index.html",
         render_section("experience", experience_page.meta, [p for p in posts if p.section == "experience"]),
     )
     write_text(
-        "game-space/index.html",
+        "knowledge/game-space/index.html",
         render_section("game-space", game_space_page.meta, [p for p in posts if p.section == "game-space"]),
     )
-    write_text("tags/index.html", render_tags(ordered_tags))
+    write_text("knowledge/tags/index.html", render_tags(ordered_tags))
     write_text("404.html", render_404())
 
     for idx, post in enumerate(posts):
