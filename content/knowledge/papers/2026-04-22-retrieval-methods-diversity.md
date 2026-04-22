@@ -1,309 +1,271 @@
 ---
 title: 召回方法整理：双塔召回多样性
-subtitle: MIND、ComiRec、SINE、Octopus、REMI、PinnerSage、DAT、爱奇艺多兴趣优化
+subtitle: MIND、ComiRec、SINE、Octopus、REMI、PinnerSage、DAT
 section: papers
 section_label: 论文解读
-summary: 整理召回方法文档中“双塔召回多样性”部分的论文与笔记内容，并按论文笔记结构重新整理排版。
+summary: 基于原论文与现有笔记，按统一模板整理多兴趣召回相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,multi-interest]
 ---
 
-## 阿里 MIND 2019 CIKM
+## 论文对比
+
+| 论文 | 主要解决问题 | 模型结构关键词 | 样本构造 | 实验结论 |
+| --- | --- | --- | --- | --- |
+| MIND 2019 | 单一 user vector 难以表示多兴趣 | dynamic routing、multi-interest extractor、label-aware attention | 用户行为序列 + target item 监督 | 在公开数据集和 Tmall 工业数据上优于 SOTA，并已上线 |
+| ComiRec 2020 | 多兴趣召回既要准确也要可控地兼顾多样性 | multi-interest module、aggregation module、controllable factor | 序列推荐设置，预测 next item | 在 Amazon / Taobao 上显著优于 baseline |
+| SINE 2021 | 多兴趣方法难处理大规模概念原型与稀疏兴趣激活 | sparse-interest module、interest aggregation | 用户行为序列预测 next item | 在公开 benchmark 和工业数据上有明显提升 |
+| Octopus 2020 | 多通道兴趣表示容易引入无关候选且成本高 | elastic channels、grouping head、quota allocation | user behavior 建模 candidate generation | 在工业与公开数据上验证有效性 |
+| REMI 2023 | 多兴趣学习更大的瓶颈在训练而非结构本身 | IHN、routing regularization | sampled softmax 训练框架 | 论文报告不同采样策略和消融实验均有收益 |
+| PinnerSage 2020 | 单 embedding 不能完整表达用户多兴趣 | hierarchical clustering、Ward、Medoid、cluster importance | 用户近 90 天行为聚类 | 线上线下实验都优于 single embedding 方法 |
+| DAT 2021 | 双塔缺少交互且类别不平衡 | AMM、CAL、dual augmented two-tower | 大规模 retrieval 数据 | 离线和在线 A/B 都有提升 |
+
+## 阿里 MIND 2019
 
 > Multi-Interest Network with Dynamic Routing for Recommendation at Tmall
 
-### 解决的问题
+### 解决问题
 
-用多个向量表示用户的多种兴趣，采用动态路由算法将历史商品聚合成多个集合，每个集合对应用户特定兴趣的向量表示。
-
-### 缺点
-
-- 结构复杂，计算开销大。
-
-### 胶囊网络与动态路由算法
-
-- 胶囊网络与神经元类似，区别是胶囊网络输入的是多个向量。
-- `c` 通过动态路由算法计算，对线性变换后的输入向量 `u` 加权。
-- 动态路由算法在每一步迭代中，会向与输出向量 `a` 更接近的输入向量 `u` 靠近；更接近的 `a` 和 `u` 内积更大，因此在下一步中 softmax 权重更大，本质上接近聚类。
-- Squashing 保证向量方向不变，模大于 0 小于 1；`s` 的模越大越接近 1，越小越接近 0，作用上类似 sigmoid。
+- 现有深度推荐方法通常只用一个向量表示用户，难以表达大规模用户的多样兴趣。
+- matching 阶段尤其依赖更细粒度的 user interest representation。
 
 ### 模型结构
 
-- 模型目的是将特征映射到用户表达；当 `V` 为一维向量时，类似 YouTubeDNN。
-- Embedding 和 Pooling 层：others features 是用户基础特征（age、gender、id 等拼接），item `N` 是用户历史行为的 item 特征，label 是目标商品特征（brand_id、shop_id 等，对冷启有效，通过 average pooling 构建 item 向量）。
-- Multi-Interest Extractor 层：通过动态路由算法计算用户兴趣向量。
-  1. 采用 shared 线性变换矩阵（上文中的 `W`，不同 item 的 `W` 相同）。
-  2. 高斯分布随机初始化 routing logits（`b`），这样可以获得不同兴趣向量，否则每个兴趣向量最后都会收敛到最感兴趣的那个方向。
-  3. 对不同用户采用动态的兴趣数量。
-- Label-Aware Attention 层：interest capsule 的权重取决于与目标 item 的兼容性。
+- 使用多个 interest vectors 表示一个用户。
+- 核心模块是基于 capsule routing 的 multi-interest extractor。
+- 使用 label-aware attention 帮助学习多兴趣用户表示。
+- 原笔记补充了 dynamic routing、shared transformation matrix 和动态兴趣数等实现点。
 
-### 超参数与结果
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/mind-architecture.png" alt="MIND 模型结构图">
+  <figcaption>MIND 论文结构图：行为序列经多兴趣提取器得到多个 interest capsules，再通过 label-aware attention 参与训练。</figcaption>
+</figure>
 
-- Initialization of routing logits `b`：`N(0, 1)` 在 `epoch = 1` 时效果最好；随着 epoch 增加，与 `N(0, 0.1)`、`N(0, 5)` 逐渐接近。
-- power number `p` in label-aware attention：`p = 0` 效果最差，相当于每个 interest capsule 都有相同权重；`p` 越大效果越好。
-- online 效果：动态 embedding 个数比 `k = 7` 微涨，涨幅不大。
+### 样本构造
+
+- 论文是典型的推荐学习设置：用户历史行为序列配合目标 item 监督。
+- 原笔记记录：label-aware attention 会根据目标 item 选择更相关的 interest capsule。
+
+### 关键信息
+
+- dynamic routing 的目标是把用户历史行为聚成多个兴趣簇。
+- routing logits 采用随机初始化，有利于学出不同兴趣方向。
+- label-aware attention 是训练阶段的重要组件。
+
+### 实验结论
+
+- 官方摘要明确写到：在多个公开 benchmark 和一个大规模 Tmall 工业数据集上，MIND 优于 state-of-the-art。
+- 论文同时说明该方法已在 Mobile Tmall 首页主流量上线。
 
 ### 参考链接
 
 - <https://github.com/shenweichen/DeepMatch/blob/master/deepmatch/models/mind.py>
 - <https://zhuanlan.zhihu.com/p/145283113>
 
-## 阿里 ComiRec 2020 KDD
+## 阿里 ComiRec 2020
 
 > Controllable Multi-Interest Framework for Recommendation
 
-用 self-attention 层来隐式提取多个用户兴趣向量，并在 serving 时增加召回结果集成模块，平衡多样性和精确度。
+### 解决问题
 
-### 优点
-
-1. 隐式地学习用户多个兴趣向量，能够适应数据分布变化。
-2. 在 serving 时增加集成模块，平衡多样性和精确度。
-
-### 缺点
-
-1. 用户兴趣数量固定，设置兴趣数量对结果影响较大；对兴趣单一的用户，效果可能不如单兴趣模型。
-2. 召回结果重复度较高、特征较少、即时性差。
+- 单一 user embedding 无法反映用户一段时间内的多个兴趣。
+- 多兴趣召回不仅要提升准确率，还要显式控制多样性。
 
 ### 模型结构
 
-#### Multi-interest Module
+- 包含 multi-interest module，用来从行为序列中提取多个兴趣向量。
+- 包含 aggregation module，用于从多兴趣召回结果中得到整体推荐。
+- 论文强调 controllable factor，用来平衡 accuracy 和 diversity。
 
-1. Dynamic Routing
-   和 MIND 相同。
-2. Self-Attention Layer
-   其中 `H` 是 user behavior embedding，每一个历史行为都可能影响每一个 embedding。
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/comirec-architecture.png" alt="ComiRec 模型结构图">
+  <figcaption>ComiRec 结构图：先进行 multi-interest extraction，再在 serving 侧通过 aggregation module 平衡精度与多样性。</figcaption>
+</figure>
 
-#### Model Training
+### 样本构造
 
-目标 item embedding 会选出一个 user behavior embedding，用选出的 embedding 来计算 loss。
+- 论文在 sequential recommendation 设置下预测 next item。
+- 原笔记记录的数据集包括 Amazon 和 Taobao。
 
-#### Aggregation Module
+### 关键信息
 
-用于在 serving 时，得到多个 interest embedding 后，获得整体的 top-N item。
+- 论文提供 Dynamic Routing 与 Self-Attention 两种多兴趣提取方式。
+- aggregation module 不只是简单拼接 topK 候选，而是显式引入 diversity 控制。
+- `Diversity@N` 是论文强调的指标之一。
 
-- 基本做法是从候选集中选出每个兴趣向量最相近的 `K` 个 item。
-- 但原笔记认为这并不是最好的做法，因为用户更倾向被推荐新的、或者更 diverse 的结果。
-- 因此在召回阶段增加了控制 diverse 的项，其中 `g(i, j)` 是 diverse 函数。
+### 实验结论
 
-### 测试结果和指标
+- 论文摘要明确给出：在两个真实数据集 Amazon 和 Taobao 上，相比现有多兴趣方法有显著提升。
+- 论文同时说明该框架已在阿里离线分布式平台部署。
 
-- 使用 `Diversity@N` 来衡量召回的多样性。
-
-## 阿里 SINE 2021 WSDM
+## 阿里 SINE 2021
 
 > Sparse-Interest Network for Sequential Recommendation
 
-根据历史行为数据，对每个用户从原型池中激活不同原型作为用户兴趣。通过计算两个方面的权重：
-
-1. 用户历史行为在原型中占比；
-2. 用户历史行为属于每个激活原型的比例；
-
-来获得各个原型的兴趣向量。随后通过 self-attention 计算用户预测兴趣，并对各个原型兴趣向量加权，得到最终用户向量。
-
-### 优点
-
-1. 不需要聚合多个向量的召回结果，不存在训练时已知目标 item、用目标 item 在多个向量中 softmax 选一个，而 serving 时未知目标 item 所带来的偏差。
-
-### 缺点
-
-1. 网络结构复杂度提升到 3 倍左右的情况下，效果没有很大提升。
-2. 多样性方面没有评估；最后得到的是一个加权后的兴趣向量，而非多个向量，多样性能否得到保障存疑。
-
-### 网络结构与算法
-
-#### Sparse-interest Module
-
-总兴趣原型有 `L` 个，激活 `K` 个。
-
-1. Concept Activation
-   - 通过 self-attention 计算商品向量权重，并得到表示用户兴趣的加权向量。
-   - 得到该用户激活的 topK 个兴趣原型。
-2. 计算第 `t` 个用户行为属于第 `k` 个兴趣原型的概率。
-3. 计算在兴趣 `k` 下 item `t` 的重要程度。
-4. 对每个激活的原型生成兴趣向量：
-   `sum(属于第 k 个原型的概率 * 在兴趣 k 中的重要程度 * 原始 embedding)`。
-
-#### Interest Aggregation Module
-
-兴趣向量选择有两种思路：
-
-1. 将目标 item 与多个兴趣向量计算 attention，选其中一个作为该条记录的兴趣向量，例如 ComiRec。
-   缺点是 inference 时没有目标 item，与训练阶段不一致，因此需要额外 aggregation module 来聚合召回结果。
-2. 用用户历史行为预测下一个感兴趣的意图，再通过 self-attention 得到预测兴趣向量，计算聚合权重，判断哪个原型与预测兴趣更接近。
-
-最终的用户兴趣向量表示为多个兴趣向量的加权和。
-
-## 微软 Octopus 2020 SIGIR
-
-> Octopus: Comprehensive and Elastic User Representation for the Generation of Recommendation Candidates
-
-### 解决的问题
-
-1. 不同用户兴趣方向数量不同。
-2. 兴趣不纯净，例如衣服方向的行为也会影响手机方向。
-
-### 优点
-
-- 灵活性：可以部署大量通道，但只有用户行为相关的通道会被激活，从而减少不相关表示和无效计算。
-- 纯净性：一类 user behavior 只会激活一个通道，通道内只有一类兴趣，避免将多种兴趣混合在同一个兴趣向量里。
-
-### 缺点
-
-1. 聚合多个向量结果时，需要额外训练一个模型决定每个向量的 quota，增大线上 serving 开销。
-2. 不同用户兴趣数量不同，会导致线上检索时计算资源难以评估。
-
-### 网络结构和算法
-
-1. 初始化 grouping head `Hg`：使用 item 表示空间的正交基底，保证通道间正交性。
-2. 计算用户历史行为与各个通道的相关性，ATT 使用向量相乘。
-3. 对每个用户行为计算其属于哪个通道。
-4. 将属于同一通道的用户行为向量做 aggregation。
-5. 选取与 label 最近的一个 interest 向量作为该 interest 向量的 label。
-6. 计算 interest 向量与 label 之间的距离，并构造对应 loss。
-
-### Serving：多兴趣召回候选集集成
-
-1. 从各个兴趣向量召回 TopK，根据与兴趣向量的距离整体排序，并选取前 `N` 个。
-2. 从各个兴趣向量召回固定 quota `k`；但平均分配显然不合理，因此另外设计网络去学习每个兴趣向量的 quota（与兴趣向量训练不耦合）。
-   1. 计算兴趣向量的使用率。
-   2. 计算每个正样本使用哪个兴趣向量。
-   3. 以 `y` 为 label、`r` 为 pred，用交叉熵损失训练网络。
-   4. 为每个兴趣向量分配 quota：`r` 越大，兴趣向量使用率越高，应该分配的 quota 越多。
-
-原笔记的结论是：
-
-- `alpha` 越大，越倾向让兴趣最相近的向量召回更多；
-- `alpha` 越小，越倾向平均分配；
-- 第二种 quota 分配方式效果明显更好。
-
-实验缩写说明：
-
-- `Orth`：channel 正交的正则项。
-- `Group`：同通道激活的视为一个组。
-- `OCT(C)`：全局 score 排序取 topK。
-- `OCT(A)`：模型决定 quota。
-
-## 微软 REMI 2023 RecSys
-
-> Rethinking Multi-Interest Learning for Candidate Matching in Recommender Systems
-
-### 解决的问题
-
-1. sampled softmax 会带来更严重的简单样本问题。
-2. 动态路由或 attention 容易造成路由崩溃，一个兴趣只由一个特别重要的 item 决定。
-
-### IHN（interest-aware negative mining）
-
-#### Idea sampling distribution
-
-1. 更容易采到会让选中兴趣向量误分类的 item。
-2. 负样本难度可调；负样本应该采多难，取决于数据量和模型复杂程度。
-
-#### 采样分布
-
-- 样本选择的概率分布正比于选中的兴趣向量与 item 向量的内积。
-- 通过调节负样本难度系数来控制采样：系数大时，即使内积较小也有较大概率被采中，负样本更简单；系数小时，只有内积较大时才更容易被采中，负样本更难。
-- 实际上是从 batch 中选择样本；而 batch 又是从样本库中均匀抽样出来的，因此这里使用蒙特卡洛重要性采样，从均匀分布中进行采样。
-
-### RR（routing regularization）
-
-本文认为路由崩溃是因为 attention 权重矩阵 `A` 过于稀疏，因此在权重矩阵上增加方差正则来消除影响。
-
-### 评估结果
-
-- 比较了不同采样方式。
-- 做了消融实验。
-
-## PinnerSage 2020 KDD
-
-> PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest
-
-对用户历史兴趣进行聚类，计算类的表示向量，并根据类重要性选出重要的类，用于召回候选。
-
-### 优点
-
-1. 避免出现不相关 badcase 候选。
-2. 可解释性强。
-
-### 缺点
-
-1. 当历史行为很多时，计算复杂度大幅增加，为 `O(n^2)`。
-2. 当历史行为有多种类型时难以应用，例如既有 item 又有 query。
-3. 依赖兴趣空间的学习算法。
-
-### 组成部分
-
-1. 将用户近 90 天的行为数据聚类。
-2. 为每个类计算一个 medoid 方法的向量表示。
-3. 对每个用户的每个类计算重要性分数。
-
-### 1. 用户行为聚类
-
-对用户行为聚类有两个限制：
-
-- 类由相似的 pins（兴趣）组成。
-- 类的数量需要根据用户兴趣数量自动决定。
-
-为了满足上述两个限制，采用 Ward 层次聚类算法，根据最小化类方差来做层次聚类。
-
-参考链接：
-
-- <https://blog.csdn.net/turkeym4/article/details/103150759>
-
-初始化时，每个历史行为 pin 都是一个类；每次选择两个合并后方差最小的类进行合并，计算复杂度为 `O(n^2)`。在计算合并后类与其他类之间的方差时，使用 Lance-Williams 算法优化效率。
-
-### 2. Medoid based Cluster Representation
-
-如果直接用模型学习类中心向量，类中一旦存在异常值，得到的中心向量在向量空间里可能落在类之外，导致召回完全不相关的候选。因此这里采用 medoid 方法生成类表示：选择类中使其他 pins 到该 pin 距离方差最小的那个 pin 作为类表示。
-
-原笔记里的补充是：这种方式还有一个优势，只需要存储 pin 的 index，embedding 可以通过 k-v 存储查询。
-
-### 3. Cluster Importance
-
-每个用户的兴趣类很多，无法每个都去做 ANN 检索，因此需要用重要性权重筛选类；这里使用时间衰减的重要性权重。
-
-## 美团 DAT 2021 DLP-KDD
-
-> A Dual Augmented Two-tower Model for Online Large-scale Recommendation
-
-### 解决的问题
-
-1. 双塔之间没有交叉信息。
-2. category 不平衡，数据量少的 category 效果较差。
+### 解决问题
+
+- 用户行为序列常常包含多个概念不同的 item，统一 embedding 容易被最近高频行为主导。
+- 现有多兴趣方法通常只发现少量概念簇，难以匹配真实系统里的大规模 concept pool。
+- 用户真正活跃的兴趣通常是稀疏的。
 
 ### 模型结构
 
-#### DAT
+- SINE 包含 sparse-interest module，从大概念池中为每个用户自适应激活少量概念原型。
+- 再用 interest aggregation module 主动预测当前意图，并聚合多个 interest embeddings。
+- 原笔记补充：模块中包含 concept activation、prototype assignment 和 aggregation。
 
-使用 query 和 item_id 生成辅助向量 `au` 和 `av`，并与其他特征拼接。
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/sine-architecture.png" alt="SINE 模型结构图">
+  <figcaption>SINE 结构图：从 concept pool 中做 sparse activation，再通过 intention selector 完成兴趣聚合。</figcaption>
+</figure>
 
-#### mimic loss
+### 样本构造
 
-- 正样本中，`au` 和 `pv` 计算 mean square error。
-- 计算 mimic loss 时，需要对双塔网络 `stop_gradient`，只更新 `au` 和 `av`。
+- 按 sequential recommendation 设置，用行为序列预测下一个 item。
 
-#### Category Alignment Loss
+### 关键信息
 
-解决类别较少的 category 效果差的问题。具体做法是：以数据量最多的 category 的 `pv` 作为 major，计算它与其他 category 协方差之差的二范数。
+- SINE 的核心不是简单增加 interest 数量，而是从大原型池中做 sparse activation。
+- 与部分多兴趣方法不同，SINE 最终输出是聚合后的用户表示。
 
-#### Loss
+### 实验结论
 
-- 交叉熵损失。
+- 官方摘要明确给出：在多个公开 benchmark 和一个大规模工业数据集上，SINE 相比 SOTA 有 substantial improvement。
 
-#### 参数选择
+## 微软 Octopus 2020
 
-- `au` 和 `av` 都是 32 维向量。
-- 原笔记里记录了若干权重系数，其中部分取 `0.5`，另一个取 `1`。
+> Octopus: Comprehensive and Elastic User Representation for the Generation of Recommendation Candidates
 
-## 爱奇艺多兴趣召回优化
+### 解决问题
 
-参考链接：
+- candidate generation 既要全面覆盖用户兴趣，又要保持检索效率。
+- 传统单向量用户表示不足以覆盖多兴趣。
+- 一些 multi-channel 方法虽然更全面，但也更容易带来无关候选和更高成本。
 
-- <https://www.6aiq.com/article/1621123836297>
+### 模型结构
 
-使用 attention 隐式提取多个兴趣向量，多 embedding 召回。
+- Octopus 为用户生成多个兴趣向量。
+- 与常规 multi-channel 结构不同，Octopus 的表示是 elastic 的：通道规模和类型会根据用户自适应确定。
+- 原笔记补充：通过 grouping head、通道分配和 quota 机制控制不同兴趣通道。
 
-### 解决的问题
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/octopus-framework.png" alt="Octopus 框架图">
+  <figcaption>Octopus 框架图：通过 channel activation 和 grouped attentive aggregation 生成弹性的多通道用户表示。</figcaption>
+</figure>
 
-1. 通过在损失函数中增加兴趣 embedding 正则项，解决召回结果重复度较高的问题。
-2. 增加激活兴趣记录表，在 serving / evaluation 时回溯该表，去掉用户激活较少的兴趣，实现兴趣动态化。
-3. 增加多模态特征，提升召回效果。
+### 样本构造
+
+- 论文明确围绕 user behavior 建模 candidate generation。
+
+### 关键信息
+
+- 论文的重点不只是“多兴趣”，而是“全面 + 弹性 + 可落地”。
+- 原笔记里记录的 quota allocation 是 serving 侧的重要设计。
+- elasticity 的意义是减少无关表示和无效计算。
+
+### 实验结论
+
+- Microsoft 官方摘要明确指出：在工业和公开数据集上，相比 SOTA baselines 验证了 Octopus 的有效性。
+
+## 微软 REMI 2023
+
+> Rethinking Multi-Interest Learning for Candidate Matching in Recommender Systems
+
+### 解决问题
+
+- 现有多兴趣 candidate matching 工作更关注模型结构，而忽略训练框架本身。
+- 论文指出两大核心问题：
+  1. uniformly sampled softmax 带来过多 easy negatives；
+  2. routing collapse，使每个兴趣只由极少数 item 决定。
+
+### 模型结构
+
+- 论文重点不是重新设计复杂 backbone，而是重做训练框架。
+- 关键组件包括：
+  - IHN（interest-aware negative mining）
+  - RR（routing regularization）
+
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/remi-ihn.png" alt="REMI IHN 算法图">
+  <figcaption>REMI 中的 IHN 训练算法：围绕 interest-aware negative mining 重构 sampled softmax 训练过程。</figcaption>
+</figure>
+
+### 样本构造
+
+- 基于 sampled softmax 的训练框架。
+- IHN 会更倾向采到对当前兴趣向量更难区分的负样本。
+
+### 关键信息
+
+- 这篇论文最重要的视角是：多兴趣学习的瓶颈不一定在结构，而在训练。
+- RR 用来缓解 attention / routing 的稀疏塌缩问题。
+
+### 实验结论
+
+- HKUST 论文摘要明确指出：通过重新审视训练框架，解决 easy negatives 和 routing collapse 后，多兴趣表示的表达性得到改善。
+- 原笔记补充了不同采样方式和消融实验。
+
+## PinnerSage 2020
+
+> PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest
+
+### 解决问题
+
+- 单个高维 user embedding 不足以完整理解用户多兴趣。
+- 工业系统需要既可解释、又可扩展的多兴趣表示。
+
+### 模型结构
+
+- 通过 hierarchical clustering（Ward）把用户行为聚成多个概念一致的簇。
+- 再用 representative pins（Medoids）表示每个兴趣簇。
+- 再为不同簇估计 importance，用于后续召回。
+
+### 样本构造
+
+- 原笔记记录：对用户近 90 天行为做聚类。
+
+### 关键信息
+
+- Ward clustering + Medoids 是论文最有辨识度的结构设计。
+- Medoid 设计兼顾效率、鲁棒性和可解释性。
+- cluster importance 用来控制多兴趣检索成本。
+
+### 实验结论
+
+- KDD 官方摘要明确给出：线上和线下 A/B 实验都表明 PinnerSage 显著优于 single embedding methods。
+
+### 参考链接
+
+- <https://blog.csdn.net/turkeym4/article/details/103150759>
+
+## 美团 DAT 2021
+
+> A Dual Augmented Two-tower Model for Online Large-scale Recommendation
+
+### 解决问题
+
+- two-tower 缺少 tower 间信息交互。
+- category data imbalance 会削弱长尾类目效果。
+
+### 模型结构
+
+- DAT 在双塔基础上加入 AMM（Adaptive-Mimic Mechanism）。
+- 同时加入 CAL（Category Alignment Loss）对齐不同类别 item representation。
+- 原笔记补充了 mimic loss 与 category alignment 的实现理解。
+
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/dat-architecture.png" alt="DAT 模型结构图">
+  <figcaption>DAT 结构图：在双塔检索框架上增加辅助向量、mimic loss 与 category alignment loss。</figcaption>
+</figure>
+
+### 样本构造
+
+- 论文面向大规模 online retrieval。
+
+### 关键信息
+
+- AMM 通过为 query 和 item 定制 augmented vector，缓解双塔缺少交互的问题。
+- CAL 处理类目不平衡。
+
+### 实验结论
+
+- 官方摘要明确给出：DAT 在大规模离线数据集上优于 baseline，且在线 A/B testing 也带来推荐质量提升。

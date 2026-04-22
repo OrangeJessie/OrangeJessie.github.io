@@ -3,211 +3,262 @@ title: 召回方法整理：双塔召回
 subtitle: DSSM、YouTubeDNN、谷歌双塔、Facebook 双塔、MOBIUS、DMR、Deep Retrieval
 section: papers
 section_label: 论文解读
-summary: 整理召回方法文档中“双塔召回”部分的论文与笔记内容，并按论文笔记结构重新整理排版。
+summary: 基于原论文与现有笔记，按统一模板整理双塔召回相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,dual-tower]
 ---
+
+## 论文对比
+
+| 论文 | 主要解决问题 | 模型结构关键词 | 样本构造 | 实验结论 |
+| --- | --- | --- | --- | --- |
+| DSSM 2013 | 语义匹配难以覆盖 query-document 深层语义 | 双塔语义投影、word hashing、cosine similarity | clickthrough 数据，点击文档为正样本 | 在真实 Web ranking 数据上优于当时 latent semantic baselines |
+| YouTubeDNN 2016 | 超大规模视频推荐的 candidate generation 与 ranking | candidate generation DNN、user embedding、sampled softmax | 用户观看序列构造监督信号，负样本通过采样获得 | 论文强调深度学习带来显著线上效果提升 |
+| Google 双塔 2019 | in-batch negative 的采样偏差会伤害大规模召回 | two-tower、item content tower、logQ correction | streaming data + in-batch negatives | 离线与在线实验都支持 sampling bias correction 有效 |
+| Facebook 双塔 2020 | 社交搜索需要同时建模文本与搜索者上下文 | 独立 query/document encoder、ANN 检索、hard mining | click / impression / hard negative / hard positive | 多个 vertical 上取得显著线上收益 |
+| MOBIUS 2019 | matching 层只看相关性，商业指标在 ranking 层才引入，导致整体回报不足 | matching + CTR 目标、active learning、ANN / MIPS | billions of query-ad pairs，主动学习补 bad cases | 作为百度广告召回系统首版落地，提升商业回报与检索效率 |
+| DMR 2020 | CTR 预测中缺少显式 user-item relevance 建模 | User-to-Item、Item-to-Item、match-to-rank | 基于 CTR prediction 数据训练 | 在 public + industrial datasets 上显著优于 baseline |
+| Deep Retrieval 2020 | ANN 两步法依赖欧式空间假设，结构学习与检索解耦 | discrete latent codes、beam search、joint structure learning | user-item interaction（如 clicks） | 在大规模推荐中同时兼顾准确率与子线性检索效率 |
 
 ## 微软 DSSM 2013
 
 > Learning Deep Structured Semantic Models for Web Search using Clickthrough Data
 
-用 query 和 document 的展现点击数据来计算语义匹配。
+### 解决问题
+
+- 传统 keyword matching 很难处理 query 和 document 的深层语义匹配。
+- 传统 latent semantic methods 在大规模 Web 搜索下表达能力和可扩展性不足。
 
 ### 模型结构
 
-- query 和 document 使用相同的参数。
-- 使用 word hashing，基于 n-gram 减小 bag-of-words 的维数，例如 `#good# -> #go, goo, ood, od#`。
+- query tower 和 document tower 将两侧文本映射到同一个低维语义空间。
+- 相关性通过 query/document 表示之间的距离来计算，文中使用 cosine similarity。
+- 为了支持大词表，论文使用 word hashing，将词映射成 letter-trigram 表示。
 
-### 训练样本
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/dssm-architecture.png" alt="DSSM 模型结构图">
+  <figcaption>DSSM 论文结构图：query 与 document 经过双塔投影后在共享语义空间内做相似度计算。</figcaption>
+</figure>
 
-- 正样本：query 有点击的 document。
-- 负样本：采样的未点击 document（非曝光未点击）。
+### 样本构造
 
-### 相似度评估
+- 使用 clickthrough data。
+- 给定 query，被点击的 document 作为正样本。
+- 未点击 document 用作负样本。
 
-- query embedding 和 document embedding 的余弦距离。
+### 关键信息
+
+- 训练目标是最大化 clicked documents 在给定 query 条件下的条件似然。
+- 论文强调该方法是 discriminative training，而不是单纯学习无监督语义空间。
+- word hashing 是论文能落到 Web-scale 的关键工程点。
+
+### 实验结论
+
+- 在真实 Web document ranking 数据集上，DSSM 最优模型显著优于此前的 latent semantic baselines。
 
 ## YouTubeDNN 2016
 
 > Deep Neural Networks for YouTube Recommendations
 
-多分类任务，使用用户侧特征（观看历史、搜索历史、人口特征），预估下一个想看的视频；没有使用视频侧特征。
+### 解决问题
 
-### 优化目标
-
-- 交叉熵损失函数。
+- YouTube 推荐规模极大，需要同时做好 candidate generation 和 ranking。
+- 传统方法难以处理海量用户行为与大规模视频库。
 
 ### 模型结构
 
-- 模型输出为 user embedding，softmax 层参数为 video embedding。
+- 论文将系统拆成 candidate generation 和 ranking 两阶段。
+- 你当前这篇召回笔记里主要对应 candidate generation：使用用户历史行为、搜索历史、人口属性等特征，生成 user embedding。
+- 输出层对视频 vocabulary 做 softmax，可视作 item embedding 参数化的一部分。
 
-### 特征处理
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/youtube-dnn-architecture.png" alt="YouTubeDNN 模型结构图">
+  <figcaption>YouTubeDNN 候选召回结构图：多路用户特征汇总为 user vector，再通过近邻检索生成候选视频。</figcaption>
+</figure>
 
-- search query：query tokenize into unigram and bigram and embed token。
-- 样本 age：训练集中样本时间最大值减去当前样本时间；预测时用 `0` 或者微小的复数。这个特征用来解决视频流行度分布变化快、但模型只能表示训练周期内平均概率的问题；它不依赖视频上传时间，因此预测时用户向量对所有 item 都是同一个值。
+### 样本构造
 
-### 训练样本
+- 正样本来自用户真实观看行为。
+- 训练时通过采样方式近似 softmax，并引入负样本。
 
-- 正样本：所有 YouTube 观看而非推荐产生的观看记录，用户看完的视频。
-- 负样本：每个正样本采样几千个负样本，并增加重要性权重。每个用户选取相同样本数，保证用户等权重。
+### 关键信息
 
-### 实现代码
+- 论文明确强调这是工业系统论文，重点是“候选召回 + 精排”二阶段架构。
+- 在候选召回部分，样本 age 特征被用来缓解内容流行度随时间剧烈变化的问题。
+- 原笔记记录：search query 做 unigram / bigram tokenization 并 embedding。
 
-- <https://github.com/ogerhsou/Youtube-Recommendation-Tensorflow/blob/master/youtube_recommendation.py>
+### 实验结论
+
+- Google 官方摘要只明确指出：深度学习带来了 dramatic performance improvements。
 
 ## 谷歌双塔 2019
 
 > Sampling-bias-corrected neural modeling for large corpus item recommendations
 
-流数据训练，使用 in-batch 负采样并做样本纠偏。batch 内负采样的优势是不需要额外增加采样步骤，也能适应样本分布变化。
+### 解决问题
+
+- 大规模 item retrieval 中，in-batch negatives 虽然高效，但会引入 sampling bias。
+- item 频率分布高度偏斜时，这种偏差会明显伤害模型效果。
 
 ### 模型结构
 
-- 两个塔相互独立，输出是 inner product。
+- two-tower neural network。
+- item tower 编码丰富的 item content features。
+- 打分使用 user tower 与 item tower 的相似性。
+- 核心新增点不是 backbone，而是 training objective 里的 sampling bias correction。
 
-### 优化目标
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/google-two-tower-architecture.png" alt="谷歌双塔模型结构图">
+  <figcaption>谷歌采样纠偏双塔结构图：用户侧与候选侧独立编码，并在 in-batch softmax 目标下完成训练。</figcaption>
+</figure>
 
-- weighted log-likelihood 损失函数，reward 是正样本权重（例如观看时长等）。
+### 样本构造
 
-### 训练样本
+- 使用 streaming data 训练。
+- 正样本来自真实用户点击 / 观看行为。
+- 负样本主要来自 random mini-batch 中的 in-batch items。
 
-- 正样本：点击的视频。
-- 负样本：每天产生的流数据中获取 batch，使用 in-batch item 作为负样本。
-- in-batch item 呈幂次分布，会导致训练样本存在较大的 bias：热门 item 更常出现在 batch 中，因此在 logit 中加 `logQ correction`，其中 `p_j` 是 item `j` 在随机 batch 中的采样概率。
-- 这个参数比较关键：如果不设置，推荐的词会非常小众；设置过大，推荐词又几乎全是热门词。原文笔记里给出的参考设置是 `log10(p)`，其中 `p` 是样本出现的概率。
+### 关键信息
 
-### 补充说明（Eric Wang Peng）
+- 论文提出 item frequency estimation 方法，用 streaming data 估计 item 出现频率。
+- 通过 `logQ correction` 对 logits 做修正，以减轻热门 item 在 batch 中更容易出现所带来的偏差。
+- 原笔记里额外保留了一段实现层的补充，指出 market-aware 场景下概率估计很容易写错。
 
-这部分是原笔记里的额外补充，主要指出代码实现中样本纠偏计算有问题。
+### 实验结论
 
-- 根据定义：`p = B * n / N`
-- `n` 是某个词出现的次数。
-- `N` 是所有词出现的次数（所有 market 之和）。
-- `B` 是训练的 `batch_size`。
-
-由于引入了 market mask，相当于将一个 batch 拆成了多个小 batch 在使用；因此对于某个 market `m` 来说，其 `batch_size = B * N_m / N`，即正比于这个 market 中词的数量。
-
-代入后得到：
-
-- `p = B * N_m * n / N^2`
-- 现在实现里使用的是 `p = n / N_m`
-- 修正项应为 `B * N_m * N_m / N^2`
-
-由于取对数：
-
-- `log(p) = log(B) + log(N_m * n) - 2log(N) = log(N_m) + log(n) - 2log(N)`
-- 现在实现是：`p = n / N_m`，因此 `log(p) = log(n) - log(N_m)`
-- 修正项变成：`log(N_m) + log(n) - 2log(N) - log(n) + log(N_m) = 2log(N_m) - 2log(N)`
-
-原笔记里的解释是：
-
-- 当 `n` 越大时，说明词越热门，越容易出现在 negative 样本中。
-- 当 `N_m` 越大时，说明这个 market 比重大，那么这个词出现在别的样本中成为负样本的可能性越大。
-
-对比当时实现：
-
-```sql
-,ln(cast(count(1) over (partition by keyword, market) as double) /
-    cast(count(1) over (partition by market) as double)) as weight
-```
-
-原笔记认为正确写法应为：
-
-```sql
-,ln((count(1) over (partition by keyword, market)) *
-    (count(1) over (partition by market))) /
-   (count(1) * count(1)) as weight
-```
-
-这一错误带来的效果是：对于小 market 的词，`p` 被高估，因此 `log(p)` 过高，`s - log(p)` 过低；当 `w` 是负样本时，梯度不足，学习会更慢。
-
-### 样本纠偏
-
-- 预估样本在随机 batch 中的采样概率 `p`，再将采样概率 `p` 转化成连续两次采样到样本之间的平均步数。
-
-### 参考链接
-
-- <https://zhuanlan.zhihu.com/p/574752588>
-
-### 技巧
-
-- embedding normalize
-- 超参数 temperature
+- Google 官方摘要明确给出：理论分析、模拟实验、两个真实数据集离线实验，以及 YouTube live A/B tests 都支持 sampling bias correction 的有效性。
 
 ## Facebook 双塔 2020
 
 > Embedding-based Retrieval in Facebook Search
 
-样本构造上，同时使用点击和展现作为正样本，随机负采样和有展无点作为负样本，并做了 hard negative mining 和 hard positive mining。在线侧采用 ANN 检索，并对不同向量量化方法做了比较以提升检索效率。
+### 解决问题
+
+- Facebook Search 不仅依赖 query text，还强依赖搜索者上下文与社交图信息。
+- Boolean matching 难以兼顾个性化语义召回和系统效率。
 
 ### 模型结构
 
-- query encoder 和 document encoder 是独立网络，用 cos 函数计算两个向量的距离。
+- query encoder 与 document encoder 分别建模两侧输入。
+- 论文将 embedding-based retrieval 接入典型 search system，并结合 ANN 检索。
+- 论文还讨论了向量量化和系统级优化。
 
-### 损失函数
-
-- triplet loss。
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/facebook-search-architecture.png" alt="Facebook Search 双塔结构图">
+  <figcaption>Facebook Search 论文中的统一 embedding 架构：query encoder 与 document encoder 分别建模检索两侧输入。</figcaption>
+</figure>
 
 ### 样本构造
 
-#### 正样本
+- 原笔记记录：click 和 impression 都被用于构造正样本。
+- 负样本包括随机负采样和 harder negatives。
+- 同时还做了 hard positive mining。
 
-- 用户 click 数据。
-- 用户 impression 数据。
-- 两种正样本效果差不多。
-- hard positive 样本构造：失败的 search session 数据作为正样本。
+### 关键信息
 
-#### 负样本
+- Facebook 论文特别强调：除了文本，还要建模 social context。
+- 原笔记记录了两类 hard negative：
+  1. online hard negative：在 batch 内选最相近但不匹配的 doc。
+  2. offline hard negative：离线构造更难的样本。
+- 系统侧重点还包括 ANN 参数调优和 full-stack optimization。
 
-- 随机负采样。
-- hard 样本构造。
+### 实验结论
 
-动机：people search 中总是把同名的人都排在前面，目标的人并不会比其他同名人更高，可能是由于负样本太简单，导致模型没有学好社交特征。
-
-解决方案：使用与正样本相近的样本作为 hard negative。
-
-1. online hard negative
-   在 batch 内，将与正样本 doc 相似度最高的其他 query 的 doc 作为负样本，对 recall 提升很大。
-   问题是：可能一个 batch 内所有样本都还不够 hard。
-2. offline hard negative
-   只用 hard negative 的效果还不如随机采样，因为模型更注重其他特征而忽略了文本特征。
-
-原笔记里的结论是：候选集中绝大多数其实是简单负样本，第一种方法相当于 easy:hard = 100:1 的负样本；第二种方法更像是 hard model 到 easy model 的迁移学习。
-
-### 向量增强
-
-- 向量加权：随机采样模型在召回量大时更容易召回目标；hard negative 模型在召回量小、候选集更小时更容易召回目标，因此可以对多个模型得到的 embedding 做加权。
-- 级联模型：先召回大量候选，再用第二个模型结果进一步过滤。
-
-### 特征工程
-
-- 文本特征用 character n-gram，加入 word n-gram 会带来提升。
-- 位置特征：在 query 侧和 document 侧都加入各自的位置。
-- 社交向量特征：独立模型。
+- 官方摘要只明确给出：在 Facebook Search 的 selected verticals 上观测到显著线上指标收益。
 
 ## 百度 MOBIUS 2019
 
 > MOBIUS: Towards the Next Generation of Query-Ad Matching in Baidu’s Sponsored Search
 
-在匹配层不仅考虑相关性，还考虑其他指标，比如 cpm、roi 等，来提升广告的 cpm。要解决的问题是低相关性高出现频次的 query-ad pair，以及大规模候选集的计算量。
+### 解决问题
+
+- 传统 sponsored search 是 funnel-shaped 三层结构。
+- matching 层只负责相关性，ranking 层才考虑 CPM、ROI 等商业指标，导致整体 commercial return 偏低。
 
 ### 模型结构
 
-- `Pr(click)` 用来线上做 ctr 预估。
-- `Pr(bad)` 用来过滤 bad case。
+- 用 CTR prediction 直接训练 matching layer，不再只优化 query-ad relevance。
+- 引入 active learning，解决 matching 层 click history 不足的问题。
+- 系统侧用 ANN / MIPS 做大规模 ad retrieval。
+- 原笔记提到 `Pr(click)` 和 `Pr(bad)` 两个输出：前者用于 CTR 预估，后者用于过滤 bad cases。
 
-### 线上检索
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/mobius-training-framework.png" alt="MOBIUS 训练框架图">
+  <figcaption>MOBIUS 训练与数据增强流程图：点击模型、relevance judger 和 augmented buffer 共同参与 matching 训练。</figcaption>
+</figure>
 
-- MIPS 将业务相关的系数作用到计算用户向量和广告向量内积的阶段。
+### 样本构造
+
+- 论文明确写的是 billions of query-ad pairs。
+- 原笔记和论文摘要都指出：通过 active learning 补充 bad cases。
+
+### 关键信息
+
+- 这是把商业目标前移到 matching 层的一篇工业系统论文。
+- active learning 是论文的重要训练机制。
+- ANN / MIPS 是满足低时延检索约束的关键工程组件。
+
+### 实验结论
+
+- KDD 页面和论文摘要都表明：MOBIUS-V1 作为百度下一代 query-ad matching 首版系统，兼顾了检索效率和商业收益目标。
 
 ## 阿里 DMR 2020
 
 > Deep Match to Rank Model for Personalized Click-Through Rate Prediction
 
+### 解决问题
+
+- 现有 CTR 预测模型更关注 user representation，本身对 user-item relevance 的显式建模不足。
+- 排序任务里需要更直接地表达用户对 target item 的偏好强度。
+
+### 模型结构
+
+- DMR 将 matching 的思想引入 ranking。
+- 包含 User-to-Item Network 和 Item-to-Item Network 两条子网络，分别刻画两种 user-item relevance。
+- 再结合传统 rec model features 输入到 MLP 做 CTR prediction。
+
+### 样本构造
+
+- 论文基于 CTR prediction 数据训练。
+
+### 关键信息
+
+- User-to-Item relevance 通过 embedding space 内积表示。
+- Item-to-Item relevance 通过用户历史 item 与 target item 的关系建模。
+- 论文本质上是 “match-to-rank”。
+
+### 实验结论
+
+- 论文摘要明确给出：在 public 和 industrial datasets 上显著优于 state-of-the-art baselines。
+
 ### 参考代码
 
 - <https://github.com/lvze92/DMR>
 
-## 字节 2021
+## 字节 Deep Retrieval 2020
 
 > Deep Retrieval: Learning A Retrievable Structure for Large-Scale Recommendations
+
+### 解决问题
+
+- 大规模推荐中，希望在子线性复杂度下准确召回 top candidates。
+- 传统方法通常是先学 inner-product model，再用 ANN 检索；这种两步法依赖欧式空间假设，并且结构学习与检索解耦。
+
+### 模型结构
+
+- DR 直接学习一个 retrievable structure，而不是先学 embedding 再套 ANN。
+- candidate items 被编码到 discrete latent space。
+- candidate latent codes 与其他网络参数一起联合学习。
+- 检索时使用 beam search。
+
+### 样本构造
+
+- 论文摘要明确给出：使用 user-item interaction data，例如 clicks。
+
+### 关键信息
+
+- 这是“把检索结构直接纳入学习目标”的代表性工作。
+- 与传统 two-tower + ANN 路线相比，DR 不再依赖 ANN 的欧式空间假设。
+
+### 实验结论
+
+- 论文摘要指出：在大规模推荐场景中，DR 能兼顾高精度召回与高效率检索。
