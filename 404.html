@@ -1,13 +1,47 @@
----
-layout: default
-title: 404 - Page not found
-permalink: /404.html
----
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404 | 橘子豆的个人博客</title>
+  <meta name="description" content="页面不存在">
+  <meta name="author" content="橘子豆">
+  <link rel="icon" href="/assets/img/beautiful_fighter.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  
+</head>
+<body class="page-404">
+  <header class="site-header">
+    <div class="site-shell site-header__inner">
+      <a class="site-brand" href="/">橘子豆的个人博客</a>
+      <nav class="site-nav"><a href="/">首页</a><a href="/papers/">论文解读</a><a href="/career/">职场那些事儿</a><a href="/aboutme/">关于我</a><a href="/tags/">标签</a></nav>
+    </div>
+  </header>
 
-<div class="text-center">
-  <h1>Whoops, this page doesn't exist.</h1>
-  <h1>Move along. (404 error)</h1>
-  <br/>
+  <main class="site-main">
+    
+    <section class="site-shell page-hero page-hero--compact">
+      <div class="eyebrow">404</div>
+      <h1>页面不存在</h1>
+      <p>这个地址现在没有内容，回首页继续看。</p>
+      <div class="button-row button-row--center">
+        <a class="button button--primary" href="/">回到首页</a>
+      </div>
+    </section>
+    
+  </main>
 
-  <img src="{{ 'assets/img/404-southpark.jpg' | relative_url }}" alt="Not found" />
-</div>
+  <footer class="site-footer">
+    <div class="site-shell site-footer__inner">
+      <div>
+        <strong>橘子豆</strong>
+        <p>记录论文解读、工程实践与职场思考</p>
+      </div>
+      <div class="site-footer__links">
+        <a href="mailto:976448731@qq.com">Email</a>
+        <a href="https://github.com/OrangeJessie" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

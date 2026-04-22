@@ -1,139 +1,146 @@
----
-layout: landing
-show-avatar: false
-share-title: 橘子豆的个人博客
-share-description: 论文解读与职场那些事儿
----
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>橘子豆的个人博客</title>
+  <meta name="description" content="记录论文解读、工程实践与职场思考">
+  <meta name="author" content="橘子豆">
+  <link rel="icon" href="/assets/img/beautiful_fighter.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  
+</head>
+<body class="page-home">
+  <header class="site-header">
+    <div class="site-shell site-header__inner">
+      <a class="site-brand" href="/">橘子豆的个人博客</a>
+      <nav class="site-nav"><a href="/" class="is-active">首页</a><a href="/papers/">论文解读</a><a href="/career/">职场那些事儿</a><a href="/aboutme/">关于我</a><a href="/tags/">标签</a></nav>
+    </div>
+  </header>
 
-{% assign paper_posts = site.posts | where: "section", "papers" %}
-{% assign career_posts = site.posts | where: "section", "career" %}
-{% assign date_format = "%Y.%m.%d" %}
-
-<section class="home-hero">
-  <div class="container-md">
-    <div class="home-hero-panel">
-      <div class="home-hero-copy">
-        <div class="home-kicker">PERSONAL BLOG</div>
-        <h1>把论文、工程和职场思考，写成真正能读下去的内容</h1>
-        <p class="home-hero-lead">
-          这里暂时专注两类主题：一类是把复杂论文拆开讲清楚，另一类是把一线工作里的踩坑、复盘和成长，写成更真实的记录。
-        </p>
-        <div class="home-hero-actions">
-          <a class="home-button home-button--primary" href="{{ '/papers/' | relative_url }}">进入论文解读</a>
-          <a class="home-button home-button--secondary" href="{{ '/career/' | relative_url }}">进入职场那些事儿</a>
-        </div>
-      </div>
-
-      <aside class="home-hero-aside">
-        {% if site.avatar %}
-          <img class="home-profile-avatar" src="{{ site.avatar | relative_url }}" alt="{{ site.author }}">
-        {% endif %}
-        <div class="home-profile-card">
-          <div class="home-profile-name">{{ site.author }}</div>
-          <p>关注算法、工程实践和表达方式，想把“看懂”和“说清楚”这两件事都做好。</p>
-        </div>
-        <div class="home-focus-grid">
-          <div class="home-focus-card">
-            <span class="home-focus-card__label">论文解读</span>
-            <strong>{{ paper_posts.size }}</strong>
-            <p>经典模型、方法拆解、实验脉络。</p>
-          </div>
-          <div class="home-focus-card">
-            <span class="home-focus-card__label">职场那些事儿</span>
-            <strong>{{ career_posts.size }}</strong>
-            <p>工程踩坑、工作复盘、成长记录。</p>
+  <main class="site-main">
+    
+    <section class="site-shell home-hero">
+      <div class="home-hero__panel">
+        <div class="home-hero__copy">
+          <div class="eyebrow">PERSONAL BLOG</div>
+          <h1>把论文、工程和职场思考，写成真正能读下去的内容</h1>
+          <p class="lead">这里暂时专注两类主题：一类是把复杂论文拆开讲清楚，另一类是把一线工作里的踩坑、复盘和成长，写成更真实的记录。</p>
+          <div class="button-row">
+            <a class="button button--primary" href="/papers/">进入论文解读</a>
+            <a class="button button--secondary" href="/career/">进入职场那些事儿</a>
           </div>
         </div>
-      </aside>
-    </div>
-  </div>
-</section>
-
-<section class="home-overview">
-  <div class="container-md">
-    <div class="home-section-heading">
-      <div>
-        <div class="home-kicker">CONTENT MAP</div>
-        <h2>现在的博客结构很简单，但方向很明确</h2>
-      </div>
-      <p>先把长期会持续写的两类内容打磨出来，再慢慢扩展更多个人表达。</p>
-    </div>
-
-    <div class="home-topic-grid">
-      <article class="home-topic-card">
-        <div class="home-topic-card__tag">01</div>
-        <h3>论文解读</h3>
-        <p>不堆术语，重点写清楚问题背景、核心方法、关键实验和我自己的理解。</p>
-        <a href="{{ '/papers/' | relative_url }}">查看这个板块</a>
-      </article>
-      <article class="home-topic-card">
-        <div class="home-topic-card__tag">02</div>
-        <h3>职场那些事儿</h3>
-        <p>把一线开发、问题排查、协作沟通和成长复盘，沉淀成有温度的职业记录。</p>
-        <a href="{{ '/career/' | relative_url }}">查看这个板块</a>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="home-preview-section">
-  <div class="container-md">
-    <div class="home-section-heading">
-      <div>
-        <div class="home-kicker">LATEST IN PAPERS</div>
-        <h2>论文解读</h2>
-      </div>
-      <a class="home-inline-link" href="{{ '/papers/' | relative_url }}">查看全部</a>
-    </div>
-
-    <div class="home-card-grid">
-      {% for post in paper_posts limit: 3 %}
-        <article class="content-card">
-          <div class="content-card__label">论文解读</div>
-          <h3><a href="{{ post.url | relative_url }}">{{ post.title | strip_html }}</a></h3>
-          <p>{{ post.summary | default: post.excerpt | strip_html | truncate: 120 }}</p>
-          <div class="content-card__meta">
-            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
-            {% if post.tags.size > 0 %}
-              <span>{{ post.tags | join: " / " }}</span>
-            {% endif %}
+        <aside class="home-hero__aside">
+          <img class="profile-avatar" src="/assets/img/beautiful_fighter.png" alt="橘子豆">
+          <div class="glass-card">
+            <strong>橘子豆</strong>
+            <p>关注算法、工程实践和表达方式，想把“看懂”和“说清楚”这两件事都做好。</p>
           </div>
-        </article>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<section class="home-preview-section home-preview-section--soft">
-  <div class="container-md">
-    <div class="home-section-heading">
-      <div>
-        <div class="home-kicker">LATEST AT WORK</div>
-        <h2>职场那些事儿</h2>
-      </div>
-      <a class="home-inline-link" href="{{ '/career/' | relative_url }}">查看全部</a>
-    </div>
-
-    {% if career_posts.size > 0 %}
-      <div class="home-card-grid">
-        {% for post in career_posts limit: 3 %}
-          <article class="content-card">
-            <div class="content-card__label">职场那些事儿</div>
-            <h3><a href="{{ post.url | relative_url }}">{{ post.title | strip_html }}</a></h3>
-            <p>{{ post.summary | default: post.excerpt | strip_html | truncate: 120 }}</p>
-            <div class="content-card__meta">
-              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: date_format }}</time>
-              {% if post.tags.size > 0 %}
-                <span>{{ post.tags | join: " / " }}</span>
-              {% endif %}
+          <div class="mini-grid">
+            <div class="mini-card">
+              <span>论文解读</span>
+              <strong>2</strong>
+              <p>经典模型、方法拆解、实验脉络。</p>
             </div>
-          </article>
-        {% endfor %}
+            <div class="mini-card">
+              <span>职场那些事儿</span>
+              <strong>1</strong>
+              <p>工程踩坑、工作复盘、成长记录。</p>
+            </div>
+          </div>
+        </aside>
       </div>
-    {% else %}
-      <div class="section-empty-state">
-        这个板块正在整理中，后续会补充更多关于工作、成长和一线经验的内容。
+    </section>
+
+    <section class="site-shell section-block">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">CONTENT MAP</div>
+          <h2>先把长期会持续写的两类内容打磨出来</h2>
+        </div>
       </div>
-    {% endif %}
-  </div>
-</section>
+      <div class="topic-grid">
+        <article class="topic-card">
+          <div class="topic-card__index">01</div>
+          <h3>论文解读</h3>
+          <p>不堆术语，重点写清楚问题背景、核心方法、关键实验和我自己的理解。</p>
+          <a href="/papers/">查看这个板块</a>
+        </article>
+        <article class="topic-card">
+          <div class="topic-card__index">02</div>
+          <h3>职场那些事儿</h3>
+          <p>把一线开发、问题排查、协作沟通和成长复盘，沉淀成有温度的职业记录。</p>
+          <a href="/career/">查看这个板块</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="site-shell section-block">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">LATEST IN PAPERS</div>
+          <h2>论文解读</h2>
+        </div>
+        <a class="section-link" href="/papers/">查看全部</a>
+      </div>
+      <div class="listing-grid">
+    <article class="listing-card">
+      <div class="listing-card__eyebrow">论文解读</div>
+      <h3><a href="/2023-03-03-GPT论文阅读/">GPT论文阅读</a></h3>
+      <p>从 GPT-1 到 GPT-3，梳理生成式预训练、zero-shot 与 few-shot 的关键演进脉络。</p>
+      <div class="listing-card__meta">
+        <time datetime="2023-03-03">2023.03.03</time>
+        <div class="listing-card__tags"><span>openai</span><span>gpt</span></div>
+      </div>
+    </article>
+    
+    <article class="listing-card">
+      <div class="listing-card__eyebrow">论文解读</div>
+      <h3><a href="/2023-03-03-GPT论文阅读2/">GPT 论文阅读整理版</a></h3>
+      <p>用更结构化的方式整理 GPT 早期论文，从训练目标、模型结构到实验设置逐段梳理。</p>
+      <div class="listing-card__meta">
+        <time datetime="2023-03-03">2023.03.03</time>
+        <div class="listing-card__tags"><span>openai</span><span>gpt</span></div>
+      </div>
+    </article>
+    </div>
+    </section>
+
+    <section class="site-shell section-block section-block--last">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">LATEST AT WORK</div>
+          <h2>职场那些事儿</h2>
+        </div>
+        <a class="section-link" href="/career/">查看全部</a>
+      </div>
+      <div class="listing-grid">
+    <article class="listing-card">
+      <div class="listing-card__eyebrow">职场那些事儿</div>
+      <h3><a href="/2023-03-14-hugging-face-set-transform-error/">Training CLIP image KeyError when using HuggingFace set_transform</a></h3>
+      <p>记录一次 HuggingFace 训练 CLIP 时的踩坑排查，从 set_transform 到 Trainer 删列逻辑的完整定位过程。</p>
+      <div class="listing-card__meta">
+        <time datetime="2023-03-14">2023.03.14</time>
+        <div class="listing-card__tags"><span>code</span><span>HuggingFace</span></div>
+      </div>
+    </article>
+    </div>
+    </section>
+    
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-shell site-footer__inner">
+      <div>
+        <strong>橘子豆</strong>
+        <p>记录论文解读、工程实践与职场思考</p>
+      </div>
+      <div class="site-footer__links">
+        <a href="mailto:976448731@qq.com">Email</a>
+        <a href="https://github.com/OrangeJessie" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
