@@ -35,6 +35,7 @@ SECTION_ORDER = [
     ("papers", "/papers/"),
     ("ai-tools", "/ai-tools/"),
     ("experience", "/experience/"),
+    ("game-space", "/game-space/"),
 ]
 
 PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart"
@@ -248,6 +249,7 @@ def clean_generated_outputs(posts: list["Post"]) -> None:
         "papers",
         "ai-tools",
         "experience",
+        "game-space",
         "career",
         "tags",
     ]:
@@ -296,11 +298,9 @@ def page_shell(page: Page) -> str:
   <footer class="site-footer">
     <div class="site-shell site-footer__inner">
       <div>
-        <strong>{html.escape(SITE['author'])}</strong>
         <p>{html.escape(SITE['description'])}</p>
       </div>
       <div class="site-footer__links">
-        <a href="mailto:{html.escape(SITE['email'])}">Email</a>
         <a href="{html.escape(SITE['github'])}" target="_blank" rel="noreferrer">GitHub</a>
       </div>
     </div>
@@ -329,11 +329,18 @@ def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> st
     cards = []
     for index, (section_key, href) in enumerate(SECTION_ORDER, start=1):
         meta = section_pages[section_key].meta
+        intro = str(meta.get("intro", meta.get("subtitle", ""))).strip()
         cards.append(
             f"""
             <a class="topic-card topic-card--link" href="{href}">
               <div class="topic-card__index">{index:02d}</div>
-              <h3>{html.escape(str(meta.get("title", section_key)))}</h3>
+              <div class="topic-card__body">
+                <div class="topic-card__heading">
+                  <h3>{html.escape(str(meta.get("title", section_key)))}</h3>
+                  <span class="topic-card__arrow" aria-hidden="true">↗</span>
+                </div>
+                <p>{html.escape(intro)}</p>
+              </div>
             </a>
             """
         )
@@ -603,10 +610,12 @@ def build() -> None:
     papers_page = load_markdown_page("papers.md")
     ai_tools_page = load_markdown_page("ai-tools.md")
     experience_page = load_markdown_page("experience.md")
+    game_space_page = load_markdown_page("game-space.md")
     section_pages = {
         "papers": papers_page,
         "ai-tools": ai_tools_page,
         "experience": experience_page,
+        "game-space": game_space_page,
     }
 
     tag_map: dict[str, list[Post]] = {}
@@ -650,6 +659,10 @@ def build() -> None:
     write_text(
         "experience/index.html",
         render_section("experience", experience_page.meta, [p for p in posts if p.section == "experience"]),
+    )
+    write_text(
+        "game-space/index.html",
+        render_section("game-space", game_space_page.meta, [p for p in posts if p.section == "game-space"]),
     )
     write_text("tags/index.html", render_tags(ordered_tags))
     write_text("404.html", render_404())
