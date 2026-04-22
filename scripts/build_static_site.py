@@ -17,9 +17,9 @@ CONTENT_POSTS = CONTENT_ROOT / "posts"
 CONTENT_PAGES = CONTENT_ROOT / "pages"
 
 SITE = {
-    "title": "橘子豆的个人博客",
+    "title": "橘子豆的AI工坊",
     "author": "橘子豆",
-    "description": "记录论文解读、AI工具与经验分享",
+    "description": "已识乾坤大，犹怜草木青",
     "email": "976448731@qq.com",
     "github": "https://github.com/OrangeJessie",
     "avatar": "/assets/img/beautiful_fighter.png",
@@ -27,11 +27,8 @@ SITE = {
 
 NAV = [
     ("首页", "/"),
-    ("论文解读", "/papers/"),
-    ("AI工具", "/ai-tools/"),
-    ("经验分享", "/experience/"),
     ("关于我", "/aboutme/"),
-    ("标签", "/tags/"),
+    ("Contact", "/contact/"),
 ]
 
 SECTION_ORDER = [
@@ -247,6 +244,7 @@ def clean_generated_outputs(posts: list["Post"]) -> None:
         "404.html",
         ".nojekyll",
         "aboutme",
+        "contact",
         "papers",
         "ai-tools",
         "experience",
@@ -328,49 +326,32 @@ def render_post_card(post: Post) -> str:
 
 
 def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> str:
-    section_posts = {key: [post for post in posts if post.section == key] for key, _ in SECTION_ORDER}
     cards = []
     for index, (section_key, href) in enumerate(SECTION_ORDER, start=1):
         meta = section_pages[section_key].meta
         cards.append(
             f"""
-            <article class="topic-card">
+            <a class="topic-card topic-card--link" href="{href}">
               <div class="topic-card__index">{index:02d}</div>
               <h3>{html.escape(str(meta.get("title", section_key)))}</h3>
-              <p>{html.escape(str(meta.get("subtitle", "")))}</p>
-              <div class="topic-card__meta">
-                <span>{len(section_posts[section_key])} 篇内容</span>
-                <a href="{href}">进入板块</a>
-              </div>
-            </article>
+            </a>
             """
         )
 
     body = f"""
     <section class="site-shell home-hero">
       <div class="home-hero__panel">
-        <div class="home-hero__copy">
-          <div class="eyebrow">PERSONAL BLOG</div>
-          <h1>把论文、工具和经验，整理成能长期沉淀的个人内容</h1>
-          <p class="lead">这个 blog 现在聚焦三条主线：论文解读负责拆清楚方法与实验，AI工具记录能真正提升效率的用法，经验分享沉淀那些做事过程中值得复用的判断和过程。</p>
-        </div>
-        <aside class="home-hero__aside">
+        <div class="home-profile">
           <img class="profile-avatar" src="{SITE['avatar']}" alt="{html.escape(SITE['author'])}">
-          <div class="glass-card">
-            <strong>{html.escape(SITE['author'])}</strong>
+          <div class="home-profile__body">
+            <h1>{html.escape(SITE['author'])}</h1>
             <p>关注算法、AI应用和表达方式，想把“看懂”“用上”“讲明白”这三件事都做好。</p>
           </div>
-        </aside>
+        </div>
       </div>
     </section>
 
     <section class="site-shell section-block">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">CONTENT MAP</div>
-          <h2>首页只保留三个入口，内容各自沉淀到对应板块</h2>
-        </div>
-      </div>
       <div class="topic-grid">{''.join(cards)}</div>
     </section>
     """
@@ -423,12 +404,20 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
     )
 
 
-def render_about(page_meta: dict[str, object], content_html: str) -> str:
-    title = str(page_meta.get("title", "关于我"))
+def render_prose_page(
+    page_meta: dict[str, object],
+    content_html: str,
+    *,
+    path: str,
+    active_nav: str,
+    body_class: str,
+    eyebrow: str,
+) -> str:
+    title = str(page_meta.get("title", "页面"))
     subtitle = str(page_meta.get("subtitle", ""))
     body = f"""
     <section class="site-shell page-hero">
-      <div class="eyebrow">ABOUT</div>
+      <div class="eyebrow">{html.escape(eyebrow)}</div>
       <h1>{html.escape(title)}</h1>
       <p>{html.escape(subtitle)}</p>
     </section>
@@ -441,10 +430,10 @@ def render_about(page_meta: dict[str, object], content_html: str) -> str:
             title=f"{title} | {SITE['title']}",
             subtitle="",
             body_html=body,
-            path="/aboutme/",
+            path=path,
             description=subtitle or "关于橘子豆的简介",
-            active_nav="/aboutme/",
-            body_class="page-about",
+            active_nav=active_nav,
+            body_class=body_class,
         )
     )
 
@@ -610,6 +599,7 @@ def build() -> None:
     posts = load_posts()
     clean_generated_outputs(posts)
     about_page = load_markdown_page("about.md")
+    contact_page = load_markdown_page("contact.md")
     papers_page = load_markdown_page("papers.md")
     ai_tools_page = load_markdown_page("ai-tools.md")
     experience_page = load_markdown_page("experience.md")
@@ -627,7 +617,28 @@ def build() -> None:
     ordered_tags = {tag: tag_map[tag] for tag in sorted(tag_map)}
 
     write_text("index.html", render_home(section_pages, posts))
-    write_text("aboutme/index.html", render_about(about_page.meta, about_page.body_html))
+    write_text(
+        "aboutme/index.html",
+        render_prose_page(
+            about_page.meta,
+            about_page.body_html,
+            path="/aboutme/",
+            active_nav="/aboutme/",
+            body_class="page-about",
+            eyebrow="ABOUT",
+        ),
+    )
+    write_text(
+        "contact/index.html",
+        render_prose_page(
+            contact_page.meta,
+            contact_page.body_html,
+            path="/contact/",
+            active_nav="/contact/",
+            body_class="page-contact",
+            eyebrow="CONTACT",
+        ),
+    )
     write_text(
         "papers/index.html",
         render_section("papers", papers_page.meta, [p for p in posts if p.section == "papers"]),

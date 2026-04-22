@@ -17,7 +17,7 @@
   - 静态站生成脚本，读取 `content/` 下的 Markdown，调用 `pandoc` 生成最终页面
 - `assets/css/site.css`
   - 主样式文件
-- `index.html` `404.html` `aboutme/` `papers/` `ai-tools/` `experience/` `tags/` `2023-*/`
+- `index.html` `404.html` `aboutme/` `contact/` `papers/` `ai-tools/` `experience/` `tags/` `2023-*/`
   - 生成后的最终静态页面
 - `.nojekyll`
   - 告诉 GitHub Pages 直接按静态文件托管，不走 Jekyll 处理

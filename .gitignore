@@ -5,3 +5,4 @@ ehthumbs.db
 
 .bundle/
 vendor/bundle/
+__pycache__/
