@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>策略梯度、TRPO、PPO | 橘子豆的AI工坊</title>
+  <meta name="description" content="把策略梯度的基本推导、TRPO 的 trust region 思路和 PPO 的两种简化形式串起来。">
+  <meta name="author" content="橘子豆">
+  <link rel="icon" href="/assets/img/beautiful_fighter.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  
+</head>
+<body class="page-post">
+  <header class="site-header">
+    <div class="site-shell site-header__inner">
+      <a class="site-brand" href="/">橘子豆的AI工坊</a>
+      <nav class="site-nav"><a href="/">首页</a><a href="/knowledge/papers/" class="is-active">论文解读</a><a href="/knowledge/ai-tools/">AI工具</a><a href="/knowledge/experience/">经验分享</a><a href="/knowledge/game-space/">游戏空间</a><a href="/aboutme/">关于我</a></nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    
+    <section class="site-shell report-hero">
+      <div class="eyebrow">论文解读</div>
+      <h1>策略梯度、TRPO、PPO</h1>
+      <div class="report-meta">
+        <span>2026.04.23</span>
+        <span>4 个标签</span>
+      </div>
+      <div class="report-tags"><a href='/knowledge/tags/#tag-reinforcement-learning'>reinforcement-learning</a><a href='/knowledge/tags/#tag-policy-gradient'>policy-gradient</a><a href='/knowledge/tags/#tag-trpo'>trpo</a><a href='/knowledge/tags/#tag-ppo'>ppo</a></div>
+    </section>
+    <section class="site-shell report-layout">
+      <aside class="article-toc"><div class="article-toc__title">目录</div><ul><li class="toc-level-2"><a href="#策略梯度">策略梯度</a></li><li class="toc-level-2"><a href="#trpo">TRPO</a></li><li class="toc-level-2"><a href="#ppo">PPO</a></li><li class="toc-level-2"><a href="#总结">总结</a></li></ul></aside>
+      <article class="report-article prose"><section class="paper-card paper-card--single"><p>强化学习的核心目标，是找到一个最优策略，使智能体在与环境交互的过程中获得的累积奖励期望最大。把策略参数化，再用梯度上升去优化目标函数，就是策略梯度方法的起点；TRPO 和 PPO 则是在这个基础上，继续解决“怎么更新得更稳”的问题。</p>
+<h2 id="策略梯度">策略梯度</h2>
+<h3 id="目标函数">目标函数</h3>
+<p>将策略参数化之后，强化学习的目标可以写成对策略参数 <span class="math inline">\(\theta\)</span> 的优化问题。原文从状态价值函数出发，把目标写成“初始状态价值的期望”。</p>
+<p>在推导里，一个关键中间量是折扣访问频率：</p>
+<p><span class="math display">\[
+\mu(x)=\sum_{k=0}^{\infty}\gamma^k \Pr(s \to x, k, \pi_\theta)
+\]</span></p>
+<p>它表示从当前状态出发，后续访问到状态 <span class="math inline">\(x\)</span> 的折扣累计权重。</p>
+<h3 id="梯度推导">梯度推导</h3>
+<p>状态价值函数的梯度可以整理成：</p>
+<p><span class="math display">\[
+\nabla_\theta V^{\pi_\theta}(s)=\sum_{x\in S}\mu(x)\phi(x)
+\]</span></p>
+<p>其中，<span class="math inline">\(\phi(x)\)</span> 表示策略发生微小变化时，状态 <span class="math inline">\(x\)</span> 下期望动作价值的变化率。原文强调，这个式子可以理解成：优化策略参数时，本质上是在给每个状态的直接梯度赋予一个重要性权重，再做加权求和。</p>
+<p>接着用恒等式</p>
+<p><span class="math display">\[
+\nabla x = x \nabla \ln x
+\]</span></p>
+<p>把动作概率的梯度改写成更适合采样的形式：</p>
+<p><span class="math display">\[
+\phi(s)=\sum_a \nabla_\theta \pi_\theta(a|s)Q^{\pi_\theta}(s,a)
+=\sum_a \pi_\theta(a|s)\nabla_\theta \ln \pi_\theta(a|s)Q^{\pi_\theta}(s,a)
+\]</span></p>
+<p>这样就不再需要遍历所有动作，而是可以直接按当前策略去采样动作，再用采样到的奖励来估计更新方向。</p>
+<h3 id="最终更新公式">最终更新公式</h3>
+<p>原文把策略梯度最终化简成：</p>
+<p><span class="math display">\[
+\nabla_\theta J(\theta)=\mathbb{E}_{s\sim \mu,\; a\sim \pi}\left[Q^\pi(s,a)\nabla_\theta \ln \pi(a|s,\theta)\right]
+\]</span></p>
+<p>在代码实现里，通常再用实际观测到的回报 <span class="math inline">\(G_t\)</span> 去替代 <span class="math inline">\(Q^\pi(s,a)\)</span>，得到参数更新公式：</p>
+<p><span class="math display">\[
+\theta \leftarrow \theta + \alpha G_t \nabla_\theta \ln \pi(A_t|S_t,\theta)
+\]</span></p>
+<h2 id="trpo">TRPO</h2>
+<h3 id="为什么要从策略梯度走到-trpo">为什么要从策略梯度走到 TRPO</h3>
+<p>原文指出，策略梯度至少有两个直接问题：</p>
+<ul>
+<li>步长难以确定。更新过大，可能把智能体带进完全未知的状态空间，使数据质量明显下降。</li>
+<li>无法保证单调提升。策略梯度本质上是局部一阶近似，一旦参数更新后状态访问分布发生明显变化，就不能保证新策略一定更好。</li>
+</ul>
+<p>TRPO（Trust Region Policy Optimization）就是在这个背景下提出的：它希望通过对“策略变化幅度”施加约束，让每一步更新都更稳。</p>
+<h3 id="性能差异恒等式">性能差异恒等式</h3>
+<p>TRPO 推导里最核心的一步，是用性能差异恒等式来比较新旧策略：</p>
+<p><span class="math display">\[
+\eta(\tilde{\pi})=\eta(\pi)+\mathbb{E}_{s_0,a_0,\dots \sim \tilde{\pi}}\left[\sum_{t=0}^{\infty}\gamma^t A_\pi(s_t,a_t)\right]
+\]</span></p>
+<p>其中，</p>
+<p><span class="math display">\[
+A_\pi(s,a)=Q_\pi(s,a)-V_\pi(s)
+\]</span></p>
+<p>表示优势函数，也就是“当前动作比该状态下平均动作好多少”。</p>
+<p>原文进一步引入折扣状态访问分布：</p>
+<p><span class="math display">\[
+\rho_{\tilde{\pi}}(s)=(1-\gamma)\sum_{t=0}^{\infty}\gamma^t P(S_t=s \mid \tilde{\pi})
+\]</span></p>
+<p>把性能差异恒等式整理成更适合优化的形式：</p>
+<p><span class="math display">\[
+\eta(\tilde{\pi})=\eta(\pi)+\sum_s \rho_{\tilde{\pi}}(s)\sum_a \tilde{\pi}(a|s)A_\pi(s,a)
+\]</span></p>
+<h3 id="trust-region-目标">Trust Region 目标</h3>
+<p>由于直接优化新策略时，状态访问分布也会跟着变化，TRPO 用旧策略的状态分布来近似，得到 surrogate objective：</p>
+<p><span class="math display">\[
+L_\pi(\tilde{\pi})=\eta(\pi)+\sum_s \rho_\pi(s)\sum_a \tilde{\pi}(a|s)A_\pi(s,a)
+\]</span></p>
+<p>然后再利用 KL 散度给出下界：</p>
+<p><span class="math display">\[
+\eta(\tilde{\pi}) \ge L_\pi(\tilde{\pi}) - C D_{KL}^{\max}(\pi,\tilde{\pi})
+\]</span></p>
+<p>只要右边增大，就能保证新策略的期望收益提升。于是 TRPO 最终把问题写成一个带约束优化：</p>
+<p><span class="math display">\[
+\underset{\theta}{\text{maximize}} \quad L_{\theta_{old}}(\theta)
+\qquad
+\text{subject to} \quad \bar{D}_{KL}^{\rho_{\theta_{old}}}(\theta_{old}, \theta)\le \delta
+\]</span></p>
+<h3 id="近似求解">近似求解</h3>
+<p>原文最后把目标函数做一阶展开、约束做二阶展开，把问题近似成一个二次约束优化。根据 KKT 条件，可以得到更新方向：</p>
+<p><span class="math display">\[
+\theta_{k+1}=\theta_k+\sqrt{\frac{2\delta}{g^T H^{-1}g}}H^{-1}g
+\]</span></p>
+<p>其中 <span class="math inline">\(g\)</span> 是目标函数的一阶梯度，<span class="math inline">\(H\)</span> 是 KL 散度的二阶项近似。也正因为这里要处理 Hessian 相关量，TRPO 的计算会更重。</p>
+<h2 id="ppo">PPO</h2>
+<h3 id="从-trpo-到-ppo">从 TRPO 到 PPO</h3>
+<p>原文对 PPO 的切入点非常直接：TRPO 虽然稳，但计算复杂。</p>
+<ul>
+<li>它需要处理带不等式约束的拉格朗日问题。</li>
+<li>参数更新和 Hessian 有关。</li>
+<li>实际实现里常常还要配合共轭梯度和线性搜索。</li>
+</ul>
+<p>PPO（Proximal Policy Optimization）保留了“不要让新旧策略差太远”的思想，但用更简单的方式来近似求解。原文把 PPO 分成两类：<code>PPO-惩罚</code> 和 <code>PPO-截断</code>。</p>
+<h3 id="ppo-惩罚">PPO-惩罚</h3>
+<p>PPO-惩罚的思路是：不再把 KL 散度写成硬约束，而是作为惩罚项直接放进目标函数里，再用启发式方式去动态调整惩罚系数。原文强调，关键不在于精确求解拉格朗日乘子，而在于根据 KL 的大小自适应调整强弱：</p>
+<ul>
+<li>当 KL 较小时，约束可以弱一些，让模型收敛更快；</li>
+<li>当 KL 较大时，约束就要更强，避免策略更新过猛。</li>
+</ul>
+<h3 id="ppo-截断">PPO-截断</h3>
+<p>PPO-截断是更常见的写法。它直接裁剪重要性采样比值：</p>
+<p><span class="math display">\[
+\arg\max_{\theta}\;
+\mathbb{E}_{s\sim \nu^{\pi_{\theta_k}},\; a\sim \pi_{\theta_k}(\cdot|s)}
+\left[
+\min\left(
+\frac{\pi_{\theta}(a|s)}{\pi_{\theta_k}(a|s)}A^{\pi_{\theta_k}}(s,a),
+\operatorname{clip}\left(
+\frac{\pi_{\theta}(a|s)}{\pi_{\theta_k}(a|s)},
+1-\epsilon,\,
+1+\epsilon
+\right)A^{\pi_{\theta_k}}(s,a)
+\right)
+\right]
+\]</span></p>
+<p>原文对这个目标的解释也很直观：</p>
+<ul>
+<li>当 <span class="math inline">\(A&gt;0\)</span> 时，如果概率比值已经超过 <span class="math inline">\(1+\epsilon\)</span>，就不再继续放大；</li>
+<li>当 <span class="math inline">\(A&lt;0\)</span> 时，如果概率比值已经低于 <span class="math inline">\(1-\epsilon\)</span>，就不再继续减小。</li>
+</ul>
+<p>这样做的目的，就是让新策略不要偏离旧策略过远。</p>
+<h3 id="实现要点">实现要点</h3>
+<p>原文给了 PPO-截断的代码实现。整理成流程，主要有四步：</p>
+<ol type="1">
+<li><p>用当前策略对状态采样动作，并记录旧策略下该动作的概率；</p></li>
+<li><p>用 reward 和 value 计算 advantage 与 target value；</p></li>
+<li><p>反复若干个 epoch，用新旧动作概率之比构造 clipped objective，更新 policy network；</p></li>
+<li><p>同时更新 value network。</p></li>
+</ol>
+<p>文中还特别提到，<code>value model</code> 和 <code>policy model</code> 往往共享底层网络，只在输出层分开：</p>
+<ul>
+<li>value model 输出标量价值；</li>
+<li>policy model 输出动作概率分布。</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>这三部分可以看成一条连续的演化链：</p>
+<ul>
+<li>策略梯度给出了最基本的优化方向；</li>
+<li>TRPO 引入 trust region，用 KL 约束换取更稳定的性能提升；</li>
+<li>PPO 则在保留“更新不要太激进”这一思想的同时，把训练过程改得更简单、更实用。</li>
+</ul>
+<p>如果只抓主线，原文其实讲得很清楚：从策略梯度到 TRPO，再到 PPO，核心一直都不是“换了一个完全不同的目标”，而是“如何在保证收益提升的前提下，让策略更新更稳定、更可实现”。</p></section></article>
+    </section>
+    <section class="site-shell post-nav-grid">
+      
+            <a class="post-nav-card" href="/knowledge/experience/2026-04-23-recommender-diversity-practice/">
+              <span>上一篇</span>
+              <strong>推荐系统的多样性提升实践</strong>
+            </a>
+            
+    </section>
+    
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-shell site-footer__inner">
+      <div>
+        <p>已识乾坤大，犹怜草木青</p>
+      </div>
+      <div class="site-footer__links">
+        <a href="https://github.com/OrangeJessie" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DPO 及变体 | 橘子豆的AI工坊</title>
+  <meta name="description" content="从 DPO 的目标函数出发，整理 IPO、Conservative DPO 和 SimPO 这几条常见变体路线。">
+  <meta name="author" content="橘子豆">
+  <link rel="icon" href="/assets/img/beautiful_fighter.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  
+</head>
+<body class="page-post">
+  <header class="site-header">
+    <div class="site-shell site-header__inner">
+      <a class="site-brand" href="/">橘子豆的AI工坊</a>
+      <nav class="site-nav"><a href="/">首页</a><a href="/knowledge/papers/" class="is-active">论文解读</a><a href="/knowledge/ai-tools/">AI工具</a><a href="/knowledge/experience/">经验分享</a><a href="/knowledge/game-space/">游戏空间</a><a href="/aboutme/">关于我</a></nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    
+    <section class="site-shell report-hero">
+      <div class="eyebrow">论文解读</div>
+      <h1>DPO 及变体</h1>
+      <div class="report-meta">
+        <span>2026.04.23</span>
+        <span>4 个标签</span>
+      </div>
+      <div class="report-tags"><a href='/knowledge/tags/#tag-reinforcement-learning'>reinforcement-learning</a><a href='/knowledge/tags/#tag-dpo'>dpo</a><a href='/knowledge/tags/#tag-alignment'>alignment</a><a href='/knowledge/tags/#tag-preference-learning'>preference-learning</a></div>
+    </section>
+    <section class="site-shell report-layout">
+      <aside class="article-toc"><div class="article-toc__title">目录</div><ul><li class="toc-level-2"><a href="#dpo">DPO</a></li><li class="toc-level-2"><a href="#ipo">IPO</a></li><li class="toc-level-2"><a href="#conservative-dpo">Conservative DPO</a></li><li class="toc-level-2"><a href="#simpo">SimPO</a></li><li class="toc-level-2"><a href="#总结">总结</a></li></ul></aside>
+      <article class="report-article prose"><section class="paper-card paper-card--single"><p>从 PPO 往对齐训练继续走，会发现工程复杂度很快上来。原文的切入点是：PPO 训练里通常需要 actor、critic、reward model 和 reference model 多个模块，维护成本高，而且显式优势函数容易把 reward 的波动直接传到梯度更新里。DPO 就是在这个背景下，把“偏好优化”改写成一个更直接的目标。</p>
+<h2 id="dpo">DPO</h2>
+<h3 id="从-ppo-到-dpo">从 PPO 到 DPO</h3>
+<p>原文对 DPO 的动机总结得很直接：</p>
+<ul>
+<li>critic 和 reward model 都会增加训练与维护成本；</li>
+<li>reward 波动过大时，优势函数也会随之剧烈波动，训练不稳定；</li>
+<li>如果能把优势函数吸收到目标函数里，就有机会只保留策略模型和参考模型。</li>
+</ul>
+<p>因此，DPO 通过变分法重写目标，把原本显式出现的优势函数换成了一个等价的偏好优化形式。</p>
+<h3 id="损失函数">损失函数</h3>
+<p>对一个偏好样本 <span class="math inline">\((x, y_w, y_l)\)</span>，其中 <span class="math inline">\(y_w\)</span> 是 preferred response，<span class="math inline">\(y_l\)</span> 是 rejected response，DPO 的目标写成：</p>
+<p><span class="math display">\[
+\mathcal{L}_{\text{DPO}}(\pi_{\theta}; \pi_{\text{ref}})
+=-
+\mathbb{E}_{(x,y_w,y_l)\sim\mathcal{D}}
+\left[
+\log \sigma \left(
+\beta \log \frac{\pi_{\theta}(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)}
+-
+\beta \log \frac{\pi_{\theta}(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}
+\right)
+\right]
+\]</span></p>
+<p>原文强调，旧策略的约束就体现在这个式子里的 reference model 上。reference 会减小 chosen / rejected 对数比值的差距，从而限制参数更新幅度。</p>
+<h3 id="实现要点">实现要点</h3>
+<p>原文给了完整的 DPO 伪代码，流程可以整理成下面几步：</p>
+<ol type="1">
+<li><p>计算策略模型对 <code>chosen</code> 和 <code>rejected</code> 的对数概率；</p></li>
+<li><p>计算参考模型对同样样本的对数概率；</p></li>
+<li><p>用两者的差构造相对 log ratio；</p></li>
+<li><p>对 <code>\beta \cdot logits</code> 取 <code>logsigmoid</code>，得到 DPO loss；</p></li>
+<li><p>额外监控 <code>chosen_rewards</code>、<code>rejected_rewards</code>、<code>reward_accuracy</code> 和 <code>reward_margin</code>。</p></li>
+</ol>
+<p>原文特别提醒了一点：这里的 <code>labels</code> 不是分类标签，而是语言模型逐 token 的监督目标；计算时还要显式忽略 <code>-100</code> 的位置。</p>
+<h2 id="ipo">IPO</h2>
+<h3 id="要解决什么问题">要解决什么问题</h3>
+<p>IPO（Identity Preference Optimization）主要针对一个问题：当偏好数据非常确定时，DPO 容易对偏好数据过拟合。</p>
+<p>原文的解释是，如果采样数据的偏好非常明确，等价于 <span class="math inline">\(q=1\)</span>，此时 DPO 会不断拉大正负样本之间的分差，KL 正则的作用会被弱化，模型就会倾向于让：</p>
+<ul>
+<li><span class="math inline">\(\pi(y_w)\)</span> 趋近于 <span class="math inline">\(100\%\)</span>；</li>
+<li><span class="math inline">\(\pi(y_l)\)</span> 趋近于 <span class="math inline">\(0\)</span>。</li>
+</ul>
+<h3 id="ipo-的做法">IPO 的做法</h3>
+<p>IPO 不再沿用 DPO 的偏好概率映射，而是采用恒等映射 <span class="math inline">\(\Psi(q)=q\)</span>，让模型的分差 <span class="math inline">\(h_\pi\)</span> 直接去拟合人类偏好：</p>
+<p><span class="math display">\[
+h_\pi \approx q
+\]</span></p>
+<p>对应地，目标函数变成一个均方误差：</p>
+<p><span class="math display">\[
+L(h) = (h_\pi - q)^2
+\]</span></p>
+<p>原文进一步写出，在真实偏好概率为 <span class="math inline">\(q\)</span>、模型分差为 <span class="math inline">\(h\)</span> 时，期望损失可以表示为：</p>
+<p><span class="math display">\[
+\mathcal{L}(h)
+=
+q \cdot (h - \Psi(1))^2 + (1-q)\cdot(-h-\Psi(1))^2
+\]</span></p>
+<p>最终得到 IPO 的训练目标：</p>
+<p><span class="math display">\[
+\mathcal{L}_{\rm IPO}(\theta)=
+\mathbb{E}_{(y_w, y_l, x) \sim \mathcal{D}}
+\left(
+h_\pi - \frac{\tau^{-1}}{2}
+\right)^2
+\]</span></p>
+<h2 id="conservative-dpo">Conservative DPO</h2>
+<h3 id="要解决什么问题-1">要解决什么问题</h3>
+<p>Conservative DPO 针对的是标签噪声。DPO 默认偏好标签全都正确，但如果偏好数据里本来就有错误标注，直接按 DPO 去拉大分差，会让模型训练不稳定。</p>
+<h3 id="损失函数-1">损失函数</h3>
+<p>原文把 Conservative DPO 的修正写成：</p>
+<p><span class="math display">\[
+\mathcal{L}_{\rm CDPO}(\theta)
+=
+-(1-\varepsilon)\log \sigma(\beta \cdot logits)
+-\varepsilon \log \sigma(-\beta \cdot logits)
+\]</span></p>
+<p>这里的 <span class="math inline">\(\varepsilon\)</span> 表示标签出错的概率，原文给的常见范围是 <code>0.1-0.3</code>。它的效果是：不会再无限制地拉大正负样本的分差。</p>
+<h2 id="simpo">SimPO</h2>
+<h3 id="要解决什么问题-2">要解决什么问题</h3>
+<p>原文把 SimPO 的动机总结成两点：</p>
+<ol type="1">
+<li><p>DPO 更偏向更长的文本，因为 logits 是对 token 概率求和，文本越长，累积值往往越大；</p></li>
+<li><p>DPO 仍然会在偏好数据上过拟合。</p></li>
+</ol>
+<p>此外，SimPO 还是一个 <code>reference-free</code> 的方案，可以直接减少显存占用。</p>
+<h3 id="奖励定义与目标函数">奖励定义与目标函数</h3>
+<p>SimPO 显式定义了基于平均 token log-prob 的奖励：</p>
+<p><span class="math display">\[
+r_\theta(y)=\frac{\beta}{L}\sum_{i=1}^{L}\log\pi_\theta(w_i|x,w_{&lt;i})
+\]</span></p>
+<p>再在损失里引入一个常量 <span class="math inline">\(\gamma\)</span>：</p>
+<p><span class="math display">\[
+\mathcal{L}_{\rm SimPO}
+=
+-\log \sigma \left(r_{\theta}(y_w)-r_{\theta}(y_l)-\gamma\right)
+\]</span></p>
+<p>原文对这个设计的解释是：当正负样本之间的差距已经大于 <span class="math inline">\(\gamma\)</span> 后，损失会逐渐趋近于零，模型不会再无止境地把两者继续拉开。</p>
+<h2 id="总结">总结</h2>
+<p>这几条路线可以看成围绕 DPO 的三种典型修正：</p>
+<ul>
+<li><code>IPO</code> 主要解决“偏好过于确定时的过拟合”；</li>
+<li><code>Conservative DPO</code> 主要解决“偏好标签有噪声”；</li>
+<li><code>SimPO</code> 主要解决“长度偏置、过拟合，以及 reference model 带来的额外开销”。</li>
+</ul>
+<p>如果只抓主线，DPO 之后的这些变体，本质上都在围绕两个问题打转：</p>
+<ul>
+<li>怎么让偏好优化更稳；</li>
+<li>怎么让训练成本更低。</li>
+</ul></section></article>
+    </section>
+    <section class="site-shell post-nav-grid">
+      
+            <a class="post-nav-card" href="/knowledge/papers/2026-04-22-retrieval-methods-diversity/">
+              <span>上一篇</span>
+              <strong>多兴趣双塔召回</strong>
+            </a>
+            
+            <a class="post-nav-card" href="/knowledge/papers/2026-04-23-rl-grpo/">
+              <span>下一篇</span>
+              <strong>GRPO</strong>
+            </a>
+            
+    </section>
+    
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-shell site-footer__inner">
+      <div>
+        <p>已识乾坤大，犹怜草木青</p>
+      </div>
+      <div class="site-footer__links">
+        <a href="https://github.com/OrangeJessie" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
