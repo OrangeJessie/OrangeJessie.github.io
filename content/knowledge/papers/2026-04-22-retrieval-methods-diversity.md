@@ -4,7 +4,7 @@ subtitle: MIND、ComiRec、SINE、Octopus、REMI、PinnerSage、DAT
 section: papers
 section_label: 论文解读
 group: retrieval
-summary: 基于原论文与现有笔记，按统一模板整理多兴趣召回相关论文，并在文首做论文对比。
+summary: 按统一模板整理多兴趣召回相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,multi-interest]
 ---
 
@@ -34,7 +34,7 @@ tags: [recsys,retrieval,multi-interest]
 - 使用多个 interest vectors 表示一个用户。
 - 核心模块是基于 capsule routing 的 multi-interest extractor。
 - 使用 label-aware attention 帮助学习多兴趣用户表示。
-- 原笔记补充了 dynamic routing、shared transformation matrix 和动态兴趣数等实现点。
+- 结构实现里还涉及 dynamic routing、shared transformation matrix 和动态兴趣数。
 
 <figure class="article-figure">
   <img src="/assets/post-media/retrieval-methods/mind-architecture.png" alt="MIND 模型结构图">
@@ -44,18 +44,13 @@ tags: [recsys,retrieval,multi-interest]
 ### 样本构造
 
 - 论文是典型的推荐学习设置：用户历史行为序列配合目标 item 监督。
-- 原笔记记录：label-aware attention 会根据目标 item 选择更相关的 interest capsule。
+- label-aware attention 会根据目标 item 选择更相关的 interest capsule。
 
 ### 关键信息
 
 - dynamic routing 的目标是把用户历史行为聚成多个兴趣簇。
 - routing logits 采用随机初始化，有利于学出不同兴趣方向。
 - label-aware attention 是训练阶段的重要组件。
-
-### 实验结论
-
-- 官方摘要明确写到：在多个公开 benchmark 和一个大规模 Tmall 工业数据集上，MIND 优于 state-of-the-art。
-- 论文同时说明该方法已在 Mobile Tmall 首页主流量上线。
 
 ## 阿里 ComiRec 2020
 
@@ -83,11 +78,6 @@ tags: [recsys,retrieval,multi-interest]
 - aggregation module 不只是简单拼接 topK 候选，而是显式引入 diversity 控制。
 - `Diversity@N` 是论文强调的指标之一。
 
-### 实验结论
-
-- 论文摘要明确给出：在两个真实数据集 Amazon 和 Taobao 上，相比现有多兴趣方法有显著提升。
-- 论文同时说明该框架已在阿里离线分布式平台部署。
-
 ## 阿里 SINE 2021
 
 > Sparse-Interest Network for Sequential Recommendation
@@ -102,7 +92,7 @@ tags: [recsys,retrieval,multi-interest]
 
 - SINE 包含 sparse-interest module，从大概念池中为每个用户自适应激活少量概念原型。
 - 再用 interest aggregation module 主动预测当前意图，并聚合多个 interest embeddings。
-- 原笔记补充：模块中包含 concept activation、prototype assignment 和 aggregation。
+- 模块中包含 concept activation、prototype assignment 和 aggregation。
 
 <figure class="article-figure">
   <img src="/assets/post-media/retrieval-methods/sine-architecture.png" alt="SINE 模型结构图">
@@ -113,10 +103,6 @@ tags: [recsys,retrieval,multi-interest]
 
 - SINE 的核心不是简单增加 interest 数量，而是从大原型池中做 sparse activation。
 - 与部分多兴趣方法不同，SINE 最终输出是聚合后的用户表示。
-
-### 实验结论
-
-- 官方摘要明确给出：在多个公开 benchmark 和一个大规模工业数据集上，SINE 相比 SOTA 有 substantial improvement。
 
 ## 微软 Octopus 2020
 
@@ -132,7 +118,7 @@ tags: [recsys,retrieval,multi-interest]
 
 - Octopus 为用户生成多个兴趣向量。
 - 与常规 multi-channel 结构不同，Octopus 的表示是 elastic 的：通道规模和类型会根据用户自适应确定。
-- 原笔记补充：通过 grouping head、通道分配和 quota 机制控制不同兴趣通道。
+- 通过 grouping head、通道分配和 quota 机制控制不同兴趣通道。
 
 <figure class="article-figure">
   <img src="/assets/post-media/retrieval-methods/octopus-framework.png" alt="Octopus 框架图">
@@ -142,12 +128,8 @@ tags: [recsys,retrieval,multi-interest]
 ### 关键信息
 
 - 论文的重点不只是“多兴趣”，而是“全面 + 弹性 + 可落地”。
-- 原笔记里记录的 quota allocation 是 serving 侧的重要设计。
+- quota allocation 是 serving 侧的重要设计。
 - elasticity 的意义是减少无关表示和无效计算。
-
-### 实验结论
-
-- Microsoft 官方摘要明确指出：在工业和公开数据集上，相比 SOTA baselines 验证了 Octopus 的有效性。
 
 ## 微软 REMI 2023
 
@@ -182,11 +164,6 @@ tags: [recsys,retrieval,multi-interest]
 - 这篇论文最重要的视角是：多兴趣学习的瓶颈不一定在结构，而在训练。
 - RR 用来缓解 attention / routing 的稀疏塌缩问题。
 
-### 实验结论
-
-- HKUST 论文摘要明确指出：通过重新审视训练框架，解决 easy negatives 和 routing collapse 后，多兴趣表示的表达性得到改善。
-- 原笔记补充了不同采样方式和消融实验。
-
 ## PinnerSage 2020
 
 > PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest
@@ -204,17 +181,13 @@ tags: [recsys,retrieval,multi-interest]
 
 ### 样本构造
 
-- 原笔记记录：对用户近 90 天行为做聚类。
+- 对用户近 90 天行为做聚类。
 
 ### 关键信息
 
 - Ward clustering + Medoids 是论文最有辨识度的结构设计。
 - Medoid 设计兼顾效率、鲁棒性和可解释性。
 - cluster importance 用来控制多兴趣检索成本。
-
-### 实验结论
-
-- KDD 官方摘要明确给出：线上和线下 A/B 实验都表明 PinnerSage 显著优于 single embedding methods。
 
 ## 美团 DAT 2021
 
@@ -229,7 +202,7 @@ tags: [recsys,retrieval,multi-interest]
 
 - DAT 在双塔基础上加入 AMM（Adaptive-Mimic Mechanism）。
 - 同时加入 CAL（Category Alignment Loss）对齐不同类别 item representation。
-- 原笔记补充了 mimic loss 与 category alignment 的实现理解。
+- 训练里还引入了 mimic loss 与 category alignment loss。
 
 <figure class="article-figure">
   <img src="/assets/post-media/retrieval-methods/dat-architecture.png" alt="DAT 模型结构图">
@@ -240,7 +213,3 @@ tags: [recsys,retrieval,multi-interest]
 
 - AMM 通过为 query 和 item 定制 augmented vector，缓解双塔缺少交互的问题。
 - CAL 处理类目不平衡。
-
-### 实验结论
-
-- 官方摘要明确给出：DAT 在大规模离线数据集上优于 baseline，且在线 A/B testing 也带来推荐质量提升。

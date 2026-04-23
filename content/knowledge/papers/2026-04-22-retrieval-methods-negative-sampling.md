@@ -4,7 +4,7 @@ subtitle: MNS、DCL、ProtoNCE、Debias CL、CLHNS、DirectCLR
 section: papers
 section_label: 论文解读
 group: retrieval
-summary: 基于原论文与现有笔记，按统一模板整理负采样与对比学习相关论文，并在文首做论文对比。
+summary: 按统一模板整理负采样与对比学习相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,negative-sampling]
 ---
 
@@ -42,17 +42,13 @@ tags: [recsys,retrieval,negative-sampling]
 
 - 一部分负样本来自 batch 内样本。
 - 另一部分负样本来自 item 库中的随机采样样本。
-- 原笔记将两部分 logits 横向拼接后统一参与训练。
+- 两部分 logits 横向拼接后统一参与训练。
 
 ### 关键信息
 
 - MNS 的重点是“混合”负样本来源，而不是只依赖 in-batch negatives。
 - 这样每个 item 都更有机会出现在负样本里，同时也能更灵活地控制采样分布。
-- 原笔记还顺手列了几种 InfoNCE 改进路线：ProtoNCE、DCL、DirectNCE、SCL、FNCL。
-
-### 实验结论
-
-- 基于原笔记可确认的结论是：MNS 主要被用来缓解选择偏差并提升采样分布可控性。
+- 相关改进路线还包括 ProtoNCE、DCL、DirectNCE、SCL、FNCL。
 
 ## DCL 2022
 
@@ -71,7 +67,7 @@ tags: [recsys,retrieval,negative-sampling]
 ### 关键信息
 
 - 论文关注 NPC（正负样本耦合）因子。
-- 原笔记记录：随着 batch size 增大，NPC 波动减小，且更容易接近 1。
+- 随着 batch size 增大，NPC 波动减小，且更容易接近 1。
 - 基于这一观察，DCL 去掉正负样本耦合项，并调整正样本权重。
 
 <figure class="article-figure">
@@ -81,7 +77,7 @@ tags: [recsys,retrieval,negative-sampling]
 
 ### 实验结论
 
-- 原笔记明确记录：batch size 越小时，DCL 相比带 NPC 的目标收益更明显。
+- batch size 越小时，DCL 相比带 NPC 的目标收益更明显。
 
 ## ProtoNCE 2021
 
@@ -102,7 +98,7 @@ tags: [recsys,retrieval,negative-sampling]
 
 ### 关键信息
 
-- 原笔记只保留了核心思想：用 prototype 代替负样本，用集中程度代替温度系数。
+- 用 prototype 代替部分负样本，用集中程度代替温度系数。
 
 ## Debias CL 2020
 
@@ -125,15 +121,14 @@ tags: [recsys,retrieval,negative-sampling]
 
 ### 关键信息
 
-- 原笔记明确记录了两点限制：
+- 这类方法有两点限制：
   1. 需要估计类先验概率，超参数敏感；
   2. 假设类分布近似均匀。
 - 论文理论上分析了有偏损失与无偏损失之间的 gap，并推导更接近无偏损失的目标。
 
 ### 实验结论
 
-- 官方摘要明确给出：该 debiased objective 在 vision、language、reinforcement learning 等 benchmark 上 consistently 优于当时 SOTA。
-- 原笔记还保留了经验性结论：`τ+` 很敏感，负样本数和正样本数都存在效果区间。
+- `τ+` 很敏感，负样本数和正样本数都存在效果区间。
 
 ## CLHNS 2021
 
@@ -152,17 +147,13 @@ tags: [recsys,retrieval,negative-sampling]
 ### 样本构造
 
 - 在无监督设定下构造 hard negatives。
-- 原笔记进一步把这个方法理解为对 von Mises-Fisher 分布参数进行控制，从而改变更难负样本的采样权重。
+- 可以把这个方法理解为对 von Mises-Fisher 分布参数进行控制，从而改变更难负样本的采样权重。
 
 ### 关键信息
 
 - 官方摘要明确指出：用户可以控制 hardness。
 - 一个极限情形会让同类样本更紧密、异类样本更分离。
-- 原笔记也记录了这类方法的限制：依赖类先验估计假设，且下游任务收益不一定统一。
-
-### 实验结论
-
-- TUM 官方摘要明确指出：该方法在多种模态的 downstream tasks 上提升了表现，同时几乎不增加实现复杂度和额外计算开销。
+- 这类方法依赖类先验估计假设，且下游任务收益不一定统一。
 
 ## DirectCLR 2022
 

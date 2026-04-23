@@ -4,7 +4,7 @@ subtitle: TDM、Deep Retrieval、RecForest
 section: papers
 section_label: 论文解读
 group: retrieval
-summary: 基于原论文与现有笔记，按统一模板整理非双塔结构的召回论文，并在文首做论文对比。
+summary: 按统一模板整理非双塔结构的召回论文，并在文首做论文对比。
 tags: [recsys,retrieval,indexing]
 ---
 
@@ -38,7 +38,7 @@ tags: [recsys,retrieval,indexing]
 
 ### 样本构造
 
-- 原笔记记录：
+- 训练时：
   - 叶子节点为正样本；
   - 从叶子到根路径上的节点都视为正样本；
   - 每一层其他节点随机采样作为负样本。
@@ -46,7 +46,7 @@ tags: [recsys,retrieval,indexing]
 ### 关键信息
 
 - 论文关键不只是“用树做索引”，而是“树结构与模型一起学习”。
-- 原笔记保留的树构建流程包括：
+- 树构建流程包括：
   - 初始化：按 category / item 排序后递归切分；
   - 学习：用 leaf embeddings 迭代更新树结构，可结合 K-means。
 
@@ -76,9 +76,6 @@ tags: [recsys,retrieval,indexing]
 - DR 的关键思想是：把“可检索结构”本身纳入学习，而不是后处理。
 - 这使得模型不必依赖 ANN 的欧式空间假设。
 
-### 实验结论
-
-- 论文摘要明确表述：DR 能在 large-scale recommendation 中同时做到更高质量召回和高效检索。
 
 ## 微软 RecForest 2022
 

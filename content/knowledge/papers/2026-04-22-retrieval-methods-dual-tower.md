@@ -4,7 +4,7 @@ subtitle: DSSM、YouTubeDNN、谷歌双塔、Facebook 双塔、MOBIUS、DMR、De
 section: papers
 section_label: 论文解读
 group: retrieval
-summary: 基于原论文与现有笔记，按统一模板整理双塔召回相关论文，并在文首做论文对比。
+summary: 按统一模板整理双塔召回相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,dual-tower]
 ---
 
@@ -52,10 +52,6 @@ tags: [recsys,retrieval,dual-tower]
 - 论文强调该方法是 discriminative training，而不是单纯学习无监督语义空间。
 - word hashing 是论文能落到 Web-scale 的关键工程点。
 
-### 实验结论
-
-- 在真实 Web document ranking 数据集上，DSSM 最优模型显著优于此前的 latent semantic baselines。
-
 ## YouTubeDNN 2016
 
 > Deep Neural Networks for YouTube Recommendations
@@ -85,11 +81,7 @@ tags: [recsys,retrieval,dual-tower]
 
 - 论文明确强调这是工业系统论文，重点是“候选召回 + 精排”二阶段架构。
 - 在候选召回部分，样本 age 特征被用来缓解内容流行度随时间剧烈变化的问题。
-- 原笔记记录：search query 做 unigram / bigram tokenization 并 embedding。
-
-### 实验结论
-
-- Google 官方摘要只明确指出：深度学习带来了 dramatic performance improvements。
+- search query 做 unigram / bigram tokenization 并 embedding。
 
 ## 谷歌双塔 2019
 
@@ -122,7 +114,7 @@ tags: [recsys,retrieval,dual-tower]
 
 - 论文提出 item frequency estimation 方法，用 streaming data 估计 item 出现频率。
 - 通过 `logQ correction` 对 logits 做修正，以减轻热门 item 在 batch 中更容易出现所带来的偏差。
-- 原笔记里额外保留了一段实现层的补充，指出 market-aware 场景下概率估计很容易写错。
+- market-aware 场景下，采样概率估计很容易写错。
 
 ### 实验结论
 
@@ -150,21 +142,17 @@ tags: [recsys,retrieval,dual-tower]
 
 ### 样本构造
 
-- 原笔记记录：click 和 impression 都被用于构造正样本。
+- click 和 impression 都被用于构造正样本。
 - 负样本包括随机负采样和 harder negatives。
 - 同时还做了 hard positive mining。
 
 ### 关键信息
 
 - Facebook 论文特别强调：除了文本，还要建模 social context。
-- 原笔记记录了两类 hard negative：
+- 论文中使用了两类 hard negative：
   1. online hard negative：在 batch 内选最相近但不匹配的 doc。
   2. offline hard negative：离线构造更难的样本。
 - 系统侧重点还包括 ANN 参数调优和 full-stack optimization。
-
-### 实验结论
-
-- 官方摘要只明确给出：在 Facebook Search 的 selected verticals 上观测到显著线上指标收益。
 
 ## 百度 MOBIUS 2019
 
@@ -180,7 +168,7 @@ tags: [recsys,retrieval,dual-tower]
 - 用 CTR prediction 直接训练 matching layer，不再只优化 query-ad relevance。
 - 引入 active learning，解决 matching 层 click history 不足的问题。
 - 系统侧用 ANN / MIPS 做大规模 ad retrieval。
-- 原笔记提到 `Pr(click)` 和 `Pr(bad)` 两个输出：前者用于 CTR 预估，后者用于过滤 bad cases。
+- 训练目标里同时涉及 `Pr(click)` 和 `Pr(bad)` 两个输出：前者用于 CTR 预估，后者用于过滤 bad cases。
 
 <figure class="article-figure">
   <img src="/assets/post-media/retrieval-methods/mobius-training-framework.png" alt="MOBIUS 训练框架图">
@@ -190,17 +178,13 @@ tags: [recsys,retrieval,dual-tower]
 ### 样本构造
 
 - 论文明确写的是 billions of query-ad pairs。
-- 原笔记和论文摘要都指出：通过 active learning 补充 bad cases。
+- 通过 active learning 补充 bad cases。
 
 ### 关键信息
 
 - 这是把商业目标前移到 matching 层的一篇工业系统论文。
 - active learning 是论文的重要训练机制。
 - ANN / MIPS 是满足低时延检索约束的关键工程组件。
-
-### 实验结论
-
-- KDD 页面和论文摘要都表明：MOBIUS-V1 作为百度下一代 query-ad matching 首版系统，兼顾了检索效率和商业收益目标。
 
 ## 阿里 DMR 2020
 
@@ -223,10 +207,6 @@ tags: [recsys,retrieval,dual-tower]
 - Item-to-Item relevance 通过用户历史 item 与 target item 的关系建模。
 - 论文本质上是 “match-to-rank”。
 
-### 实验结论
-
-- 论文摘要明确给出：在 public 和 industrial datasets 上显著优于 state-of-the-art baselines。
-
 ## 字节 Deep Retrieval 2020
 
 > Deep Retrieval: Learning A Retrievable Structure for Large-Scale Recommendations
@@ -247,7 +227,3 @@ tags: [recsys,retrieval,dual-tower]
 
 - 这是“把检索结构直接纳入学习目标”的代表性工作。
 - 与传统 two-tower + ANN 路线相比，DR 不再依赖 ANN 的欧式空间假设。
-
-### 实验结论
-
-- 论文摘要指出：在大规模推荐场景中，DR 能兼顾高精度召回与高效率检索。
