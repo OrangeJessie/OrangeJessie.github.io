@@ -1,8 +1,9 @@
 ---
-title: 召回方法整理：双塔召回
+title: 双塔召回
 subtitle: DSSM、YouTubeDNN、谷歌双塔、Facebook 双塔、MOBIUS、DMR、Deep Retrieval
 section: papers
 section_label: 论文解读
+group: retrieval
 summary: 基于原论文与现有笔记，按统一模板整理双塔召回相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,dual-tower]
 ---

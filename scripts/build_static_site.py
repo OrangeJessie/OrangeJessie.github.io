@@ -149,6 +149,30 @@ NAV = [
 
 SECTION_ORDER = ["papers", "ai-tools", "experience", "game-space"]
 
+SECTION_GROUPS: dict[str, list[tuple[str, str]]] = {
+    "papers": [
+        ("retrieval", "召回"),
+        ("ranking", "排序"),
+        ("reinforcement-learning", "强化学习"),
+        ("language-model", "语言模型"),
+    ],
+    "ai-tools": [
+        ("workflow", "工作流"),
+        ("debugging", "工程排错"),
+        ("training", "模型训练"),
+    ],
+    "experience": [
+        ("career", "职场"),
+        ("projects", "项目复盘"),
+        ("methods", "方法论"),
+    ],
+    "game-space": [
+        ("survival", "生存建造"),
+        ("simulation", "模拟经营"),
+        ("competitive", "竞技对战"),
+    ],
+}
+
 PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart+autolink_bare_uris"
 
 
@@ -179,6 +203,8 @@ class Post:
     tags: list[str]
     section: str
     section_label: str
+    group: str
+    group_label: str
     url: str
     source_path: Path
     html: str
@@ -540,6 +566,38 @@ def render_post_list_item(post: Post) -> str:
     """
 
 
+def build_section_groups(section_key: str, posts: list[Post]) -> list[dict[str, object]]:
+    configured_groups = SECTION_GROUPS.get(section_key, [])
+    configured_labels = {group_key: label for group_key, label in configured_groups}
+    grouped_posts: dict[str, list[Post]] = {}
+
+    for post in posts:
+        grouped_posts.setdefault(post.group, []).append(post)
+
+    groups: list[dict[str, object]] = []
+    for group_key, label in configured_groups:
+        groups.append(
+            {
+                "key": group_key,
+                "label": label,
+                "posts": grouped_posts.pop(group_key, []),
+            }
+        )
+
+    for group_key in sorted(grouped_posts):
+        items = grouped_posts[group_key]
+        fallback_label = items[0].group_label if items and items[0].group_label else group_key
+        groups.append(
+            {
+                "key": group_key,
+                "label": configured_labels.get(group_key, fallback_label),
+                "posts": items,
+            }
+        )
+
+    return groups
+
+
 def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> str:
     cards = []
     for index, section_key in enumerate(SECTION_ORDER, start=1):
@@ -615,19 +673,77 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
     title = str(page_meta.get("title", section_key))
     subtitle = str(page_meta.get("subtitle", ""))
     empty_text = str(page_meta.get("empty_text", "这个板块正在整理中，很快会补充内容。"))
-    listing_html = "".join(render_post_list_item(post) for post in posts)
-    if not listing_html:
-        listing_html = f'<div class="empty-state"><p>{html.escape(empty_text)}</p></div>'
-    subtitle_html = f"<p>{html.escape(subtitle)}</p>" if subtitle else ""
+    groups = build_section_groups(section_key, posts)
+    if posts:
+        nav_items = "".join(
+            f'<li><a href="#group-{section_key}-{html.escape(str(group["key"]))}">{html.escape(str(group["label"]))}</a></li>'
+            for group in groups
+        )
+        group_sections = []
+        for group in groups:
+            items = list(group["posts"])
+            if items:
+                listing_html = "".join(render_post_list_item(post) for post in items)
+            else:
+                listing_html = '<div class="empty-state"><p>这个分组还在整理中。</p></div>'
+            group_sections.append(
+                f"""
+                <section id="group-{section_key}-{html.escape(str(group["key"]))}" class="section-group">
+                  <div class="section-group__head">
+                    <h2>{html.escape(str(group["label"]))}</h2>
+                    <span class="section-group__count">{len(items)} 篇</span>
+                  </div>
+                  <div class="article-list article-list--grouped">
+                    {listing_html}
+                  </div>
+                </section>
+                """
+            )
+        listing_html = f"""
+        <div class="section-layout">
+          <aside class="section-directory">
+            <div class="section-directory__title">目录</div>
+            <ul>{nav_items}</ul>
+          </aside>
+          <div class="section-groups">
+            {''.join(group_sections)}
+          </div>
+        </div>
+        """
+    else:
+        nav_items = "".join(
+            f'<li><a href="#group-{section_key}-{group_key}">{html.escape(label)}</a></li>'
+            for group_key, label in SECTION_GROUPS.get(section_key, [])
+        )
+        group_sections = "".join(
+            f"""
+            <section id="group-{section_key}-{group_key}" class="section-group">
+              <div class="section-group__head">
+                <h2>{html.escape(label)}</h2>
+                <span class="section-group__count">0 篇</span>
+              </div>
+              <div class="empty-state"><p>{html.escape(empty_text)}</p></div>
+            </section>
+            """
+            for group_key, label in SECTION_GROUPS.get(section_key, [])
+        )
+        listing_html = f"""
+        <div class="section-layout">
+          <aside class="section-directory">
+            <div class="section-directory__title">目录</div>
+            <ul>{nav_items}</ul>
+          </aside>
+          <div class="section-groups">
+            {group_sections}
+          </div>
+        </div>
+        """
     body = f"""
     <section class="site-shell page-hero page-hero--archive">
       <h1>{html.escape(title)}</h1>
-      {subtitle_html}
     </section>
-    <section class="site-shell article-index">
-      <div class="article-list">
-        {listing_html}
-      </div>
+    <section class="site-shell article-index article-index--grouped">
+      {listing_html}
     </section>
     """
     return page_shell(
@@ -658,7 +774,6 @@ def render_prose_page(
     <section class="site-shell page-hero">
       <div class="eyebrow">{html.escape(eyebrow)}</div>
       <h1>{html.escape(title)}</h1>
-      <p>{html.escape(subtitle)}</p>
     </section>
     <section class="site-shell prose-card">
       <article class="prose prose--about">{content_html}</article>
@@ -790,7 +905,6 @@ def render_post(post: Post, previous_post: Post | None, next_post: Post | None) 
     <section class="site-shell report-hero">
       <div class="eyebrow">{html.escape(post.section_label)}</div>
       <h1>{html.escape(post.title)}</h1>
-      <p class="report-hero__subtitle">{html.escape(post.subtitle)}</p>
       <div class="report-meta">
         <span>{format_date(post.date)}</span>
         <span>{len(post.tags)} 个标签</span>
@@ -850,6 +964,7 @@ def load_posts() -> list[Post]:
         date_part = path.stem[:10]
         date_value = datetime.strptime(date_part, "%Y-%m-%d")
         html_fragment, toc_html = markdown_to_html(markdown_body, path.parent)
+        group_key = str(meta.get("group", "general"))
         posts.append(
             Post(
                 title=str(meta.get("title", path.stem)),
@@ -859,6 +974,8 @@ def load_posts() -> list[Post]:
                 tags=list(meta.get("tags", [])),
                 section=section_key,
                 section_label=str(meta.get("section_label", section_key)),
+                group=group_key,
+                group_label=str(meta.get("group_label", group_key)),
                 url=post_url(section_key, path.stem),
                 source_path=path,
                 html=html_fragment,

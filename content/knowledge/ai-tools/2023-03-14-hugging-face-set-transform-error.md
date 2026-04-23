@@ -3,6 +3,7 @@ title: Training CLIP image KeyError when using HuggingFace set_transform
 subtitle: on-the-fly transform error
 section: ai-tools
 section_label: AI工具
+group: debugging
 summary: 记录一次 HuggingFace 训练 CLIP 时的踩坑排查，从 set_transform 到 Trainer 删列逻辑的完整定位过程。
 tags: [code,HuggingFace]
 ---

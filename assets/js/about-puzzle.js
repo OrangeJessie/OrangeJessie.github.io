@@ -9,6 +9,9 @@
     const puzzle = document.querySelector("[data-about-puzzle]");
     if (!puzzle) return;
 
+    const header = document.querySelector(".site-header");
+    const footer = document.querySelector(".site-footer");
+    const sceneWrap = puzzle.querySelector(".about-puzzle__scene");
     const scene = puzzle.querySelector("[data-puzzle-scene]");
     const source = puzzle.querySelector("[data-puzzle-source]");
     const stone = puzzle.querySelector("[data-puzzle-stone]");
@@ -16,12 +19,32 @@
     const successUrl = puzzle.getAttribute("data-success-url") || "/aboutme/profile/";
     const emptyScene = puzzle.getAttribute("data-scene-empty") || scene.getAttribute("src") || "";
     const pickedScene = puzzle.getAttribute("data-scene-picked") || emptyScene;
+    const sceneRatio = 1536 / 1024;
 
     let dragging = false;
     let pointerId = null;
     let offsetX = 0;
     let offsetY = 0;
     let solved = false;
+
+    function layoutScene() {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const headerHeight = header ? header.offsetHeight : 0;
+      const footerHeight = footer ? footer.offsetHeight : 0;
+      const availableHeight = Math.max(280, viewportHeight - headerHeight - footerHeight);
+
+      let width = viewportWidth;
+      let height = width / sceneRatio;
+
+      if (height > availableHeight) {
+        height = availableHeight;
+        width = height * sceneRatio;
+      }
+
+      sceneWrap.style.width = `${Math.floor(width)}px`;
+      sceneWrap.style.height = `${Math.floor(height)}px`;
+    }
 
     function resetStone() {
       dragging = false;
@@ -99,6 +122,9 @@
       window.addEventListener("pointerup", onPointerUp);
       window.addEventListener("pointercancel", onPointerUp);
     });
+
+    layoutScene();
+    window.addEventListener("resize", layoutScene);
   }
 
   window.addEventListener("DOMContentLoaded", init);

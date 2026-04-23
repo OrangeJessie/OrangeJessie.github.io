@@ -2,6 +2,7 @@
 
 :root {
   --navy: #0f2a3f;
+  --heading: #314659;
   --dark-teal: #8b6f96;
   --teal: #bc99ca;
   --seafoam: #efdff1;
@@ -77,7 +78,7 @@ pre {
 }
 
 .site-brand {
-  color: var(--text);
+  color: var(--heading);
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -94,7 +95,7 @@ pre {
 .site-nav a {
   padding: 9px 14px;
   border-radius: 999px;
-  color: var(--text);
+  color: var(--heading);
   font-size: 0.92rem;
   font-weight: 600;
 }
@@ -102,7 +103,7 @@ pre {
 .site-nav a.is-active,
 .site-nav a:hover {
   background: var(--white);
-  color: var(--text);
+  color: var(--heading);
   box-shadow: 0 6px 18px rgba(15, 42, 63, 0.08);
 }
 
@@ -202,7 +203,7 @@ pre {
 
 .home-profile__body h1 {
   margin: 0 0 8px;
-  color: var(--navy);
+  color: var(--heading);
   font-size: clamp(1.55rem, 2.7vw, 2.15rem);
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -348,7 +349,7 @@ pre {
 .page-hero h1,
 .report-hero h1 {
   margin: 0;
-  color: var(--navy);
+  color: var(--heading);
   font-size: clamp(2.1rem, 3.6vw, 3.2rem);
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -646,10 +647,98 @@ pre {
   padding-top: 24px;
 }
 
+.article-index--grouped {
+  padding-top: 8px;
+}
+
+.section-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 30px;
+  align-items: start;
+}
+
+.section-directory {
+  position: sticky;
+  top: 92px;
+  padding: 20px 22px;
+  border: 1px solid var(--light-gray);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.section-directory__title {
+  margin-bottom: 12px;
+  color: var(--heading);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section-directory ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section-directory li + li {
+  margin-top: 8px;
+}
+
+.section-directory a {
+  color: var(--dark-gray);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.section-directory a:hover {
+  color: var(--heading);
+}
+
+.section-groups {
+  min-width: 0;
+}
+
+.section-group + .section-group {
+  margin-top: 44px;
+}
+
+.section-group__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(188, 204, 214, 0.62);
+}
+
+.section-group__head h2 {
+  margin: 0;
+  color: var(--heading);
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.section-group__count {
+  color: var(--gray);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .article-list {
   display: block;
   width: min(100%, 920px);
   margin: 0 auto;
+}
+
+.article-list--grouped {
+  width: 100%;
+  margin: 0;
 }
 
 .article-list-item {
@@ -661,9 +750,14 @@ pre {
   padding-top: 0;
 }
 
+.article-list--grouped .article-list-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
 .article-list-item h2 {
   margin: 14px 0 14px;
-  color: var(--text);
+  color: var(--heading);
   font-size: clamp(1.45rem, 2vw, 1.95rem);
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -862,15 +956,17 @@ pre {
 }
 
 .page-about-puzzle {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .page-about-puzzle .site-main {
   flex: 1;
   display: flex;
+  min-height: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 .page-about-puzzle .about-puzzle-page {
@@ -878,7 +974,10 @@ pre {
   margin: 0;
   display: flex;
   flex: 1;
+  min-height: 0;
   padding-top: 0;
+  align-items: center;
+  justify-content: center;
 }
 
 .page-about-puzzle .about-puzzle {
@@ -886,15 +985,23 @@ pre {
   flex: 1;
   width: 100%;
   max-width: none;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
 }
 
 .page-about-puzzle .about-puzzle__scene {
-  flex: 1;
+  flex: none;
   border-radius: 0;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .page-about-puzzle .about-puzzle__scene-image,
 .page-about-puzzle .about-puzzle__scene-found {
+  width: 100%;
   height: 100%;
   object-fit: cover;
 }
@@ -1037,7 +1144,7 @@ pre {
 .prose h2,
 .prose h3,
 .prose h4 {
-  color: var(--text);
+  color: var(--heading);
   font-weight: 800;
   letter-spacing: -0.03em;
 }
@@ -1373,6 +1480,11 @@ pre {
     grid-template-columns: 1fr;
   }
 
+  .section-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
   .home-hero__panel,
   .home-profile {
     flex-direction: column;
@@ -1388,6 +1500,10 @@ pre {
   }
 
   .article-toc {
+    position: static;
+  }
+
+  .section-directory {
     position: static;
   }
 }

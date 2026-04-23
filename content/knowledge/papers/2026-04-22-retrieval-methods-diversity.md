@@ -1,8 +1,9 @@
 ---
-title: 召回方法整理：双塔召回多样性
+title: 多兴趣双塔召回
 subtitle: MIND、ComiRec、SINE、Octopus、REMI、PinnerSage、DAT
 section: papers
 section_label: 论文解读
+group: retrieval
 summary: 基于原论文与现有笔记，按统一模板整理多兴趣召回相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,multi-interest]
 ---

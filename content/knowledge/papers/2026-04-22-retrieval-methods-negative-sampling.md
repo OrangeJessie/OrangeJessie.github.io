@@ -1,8 +1,9 @@
 ---
-title: 召回方法整理：负采样
+title: 召回样本优化——负采样
 subtitle: MNS、DCL、ProtoNCE、Debias CL、CLHNS、DirectCLR
 section: papers
 section_label: 论文解读
+group: retrieval
 summary: 基于原论文与现有笔记，按统一模板整理负采样与对比学习相关论文，并在文首做论文对比。
 tags: [recsys,retrieval,negative-sampling]
 ---

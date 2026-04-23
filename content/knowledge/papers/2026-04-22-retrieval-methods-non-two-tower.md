@@ -1,8 +1,9 @@
 ---
-title: 召回方法整理：非双塔结构
+title: 召回索引建模
 subtitle: TDM、Deep Retrieval、RecForest
 section: papers
 section_label: 论文解读
+group: retrieval
 summary: 基于原论文与现有笔记，按统一模板整理非双塔结构的召回论文，并在文首做论文对比。
 tags: [recsys,retrieval,indexing]
 ---
