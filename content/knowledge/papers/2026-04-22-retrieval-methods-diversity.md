@@ -94,15 +94,19 @@ tags: [recsys,retrieval,multi-interest]
 - 再用 interest aggregation module 主动预测当前意图，并聚合多个 interest embeddings。
 - 模块中包含 concept activation、prototype assignment 和 aggregation。
 
-<figure class="article-figure">
-  <img src="/assets/post-media/retrieval-methods/sine-architecture.png" alt="SINE 模型结构图">
-  <figcaption>SINE 结构图：从 concept pool 中做 sparse activation，再通过 intention selector 完成兴趣聚合。</figcaption>
-</figure>
-
 ### 关键信息
 
 - SINE 的核心不是简单增加 interest 数量，而是从大原型池中做 sparse activation。
 - 与部分多兴趣方法不同，SINE 最终输出是聚合后的用户表示。
+
+### 实验结论
+
+- 下图给出了 SINE 在 MovieLens、Amazon 和 Taobao 数据集上的公开实验结果，对比了 GRU4Rec、Caser、SASRec、MIND 和 MCPRN。
+
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/sine-architecture.png" alt="SINE 论文实验结果表">
+  <figcaption>SINE 论文结果表：在 MovieLens、Amazon 和 Taobao 上对比多种序列推荐与多兴趣基线模型的公开结果。</figcaption>
+</figure>
 
 ## 微软 Octopus 2020
 
@@ -149,11 +153,6 @@ tags: [recsys,retrieval,multi-interest]
   - IHN（interest-aware negative mining）
   - RR（routing regularization）
 
-<figure class="article-figure">
-  <img src="/assets/post-media/retrieval-methods/remi-ihn.png" alt="REMI IHN 算法图">
-  <figcaption>REMI 中的 IHN 训练算法：围绕 interest-aware negative mining 重构 sampled softmax 训练过程。</figcaption>
-</figure>
-
 ### 样本构造
 
 - 基于 sampled softmax 的训练框架。
@@ -163,6 +162,11 @@ tags: [recsys,retrieval,multi-interest]
 
 - 这篇论文最重要的视角是：多兴趣学习的瓶颈不一定在结构，而在训练。
 - RR 用来缓解 attention / routing 的稀疏塌缩问题。
+
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/remi-ihn.png" alt="REMI IHN 训练算法图">
+  <figcaption>REMI 中的 IHN 训练算法：围绕 interest-aware negative mining 重构 sampled softmax 训练过程。</figcaption>
+</figure>
 
 ## PinnerSage 2020
 

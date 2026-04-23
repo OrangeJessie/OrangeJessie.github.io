@@ -1213,6 +1213,26 @@ pre {
   margin: -0.4em 0 1.15em;
 }
 
+.citation-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid rgba(188, 153, 202, 0.34);
+  border-radius: 999px;
+  background: rgba(250, 241, 251, 0.95);
+  color: var(--dark-teal);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.citation-link::before {
+  content: "↗";
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
 .citation-note {
   position: relative;
   display: inline-block;

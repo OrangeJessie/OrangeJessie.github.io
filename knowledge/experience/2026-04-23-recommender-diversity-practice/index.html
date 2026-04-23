@@ -42,8 +42,8 @@
       <div class="report-tags"><a href='/knowledge/tags/#tag-recsys'>recsys</a><a href='/knowledge/tags/#tag-diversity'>diversity</a><a href='/knowledge/tags/#tag-ranking'>ranking</a></div>
     </section>
     <section class="site-shell report-layout">
-      <aside class="article-toc"><div class="article-toc__title">目录</div><ul><li class="toc-level-2"><a href="#多样性指标">多样性指标</a></li><li class="toc-level-2"><a href="#多样性优化方向">多样性优化方向</a></li><li class="toc-level-2"><a href="#召回优化">召回优化</a></li><li class="toc-level-2"><a href="#排序策略优化">排序策略优化</a></li><li class="toc-level-2"><a href="#总结">总结</a></li></ul></aside>
-      <article class="report-article prose"><p>当一个推荐系统的效率已经很高的时候，往往就需要开始考虑多样性。</p>
+      <aside class="article-toc"><div class="article-toc__title">目录</div><ul><li class="toc-level-2"><a href="#多样性指标">多样性指标</a></li><li class="toc-level-2"><a href="#多样性优化方向">多样性优化方向</a></li><li class="toc-level-2"><a href="#总结">总结</a></li></ul></aside>
+      <article class="report-article prose"><section class="paper-card paper-card--single"><p>当一个推荐系统的效率已经很高的时候，往往就需要开始考虑多样性。</p>
 <p><code>CTR</code> 和 <code>CVR</code> 的建模只针对这一次的展现，是一个短期行为；而越精确的模型，往往会带来越多同质化内容。实时重定向内容的转化链路效率通常高于其他内容，用户很容易陷入信息茧房。长期来看，用户体验会下降，导致用户流失，转化效率下降。</p>
 <p>因此，一个好的推荐系统，不仅要考虑短期内的转化效率提升，还要考虑长期的用户体验。归根结底，多样性优化最终还是要落到系统整体转化量的增长上，例如 <code>GMV</code>、<code>order</code> 或广告收入。</p>
 <h2 id="多样性指标">多样性指标</h2>
@@ -72,22 +72,22 @@
 <li>内容异质主要通过排序阶段的策略调整，优化多样性呈现，减少相似内容的重复。</li>
 </ul>
 <p>简单来说，一方面要增加覆盖用户更多兴趣、更广类目的召回；另一方面，要从排序策略上减少重复内容。</p>
-<h2 id="召回优化">召回优化</h2>
+<h3 id="召回优化">召回优化</h3>
 <p>对召回的优化主要有三个层面。</p>
-<h3 id="单个兴趣点召回不同内容">单个兴趣点召回不同内容</h3>
+<h4 id="单个兴趣点召回不同内容">单个兴趣点召回不同内容</h4>
 <p>单纯的重定向召回缺乏相关商品的推荐，而双塔模型召回恰好擅长捕捉潜在关系。</p>
 <p>双塔模型召回的经典文章是谷歌 2019 年发表的 <a href="https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/">Sampling-bias-corrected neural modeling for large corpus item recommendations</a>。这篇工作采用了 <code>in-batch</code> 负采样和样本纠偏参数，是一个很好的 baseline 模型。</p>
-<h3 id="覆盖更多兴趣点">覆盖更多兴趣点</h3>
+<h4 id="覆盖更多兴趣点">覆盖更多兴趣点</h4>
 <p>多向量双塔召回非常适合做多兴趣点召回。用户的单向量表示总是受到主要兴趣的影响，导致主要兴趣召回得更多，而一些不那么重要的兴趣召回得更少。</p>
 <p><a href="https://researchportal.hkust.edu.hk/en/publications/multi-interest-network-with-dynamic-routing-for-recommendation-at-2">Multi-Interest Network with Dynamic Routing for Recommendation at Tmall</a> 在 2019 年提出了 <code>MIND</code>。它使用胶囊网络和动态路由算法，让商品向量向近似的兴趣向量靠近，再进行聚类，从而得到不同方向的兴趣向量，但整体结构比较复杂，计算开销也更大。</p>
 <p>在 2020 年，阿里的 <a href="https://arxiv.org/abs/2005.09347">Controllable Multi-Interest Framework for Recommendation</a> 提出了 <code>ComiRec</code>。它在 <code>MIND</code> 的基础上，用 <code>self-attention</code> 代替动态路由来隐式提取用户的不同兴趣向量，并在 serving 阶段增加控制多样性指标的集成模块，用来平衡召回多样性和精确度。</p>
 <p>上面两种多向量召回都是隐式地学习用户的多个兴趣。如果某个用户的兴趣很广泛，但其中一个兴趣占了绝对主导，这种方式依然不一定能得到足够多样化的结果，多个向量召回出来的内容仍可能属于相同兴趣方向。</p>
 <p>微软在 2020 年 SIGIR 发表的 <a href="https://www.microsoft.com/en-us/research/?p=683799">Octopus: Comprehensive and Elastic User Representation for the Generation of Recommendation Candidates</a> 则显式控制各个兴趣向量之间的正交性，确保不同向量召回的商品尽可能不相关，并降低单个向量兴趣不纯净带来的影响。</p>
-<h3 id="拓展兴趣点">拓展兴趣点</h3>
+<h4 id="拓展兴趣点">拓展兴趣点</h4>
 <p>热门、最快上升、年龄性别、类别最热等一系列规则召回，精确度不高，但可以作为补充探索的方式。</p>
 <p>实际实践中，这类方法通常效果不好。一方面，这些内容与用户历史兴趣无关，排序模型很难把它们排在前面，所以展现量很少；另一方面，即使展现出来，用户往往也不感兴趣，又会给排序模型更多负反馈。</p>
-<h2 id="排序策略优化">排序策略优化</h2>
-<h3 id="determinantal-point-processdpp">Determinantal Point Process（DPP）</h3>
+<h3 id="排序策略优化">排序策略优化</h3>
+<h4 id="determinantal-point-processdpp">Determinantal Point Process（DPP）</h4>
 <p>可以用商品集合的相似度矩阵的行列式来表达商品集合的多样性。把矩阵看作向量集合时，行列式表示这些向量张成的有向体积；向量间夹角越大，也就是商品越不相关时，有向体积越大。因此，矩阵行列式越大，商品集合的多样性越好。</p>
 <p>目标可以写成：</p>
 <p><span class="math display">\[
@@ -96,7 +96,7 @@ Y^* = \arg\max_{Y \subseteq Z} \det(L_Y)
 <p>其中，<span class="math inline">\(Y\)</span> 是当前候选集，<span class="math inline">\(Z\)</span> 是商品集合。</p>
 <p>Hulu 在 2018 年 NeurIPS 发表的 <a href="https://papers.nips.cc/paper/7805-fast-greedy-map-inference-for-determinantal-point-process-to-improve-recommendation-diversity">Fast Greedy MAP Inference for Determinantal Point Process to Improve Recommendation Diversity</a> 提出了一种求解过程，使用贪心算法，每次从候选集中选一个使当前商品集多样性增加最多的商品加入结果集合。</p>
 <p>在这之后，可以经过一系列化简，得到最大化后验概率的算法。化简过程这里不展开。</p>
-<h3 id="频控策略">频控策略</h3>
+<h4 id="频控策略">频控策略</h4>
 <p>频控策略更多是启发式规则，需要根据具体业务数据进行分析。</p>
 <p>一个直接的做法是分析从召回到转化的漏斗数据，计算每一步的通过率：</p>
 <p><span class="math display">\[
@@ -106,7 +106,7 @@ Y^* = \arg\max_{Y \subseteq Z} \det(L_Y)
 <p>通过分析每一阶段的通过率，可以定位到底是哪一阶段导致系统多样性明显下降，再针对性地采取措施。</p>
 <h2 id="总结">总结</h2>
 <p>在优化系统多样性之前，首先要搞清楚：哪些多样性指标真的能给系统带来长期收益。</p>
-<p>如果这个问题没有想明白，那么那些不能带来业务指标提升的多样性优化，最终很容易停留在局部修补的层面，难以长期被重视。</p></article>
+<p>如果这个问题没有想明白，那么那些不能带来业务指标提升的多样性优化，最终很容易停留在局部修补的层面，难以长期被重视。</p></section></article>
     </section>
     <section class="site-shell post-nav-grid">
       

@@ -170,11 +170,6 @@ tags: [recsys,retrieval,dual-tower]
 - 系统侧用 ANN / MIPS 做大规模 ad retrieval。
 - 训练目标里同时涉及 `Pr(click)` 和 `Pr(bad)` 两个输出：前者用于 CTR 预估，后者用于过滤 bad cases。
 
-<figure class="article-figure">
-  <img src="/assets/post-media/retrieval-methods/mobius-training-framework.png" alt="MOBIUS 训练框架图">
-  <figcaption>MOBIUS 训练与数据增强流程图：点击模型、relevance judger 和 augmented buffer 共同参与 matching 训练。</figcaption>
-</figure>
-
 ### 样本构造
 
 - 论文明确写的是 billions of query-ad pairs。
@@ -185,6 +180,11 @@ tags: [recsys,retrieval,dual-tower]
 - 这是把商业目标前移到 matching 层的一篇工业系统论文。
 - active learning 是论文的重要训练机制。
 - ANN / MIPS 是满足低时延检索约束的关键工程组件。
+
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/mobius-training-framework.png" alt="MOBIUS 训练与数据增强流程图">
+  <figcaption>MOBIUS 训练与数据增强流程图：点击模型、relevance judger 和 augmented buffer 共同参与 matching 训练。</figcaption>
+</figure>
 
 ## 阿里 DMR 2020
 

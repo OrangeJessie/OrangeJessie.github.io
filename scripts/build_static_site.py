@@ -313,29 +313,6 @@ def remove_missing_images(content_html: str, source_dir: Path) -> str:
     return pattern.sub(replace, content_html)
 
 
-def render_citation_note(title: str, meta: dict[str, str]) -> str:
-    display_title = meta.get("paper_title", title)
-    excerpt = meta.get("excerpt", "").strip()
-    excerpt_html = (
-        f'<p class="citation-note__excerpt">"{html.escape(excerpt)}"</p>'
-        if excerpt
-        else ""
-    )
-    return (
-        '<div class="citation-row">'
-        '<details class="citation-note">'
-        '<summary>论文链接</summary>'
-        '<div class="citation-note__card">'
-        f'<div class="citation-note__source">{html.escape(meta["source_name"])}</div>'
-        f'<p class="citation-note__title">{html.escape(display_title)}</p>'
-        f"{excerpt_html}"
-        f'<a href="{html.escape(meta["source_url"])}" target="_blank" rel="noreferrer">打开论文原文</a>'
-        "</div>"
-        "</details>"
-        "</div>"
-    )
-
-
 def inject_paper_citations(content_html: str) -> str:
     updated = content_html
     for title, meta in PAPER_SOURCES.items():
@@ -344,8 +321,13 @@ def inject_paper_citations(content_html: str) -> str:
             rf"(<blockquote>\s*<p>{re.escape(title_html)}</p>\s*</blockquote>)",
             re.S,
         )
+        citation_link = (
+            '<div class="citation-row">'
+            f'<a class="citation-link" href="{html.escape(meta["source_url"])}" target="_blank" rel="noreferrer">论文链接</a>'
+            "</div>"
+        )
         updated = pattern.sub(
-            lambda match: match.group(1) + render_citation_note(title, meta),
+            lambda match: match.group(1) + citation_link,
             updated,
             count=1,
         )
@@ -960,6 +942,9 @@ def load_posts() -> list[Post]:
         date_part = path.stem[:10]
         date_value = datetime.strptime(date_part, "%Y-%m-%d")
         html_fragment, toc_html = markdown_to_html(markdown_body, path.parent)
+        has_structured_cards = 'class="article-overview-card"' in html_fragment or 'class="paper-card"' in html_fragment
+        if bool(meta.get("single_card", False)) or not has_structured_cards:
+            html_fragment = f'<section class="paper-card paper-card--single">{html_fragment}</section>'
         group_key = str(meta.get("group", "general"))
         posts.append(
             Post(

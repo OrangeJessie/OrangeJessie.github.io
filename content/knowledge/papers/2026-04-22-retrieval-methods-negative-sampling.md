@@ -33,16 +33,16 @@ tags: [recsys,retrieval,negative-sampling]
 - 论文仍然是在 two-tower recommendation 框架下工作。
 - 核心创新点不在 backbone，而在 negative sampling 策略。
 
-<figure class="article-figure">
-  <img src="/assets/post-media/retrieval-methods/mns-architecture.png" alt="MNS 负采样结构图">
-  <figcaption>MNS 结构图：将 batch 内样本与索引库额外采样样本共同拼入 logits，形成 mixed negative sampling。</figcaption>
-</figure>
-
 ### 样本构造
 
 - 一部分负样本来自 batch 内样本。
 - 另一部分负样本来自 item 库中的随机采样样本。
 - 两部分 logits 横向拼接后统一参与训练。
+
+<figure class="article-figure">
+  <img src="/assets/post-media/retrieval-methods/mns-architecture.png" alt="MNS 负采样流程图">
+  <figcaption>MNS 负采样流程图：将 batch 内样本与索引库额外采样样本共同拼入 logits，形成 mixed negative sampling。</figcaption>
+</figure>
 
 ### 关键信息
 

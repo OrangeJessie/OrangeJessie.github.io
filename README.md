@@ -22,6 +22,8 @@
   - 各个知识模块的文章内容源，按模块分目录管理
 - `scripts/build_static_site.py`
   - 静态站生成脚本，读取 `content/` 下的 Markdown，调用 `pandoc` 生成最终页面
+- `scripts/new_article.py`
+  - 新文章脚手架，默认按当前“论文解读风格”创建文章 Markdown
 - `assets/css/site.css`
   - 主样式文件
 - `index.html` `404.html` `aboutme/`
@@ -43,6 +45,35 @@
 ```bash
 python3 scripts/build_static_site.py
 ```
+
+## 新建文章
+
+默认可以直接交互式创建：
+
+```bash
+python3 scripts/new_article.py
+```
+
+也可以一次性带参数：
+
+```bash
+python3 scripts/new_article.py \
+  --section experience \
+  --group projects \
+  --title "推荐系统的多样性提升实践" \
+  --subtitle "指标、召回优化、排序策略与频控" \
+  --summary "从指标、召回优化、排序策略和频控四个角度整理推荐系统多样性提升方法。" \
+  --tags "recsys,diversity,ranking" \
+  --template single-card \
+  --build
+```
+
+模板说明：
+
+- `single-card`
+  - 单篇文章，正文会按当前论文解读页的单卡片风格生成，适合经验分享、工具总结、项目实践
+- `paper-series`
+  - 多论文整理模板，带 `论文对比 / 解决问题 / 模型结构 / 样本构造 / 关键信息 / 实验结论`
 
 ## 更新流程
 

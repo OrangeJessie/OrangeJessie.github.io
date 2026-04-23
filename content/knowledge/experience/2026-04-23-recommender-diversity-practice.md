@@ -4,6 +4,7 @@ subtitle: 指标、召回优化、排序策略与频控
 section: experience
 section_label: 经验分享
 group: projects
+single_card: true
 summary: 从指标、召回优化、排序策略和频控四个角度整理推荐系统多样性提升方法。
 tags: [recsys,diversity,ranking]
 ---
@@ -45,17 +46,17 @@ tags: [recsys,diversity,ranking]
 
 简单来说，一方面要增加覆盖用户更多兴趣、更广类目的召回；另一方面，要从排序策略上减少重复内容。
 
-## 召回优化
+### 召回优化
 
 对召回的优化主要有三个层面。
 
-### 单个兴趣点召回不同内容
+#### 单个兴趣点召回不同内容
 
 单纯的重定向召回缺乏相关商品的推荐，而双塔模型召回恰好擅长捕捉潜在关系。
 
 双塔模型召回的经典文章是谷歌 2019 年发表的 [Sampling-bias-corrected neural modeling for large corpus item recommendations](https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/)。这篇工作采用了 `in-batch` 负采样和样本纠偏参数，是一个很好的 baseline 模型。
 
-### 覆盖更多兴趣点
+#### 覆盖更多兴趣点
 
 多向量双塔召回非常适合做多兴趣点召回。用户的单向量表示总是受到主要兴趣的影响，导致主要兴趣召回得更多，而一些不那么重要的兴趣召回得更少。
 
@@ -67,15 +68,15 @@ tags: [recsys,diversity,ranking]
 
 微软在 2020 年 SIGIR 发表的 [Octopus: Comprehensive and Elastic User Representation for the Generation of Recommendation Candidates](https://www.microsoft.com/en-us/research/?p=683799) 则显式控制各个兴趣向量之间的正交性，确保不同向量召回的商品尽可能不相关，并降低单个向量兴趣不纯净带来的影响。
 
-### 拓展兴趣点
+#### 拓展兴趣点
 
 热门、最快上升、年龄性别、类别最热等一系列规则召回，精确度不高，但可以作为补充探索的方式。
 
 实际实践中，这类方法通常效果不好。一方面，这些内容与用户历史兴趣无关，排序模型很难把它们排在前面，所以展现量很少；另一方面，即使展现出来，用户往往也不感兴趣，又会给排序模型更多负反馈。
 
-## 排序策略优化
+### 排序策略优化
 
-### Determinantal Point Process（DPP）
+#### Determinantal Point Process（DPP）
 
 可以用商品集合的相似度矩阵的行列式来表达商品集合的多样性。把矩阵看作向量集合时，行列式表示这些向量张成的有向体积；向量间夹角越大，也就是商品越不相关时，有向体积越大。因此，矩阵行列式越大，商品集合的多样性越好。
 
@@ -91,7 +92,7 @@ Hulu 在 2018 年 NeurIPS 发表的 [Fast Greedy MAP Inference for Determinantal
 
 在这之后，可以经过一系列化简，得到最大化后验概率的算法。化简过程这里不展开。
 
-### 频控策略
+#### 频控策略
 
 频控策略更多是启发式规则，需要根据具体业务数据进行分析。
 
