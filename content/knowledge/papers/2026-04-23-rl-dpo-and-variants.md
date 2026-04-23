@@ -1,5 +1,6 @@
 ---
 title: DPO 及变体
+date: 2026-04-23 17:12:02
 subtitle: DPO、IPO、Conservative DPO、SimPO
 section: papers
 section_label: 论文解读

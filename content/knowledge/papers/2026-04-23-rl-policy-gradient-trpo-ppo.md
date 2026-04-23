@@ -1,5 +1,6 @@
 ---
 title: 策略梯度、TRPO、PPO
+date: 2026-04-23 17:12:03
 subtitle: 从 vanilla policy gradient 到 trust region 与 clipped objective
 section: papers
 section_label: 论文解读

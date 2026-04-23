@@ -140,6 +140,7 @@ def choose_group(section: str, group: str | None) -> str:
 def build_front_matter(
     *,
     title: str,
+    published_at: str,
     subtitle: str,
     summary: str,
     section: str,
@@ -151,6 +152,7 @@ def build_front_matter(
     lines = [
         "---",
         f"title: {title}",
+        f"date: {published_at}",
         f"subtitle: {subtitle}",
         f"section: {section}",
         f"section_label: {SECTION_LABELS[section]}",
@@ -185,7 +187,9 @@ def create_article(
     section_dir = CONTENT_KNOWLEDGE / section
     section_dir.mkdir(parents=True, exist_ok=True)
 
-    date_prefix = date_str or datetime.now().strftime("%Y-%m-%d")
+    now = datetime.now()
+    date_prefix = date_str or now.strftime("%Y-%m-%d")
+    published_at = f"{date_prefix} 00:00:00" if date_str else now.strftime("%Y-%m-%d %H:%M:%S")
     resolved_slug = slugify(slug or title)
     if not resolved_slug:
         resolved_slug = datetime.now().strftime("article-%H%M%S")
@@ -198,6 +202,7 @@ def create_article(
     single_card = template == "single-card"
     content = build_front_matter(
         title=title,
+        published_at=published_at,
         subtitle=subtitle,
         summary=summary,
         section=section,

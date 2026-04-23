@@ -209,6 +209,26 @@ class Post:
     toc: str
 
 
+def parse_post_datetime(meta_value: object, fallback_stem: str) -> datetime:
+    if meta_value:
+        raw = str(meta_value).strip()
+        if raw:
+            try:
+                return datetime.fromisoformat(raw)
+            except ValueError:
+                for fmt in (
+                    "%Y-%m-%d %H:%M:%S",
+                    "%Y-%m-%d %H:%M",
+                    "%Y-%m-%d",
+                ):
+                    try:
+                        return datetime.strptime(raw, fmt)
+                    except ValueError:
+                        continue
+    date_part = fallback_stem[:10]
+    return datetime.strptime(date_part, "%Y-%m-%d")
+
+
 def section_url(section_key: str) -> str:
     return f"{KNOWLEDGE_BASE_URL}/{section_key}/"
 
@@ -561,6 +581,7 @@ def render_post_list_item(post: Post) -> str:
 def build_section_groups(section_key: str, posts: list[Post]) -> list[dict[str, object]]:
     configured_groups = SECTION_GROUPS.get(section_key, [])
     configured_labels = {group_key: label for group_key, label in configured_groups}
+    configured_order = {group_key: index for index, (group_key, _) in enumerate(configured_groups)}
     grouped_posts: dict[str, list[Post]] = {}
 
     for post in posts:
@@ -587,6 +608,13 @@ def build_section_groups(section_key: str, posts: list[Post]) -> list[dict[str, 
             }
         )
 
+    groups.sort(
+        key=lambda group: (
+            max((post.date for post in group["posts"]), default=datetime.min),
+            -configured_order.get(str(group["key"]), len(configured_order)),
+        ),
+        reverse=True,
+    )
     return groups
 
 
@@ -939,8 +967,7 @@ def load_posts() -> list[Post]:
         raw_text = path.read_text(encoding="utf-8")
         meta, markdown_body = parse_front_matter(raw_text)
         section_key = path.parent.relative_to(CONTENT_KNOWLEDGE).parts[0]
-        date_part = path.stem[:10]
-        date_value = datetime.strptime(date_part, "%Y-%m-%d")
+        date_value = parse_post_datetime(meta.get("date"), path.stem)
         html_fragment, toc_html = markdown_to_html(markdown_body, path.parent)
         has_structured_cards = 'class="article-overview-card"' in html_fragment or 'class="paper-card"' in html_fragment
         if bool(meta.get("single_card", False)) or not has_structured_cards:
@@ -963,7 +990,7 @@ def load_posts() -> list[Post]:
                 toc=toc_html,
             )
         )
-    posts.sort(key=lambda item: (item.date, item.title), reverse=True)
+    posts.sort(key=lambda item: (item.date, item.source_path.stem), reverse=True)
     return posts
 
 
