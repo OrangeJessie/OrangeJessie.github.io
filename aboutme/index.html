@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>关于我 | 橘子豆的AI工坊</title>
-  <meta name="description" content="算法、工程与表达">
+  <meta name="description" content="拖动石头找到呀哈哈，然后进入关于我页面">
   <meta name="author" content="橘子豆">
   <link rel="icon" href="/assets/img/beautiful_fighter.png">
   <link rel="stylesheet" href="/assets/css/site.css">
-  
+  <script defer src="/assets/js/about-puzzle.js"></script>
 </head>
-<body class="page-about">
+<body class="page-about-puzzle">
   <header class="site-header">
     <div class="site-shell site-header__inner">
       <a class="site-brand" href="/">橘子豆的AI工坊</a>
@@ -20,21 +20,36 @@
 
   <main class="site-main">
     
-    <section class="site-shell page-hero">
-      <div class="eyebrow">ABOUT</div>
-      <h1>关于我</h1>
-      <p>算法、工程与表达</p>
-    </section>
-    <section class="site-shell prose-card">
-      <article class="prose prose--about"><p>你好，我是橘子豆。</p>
-<p>这是一间以个人表达为主的 blog，暂时会认真写三类内容：</p>
-<ul>
-<li>论文解读：把复杂论文拆成背景、方法、实验和个人理解，尽量让内容读起来不费劲。</li>
-<li>AI工具：记录真正能提升效率的工具、工作流和具体用法，不写泛泛介绍。</li>
-<li>经验分享：沉淀做事过程里的判断、复盘和方法，尽量写成能复用的经验。</li>
-</ul>
-<p>我更在意的不是“写了很多”，而是“有没有真的讲清楚”。所以这里的内容会尽量少一点空话，多一点结论、过程和可复用的经验。</p>
-<p>如果你也关心算法、AI工具，或者想看看一个普通开发者是怎么理解工作与成长的，欢迎常来。</p></article>
+    <section class="site-shell about-puzzle-page">
+      <div class="about-puzzle-intro">
+        <div class="eyebrow">ABOUT</div>
+        <h1>先帮我找到呀哈哈</h1>
+        <p>把右下角的石头拖到空缺的位置，找到呀哈哈后再进入真正的关于我页面。</p>
+      </div>
+      <section
+        class="about-puzzle"
+        data-about-puzzle
+        data-success-url="/aboutme/profile/"
+        data-scene-empty="/assets/img/about-puzzle/korok-scene-empty.png"
+        data-scene-picked="/assets/img/about-puzzle/korok-scene-picked.png"
+      >
+        <div class="about-puzzle__scene">
+          <img
+            class="about-puzzle__scene-image"
+            data-puzzle-scene
+            src="/assets/img/about-puzzle/korok-scene-empty.png"
+            alt="呀哈哈小游戏场景"
+          >
+          <img class="about-puzzle__scene-found" src="/assets/img/about-puzzle/korok-scene-found.png" alt="找到呀哈哈后的场景">
+          <button class="about-puzzle__source" type="button" data-puzzle-source aria-label="拿起右下角的石头"></button>
+          <div class="about-puzzle__target" data-puzzle-target aria-hidden="true"></div>
+          <button class="about-puzzle__stone" type="button" data-puzzle-stone hidden tabindex="-1" aria-hidden="true">
+            <img src="/assets/img/about-puzzle/korok-stone-crop.png" alt="石头">
+          </button>
+          <div class="about-puzzle__hint">把右下角石头拖到空缺处</div>
+        </div>
+        <div class="about-puzzle__success" aria-live="polite">呀哈哈！正在跳转到关于我...</div>
+      </section>
     </section>
     
   </main>

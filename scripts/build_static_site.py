@@ -677,6 +677,54 @@ def render_prose_page(
     )
 
 
+def render_about_puzzle() -> str:
+    body = """
+    <section class="site-shell about-puzzle-page">
+      <div class="about-puzzle-intro">
+        <div class="eyebrow">ABOUT</div>
+        <h1>先帮我找到呀哈哈</h1>
+        <p>把右下角的石头拖到空缺的位置，找到呀哈哈后再进入真正的关于我页面。</p>
+      </div>
+      <section
+        class="about-puzzle"
+        data-about-puzzle
+        data-success-url="/aboutme/profile/"
+        data-scene-empty="/assets/img/about-puzzle/korok-scene-empty.png"
+        data-scene-picked="/assets/img/about-puzzle/korok-scene-picked.png"
+      >
+        <div class="about-puzzle__scene">
+          <img
+            class="about-puzzle__scene-image"
+            data-puzzle-scene
+            src="/assets/img/about-puzzle/korok-scene-empty.png"
+            alt="呀哈哈小游戏场景"
+          >
+          <img class="about-puzzle__scene-found" src="/assets/img/about-puzzle/korok-scene-found.png" alt="找到呀哈哈后的场景">
+          <button class="about-puzzle__source" type="button" data-puzzle-source aria-label="拿起右下角的石头"></button>
+          <div class="about-puzzle__target" data-puzzle-target aria-hidden="true"></div>
+          <button class="about-puzzle__stone" type="button" data-puzzle-stone hidden tabindex="-1" aria-hidden="true">
+            <img src="/assets/img/about-puzzle/korok-stone-crop.png" alt="石头">
+          </button>
+          <div class="about-puzzle__hint">把右下角石头拖到空缺处</div>
+        </div>
+        <div class="about-puzzle__success" aria-live="polite">呀哈哈！正在跳转到关于我...</div>
+      </section>
+    </section>
+    """
+    return page_shell(
+        Page(
+            title=f"关于我 | {SITE['title']}",
+            subtitle="",
+            body_html=body,
+            path="/aboutme/",
+            description="拖动石头找到呀哈哈，然后进入关于我页面",
+            active_nav="/aboutme/",
+            extra_head='<script defer src="/assets/js/about-puzzle.js"></script>',
+            body_class="page-about-puzzle",
+        )
+    )
+
+
 def render_tags(tag_map: dict[str, list[Post]]) -> str:
     tag_buttons = "".join(
         f'<a class="tag-chip" href="#tag-{html.escape(tag)}">{html.escape(tag)} <span>{len(items)}</span></a>'
@@ -881,12 +929,13 @@ def build() -> None:
     search_index = {"documents": build_search_documents(posts)}
 
     write_text("index.html", render_home(section_pages, posts))
+    write_text("aboutme/index.html", render_about_puzzle())
     write_text(
-        "aboutme/index.html",
+        "aboutme/profile/index.html",
         render_prose_page(
             about_page.meta,
             about_page.body_html,
-            path="/aboutme/",
+            path="/aboutme/profile/",
             active_nav="/aboutme/",
             body_class="page-about",
             eyebrow="ABOUT",
