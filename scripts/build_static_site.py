@@ -143,6 +143,7 @@ NAV = [
     ("论文解读", "/knowledge/papers/"),
     ("AI工具", "/knowledge/ai-tools/"),
     ("经验分享", "/knowledge/experience/"),
+    ("游戏空间", "/knowledge/game-space/"),
     ("关于我", "/aboutme/"),
 ]
 
@@ -576,10 +577,6 @@ def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> st
 
     <section class="site-shell home-search-section">
       <div class="home-search" data-home-search>
-        <div class="home-search__watermark" aria-hidden="true">
-          <span class="home-search__watermark-icon">⌕</span>
-          <span class="home-search__watermark-text">SEARCH</span>
-        </div>
         <label class="home-search__input-wrap" for="site-search-input">
           <span class="home-search__icon" aria-hidden="true">⌕</span>
           <input
