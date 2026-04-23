@@ -162,9 +162,7 @@ SECTION_GROUPS: dict[str, list[tuple[str, str]]] = {
         ("training", "模型训练"),
     ],
     "experience": [
-        ("career", "职场"),
-        ("projects", "项目复盘"),
-        ("methods", "方法论"),
+        ("projects", "项目实践"),
     ],
     "game-space": [
         ("survival", "生存建造"),

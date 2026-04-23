@@ -3,7 +3,7 @@ title: 推荐系统的多样性提升实践
 subtitle: 指标、召回优化、排序策略与频控
 section: experience
 section_label: 经验分享
-group: methods
+group: projects
 summary: 从指标、召回优化、排序策略和频控四个角度整理推荐系统多样性提升方法。
 tags: [recsys,diversity,ranking]
 ---
