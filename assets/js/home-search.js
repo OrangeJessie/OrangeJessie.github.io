@@ -190,40 +190,35 @@
     if (!root) return;
 
     const input = root.querySelector(".home-search__input");
-    const clearButton = root.querySelector("[data-search-clear]");
     const status = root.querySelector("[data-search-status]");
     const results = root.querySelector("[data-search-results]");
 
     let documents = [];
     let stats = null;
 
-    function updateIdleState(message) {
-      status.textContent = message;
+    function updateIdleState() {
+      status.hidden = true;
+      status.textContent = "";
       results.hidden = true;
       results.innerHTML = "";
     }
 
-    function updateClearButton() {
-      clearButton.hidden = !input.value.trim();
-    }
-
     function runSearch() {
-      updateClearButton();
-
       const rawQuery = input.value.trim();
       if (!rawQuery) {
-        updateIdleState("支持中英混搜，例如：双塔、GPT、HuggingFace、召回、负采样");
+        updateIdleState();
         return;
       }
 
       if (!documents.length || !stats) {
+        status.hidden = false;
         status.textContent = "搜索索引还在加载，稍等一下。";
         return;
       }
 
       const query = buildQuery(rawQuery);
       if (!query.normalized) {
-        updateIdleState("请输入更具体一点的关键词。");
+        updateIdleState();
         return;
       }
 
@@ -238,23 +233,18 @@
         .map((item) => item.doc);
 
       if (!matched.length) {
-        status.textContent = `没有找到和 “${rawQuery}” 相关的内容。`;
+        status.hidden = true;
         results.hidden = false;
         results.innerHTML = '<div class="search-empty">换个更具体的关键词试试，比如论文名、方法名、模型名或标签。</div>';
         return;
       }
 
-      status.textContent = `找到 ${matched.length} 条相关内容。`;
+      status.hidden = true;
       results.hidden = false;
       renderResults(results, matched, query);
     }
 
     input.addEventListener("input", runSearch);
-    clearButton.addEventListener("click", () => {
-      input.value = "";
-      input.focus();
-      runSearch();
-    });
 
     try {
       const response = await fetch("/assets/data/search-index.json");
@@ -295,6 +285,7 @@
       runSearch();
     } catch (error) {
       console.error("Failed to load search index", error);
+      status.hidden = false;
       status.textContent = "搜索索引加载失败了，刷新页面再试一次。";
       results.hidden = true;
     }

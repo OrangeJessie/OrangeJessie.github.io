@@ -575,28 +575,24 @@ def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> st
     </section>
 
     <section class="site-shell home-search-section">
-      <div class="home-search-card">
-        <div class="home-search-card__copy">
-          <div class="eyebrow">Search</div>
-          <h2>搜一下我写过的内容</h2>
-          <p>支持中英混搜，适合搜论文名、方法名、工具名和主题关键词。</p>
+      <div class="home-search" data-home-search>
+        <div class="home-search__watermark" aria-hidden="true">
+          <span class="home-search__watermark-icon">⌕</span>
+          <span class="home-search__watermark-text">SEARCH</span>
         </div>
-        <div class="home-search" data-home-search>
-          <label class="home-search__input-wrap" for="site-search-input">
-            <span class="home-search__icon" aria-hidden="true">⌕</span>
-            <input
-              id="site-search-input"
-              class="home-search__input"
-              type="search"
-              name="q"
-              placeholder="搜索论文、AI工具、经验分享，比如：双塔 / GPT / HuggingFace"
-              autocomplete="off"
-            >
-            <button class="home-search__clear" type="button" data-search-clear hidden>清空</button>
-          </label>
-          <p class="home-search__status" data-search-status role="status" aria-live="polite">正在加载搜索索引...</p>
-          <div class="home-search__results" data-search-results hidden></div>
-        </div>
+        <label class="home-search__input-wrap" for="site-search-input">
+          <span class="home-search__icon" aria-hidden="true">⌕</span>
+          <input
+            id="site-search-input"
+            class="home-search__input"
+            type="search"
+            name="q"
+            placeholder="Search"
+            autocomplete="off"
+          >
+        </label>
+        <p class="home-search__status" data-search-status role="status" aria-live="polite" hidden></p>
+        <div class="home-search__results" data-search-results hidden></div>
       </div>
     </section>
 
@@ -868,7 +864,6 @@ def build() -> None:
     posts = load_posts()
     clean_generated_outputs(posts)
     about_page = load_markdown_page("about.md")
-    contact_page = load_markdown_page("contact.md")
     papers_page = load_markdown_page("papers.md")
     ai_tools_page = load_markdown_page("ai-tools.md")
     experience_page = load_markdown_page("experience.md")
@@ -898,17 +893,6 @@ def build() -> None:
             active_nav="/aboutme/",
             body_class="page-about",
             eyebrow="ABOUT",
-        ),
-    )
-    write_text(
-        "contact/index.html",
-        render_prose_page(
-            contact_page.meta,
-            contact_page.body_html,
-            path="/contact/",
-            active_nav="/contact/",
-            body_class="page-contact",
-            eyebrow="CONTACT",
         ),
     )
     write_text(

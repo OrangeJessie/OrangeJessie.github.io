@@ -35,28 +35,24 @@
     </section>
 
     <section class="site-shell home-search-section">
-      <div class="home-search-card">
-        <div class="home-search-card__copy">
-          <div class="eyebrow">Search</div>
-          <h2>搜一下我写过的内容</h2>
-          <p>支持中英混搜，适合搜论文名、方法名、工具名和主题关键词。</p>
+      <div class="home-search" data-home-search>
+        <div class="home-search__watermark" aria-hidden="true">
+          <span class="home-search__watermark-icon">⌕</span>
+          <span class="home-search__watermark-text">SEARCH</span>
         </div>
-        <div class="home-search" data-home-search>
-          <label class="home-search__input-wrap" for="site-search-input">
-            <span class="home-search__icon" aria-hidden="true">⌕</span>
-            <input
-              id="site-search-input"
-              class="home-search__input"
-              type="search"
-              name="q"
-              placeholder="搜索论文、AI工具、经验分享，比如：双塔 / GPT / HuggingFace"
-              autocomplete="off"
-            >
-            <button class="home-search__clear" type="button" data-search-clear hidden>清空</button>
-          </label>
-          <p class="home-search__status" data-search-status role="status" aria-live="polite">正在加载搜索索引...</p>
-          <div class="home-search__results" data-search-results hidden></div>
-        </div>
+        <label class="home-search__input-wrap" for="site-search-input">
+          <span class="home-search__icon" aria-hidden="true">⌕</span>
+          <input
+            id="site-search-input"
+            class="home-search__input"
+            type="search"
+            name="q"
+            placeholder="Search"
+            autocomplete="off"
+          >
+        </label>
+        <p class="home-search__status" data-search-status role="status" aria-live="polite" hidden></p>
+        <div class="home-search__results" data-search-results hidden></div>
       </div>
     </section>
 

@@ -24,7 +24,7 @@
   - 静态站生成脚本，读取 `content/` 下的 Markdown，调用 `pandoc` 生成最终页面
 - `assets/css/site.css`
   - 主样式文件
-- `index.html` `404.html` `aboutme/` `contact/`
+- `index.html` `404.html` `aboutme/`
   - 首页和基础页面
 - `knowledge/papers/` `knowledge/ai-tools/` `knowledge/experience/` `knowledge/game-space/` `knowledge/tags/`
   - 生成后的知识模块页、文章页和标签页
