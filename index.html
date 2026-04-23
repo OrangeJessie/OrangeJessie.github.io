@@ -8,13 +8,13 @@
   <meta name="author" content="橘子豆">
   <link rel="icon" href="/assets/img/beautiful_fighter.png">
   <link rel="stylesheet" href="/assets/css/site.css">
-  
+  <script defer src="/assets/js/home-search.js"></script>
 </head>
 <body class="page-home">
   <header class="site-header">
     <div class="site-shell site-header__inner">
       <a class="site-brand" href="/">橘子豆的AI工坊</a>
-      <nav class="site-nav"><a href="/" class="is-active">首页</a><a href="/aboutme/">关于我</a><a href="/contact/">Contact</a></nav>
+      <nav class="site-nav"><a href="/" class="is-active">首页</a><a href="/knowledge/papers/">论文解读</a><a href="/knowledge/ai-tools/">AI工具</a><a href="/knowledge/experience/">经验分享</a><a href="/aboutme/">关于我</a></nav>
     </div>
   </header>
 
@@ -30,6 +30,32 @@
             <p>论文 | 职场 | 项目 | 有关ai的想法以及其他</p>
             <p>文明 | 饥荒缺氧泰拉瑞亚 | 星露谷农夫 | LOL金铲铲 等游戏六级爱好者</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-shell home-search-section">
+      <div class="home-search-card">
+        <div class="home-search-card__copy">
+          <div class="eyebrow">Search</div>
+          <h2>搜一下我写过的内容</h2>
+          <p>支持中英混搜，适合搜论文名、方法名、工具名和主题关键词。</p>
+        </div>
+        <div class="home-search" data-home-search>
+          <label class="home-search__input-wrap" for="site-search-input">
+            <span class="home-search__icon" aria-hidden="true">⌕</span>
+            <input
+              id="site-search-input"
+              class="home-search__input"
+              type="search"
+              name="q"
+              placeholder="搜索论文、AI工具、经验分享，比如：双塔 / GPT / HuggingFace"
+              autocomplete="off"
+            >
+            <button class="home-search__clear" type="button" data-search-clear hidden>清空</button>
+          </label>
+          <p class="home-search__status" data-search-status role="status" aria-live="polite">正在加载搜索索引...</p>
+          <div class="home-search__results" data-search-results hidden></div>
         </div>
       </div>
     </section>

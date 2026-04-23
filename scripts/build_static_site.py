@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import json
 import re
 import shutil
 import subprocess
@@ -139,8 +140,10 @@ PAPER_SOURCES: dict[str, dict[str, str]] = {
 
 NAV = [
     ("首页", "/"),
+    ("论文解读", "/knowledge/papers/"),
+    ("AI工具", "/knowledge/ai-tools/"),
+    ("经验分享", "/knowledge/experience/"),
     ("关于我", "/aboutme/"),
-    ("Contact", "/contact/"),
 ]
 
 SECTION_ORDER = ["papers", "ai-tools", "experience", "game-space"]
@@ -409,6 +412,10 @@ def format_date(date_value: datetime) -> str:
     return date_value.strftime("%Y.%m.%d")
 
 
+def normalize_plain_text(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def output_path(relative_path: str) -> Path:
     return ROOT / relative_path.lstrip("/")
 
@@ -567,6 +574,32 @@ def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> st
       </div>
     </section>
 
+    <section class="site-shell home-search-section">
+      <div class="home-search-card">
+        <div class="home-search-card__copy">
+          <div class="eyebrow">Search</div>
+          <h2>搜一下我写过的内容</h2>
+          <p>支持中英混搜，适合搜论文名、方法名、工具名和主题关键词。</p>
+        </div>
+        <div class="home-search" data-home-search>
+          <label class="home-search__input-wrap" for="site-search-input">
+            <span class="home-search__icon" aria-hidden="true">⌕</span>
+            <input
+              id="site-search-input"
+              class="home-search__input"
+              type="search"
+              name="q"
+              placeholder="搜索论文、AI工具、经验分享，比如：双塔 / GPT / HuggingFace"
+              autocomplete="off"
+            >
+            <button class="home-search__clear" type="button" data-search-clear hidden>清空</button>
+          </label>
+          <p class="home-search__status" data-search-status role="status" aria-live="polite">正在加载搜索索引...</p>
+          <div class="home-search__results" data-search-results hidden></div>
+        </div>
+      </div>
+    </section>
+
     <section class="site-shell section-block">
       <div class="topic-grid">{''.join(cards)}</div>
     </section>
@@ -579,6 +612,7 @@ def render_home(section_pages: dict[str, MarkdownPage], posts: list[Post]) -> st
             path="/",
             description=SITE["description"],
             active_nav="/",
+            extra_head='<script defer src="/assets/js/home-search.js"></script>',
             body_class="page-home",
         )
     )
@@ -744,6 +778,7 @@ def render_post(post: Post, previous_post: Post | None, next_post: Post | None) 
             body_html=body,
             path=post.url,
             description=post.summary or post.subtitle,
+            active_nav=section_url(post.section),
             body_class="page-post",
         )
     )
@@ -808,6 +843,27 @@ def load_markdown_page(source_file: str) -> MarkdownPage:
     return MarkdownPage(meta=meta, body_html=html_fragment)
 
 
+def build_search_documents(posts: list[Post]) -> list[dict[str, object]]:
+    documents: list[dict[str, object]] = []
+    for post in posts:
+        content_text = normalize_plain_text(strip_tags(post.html))
+        documents.append(
+            {
+                "id": post.url.strip("/"),
+                "url": post.url,
+                "title": post.title,
+                "subtitle": post.subtitle,
+                "summary": post.summary,
+                "section": post.section,
+                "section_label": post.section_label,
+                "tags": post.tags,
+                "date": format_date(post.date),
+                "content": content_text[:6000],
+            }
+        )
+    return documents
+
+
 def build() -> None:
     posts = load_posts()
     clean_generated_outputs(posts)
@@ -830,6 +886,7 @@ def build() -> None:
             tag_map.setdefault(tag, []).append(post)
 
     ordered_tags = {tag: tag_map[tag] for tag in sorted(tag_map)}
+    search_index = {"documents": build_search_documents(posts)}
 
     write_text("index.html", render_home(section_pages, posts))
     write_text(
@@ -871,6 +928,7 @@ def build() -> None:
         render_section("game-space", game_space_page.meta, [p for p in posts if p.section == "game-space"]),
     )
     write_text("knowledge/tags/index.html", render_tags(ordered_tags))
+    write_text("assets/data/search-index.json", json.dumps(search_index, ensure_ascii=False, separators=(",", ":")))
     write_text("404.html", render_404())
 
     for idx, post in enumerate(posts):
