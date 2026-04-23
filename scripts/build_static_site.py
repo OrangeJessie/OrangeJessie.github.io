@@ -173,7 +173,7 @@ SECTION_GROUPS: dict[str, list[tuple[str, str]]] = {
     ],
 }
 
-PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart+autolink_bare_uris"
+PANDOC_FROM = "markdown+fenced_code_blocks+pipe_tables+raw_html+auto_identifiers+smart+autolink_bare_uris+tex_math_dollars"
 
 
 @dataclass
@@ -251,7 +251,7 @@ def parse_front_matter(text: str) -> tuple[dict[str, object], str]:
 
 def run_pandoc(markdown_text: str) -> str:
     completed = subprocess.run(
-        ["pandoc", f"--from={PANDOC_FROM}", "--to=html5", "--wrap=none"],
+        ["pandoc", f"--from={PANDOC_FROM}", "--to=html5", "--wrap=none", "--mathjax"],
         input=markdown_text,
         text=True,
         capture_output=True,
@@ -503,6 +503,18 @@ def page_shell(page: Page) -> str:
   <meta name="author" content="{html.escape(SITE['author'])}">
   <link rel="icon" href="{SITE['avatar']}">
   <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    window.MathJax = {{
+      tex: {{
+        inlineMath: [['\\\\(', '\\\\)'], ['$', '$']],
+        displayMath: [['\\\\[', '\\\\]'], ['$$', '$$']]
+      }},
+      options: {{
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }}
+    }};
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
   {page.extra_head}
 </head>
 <body class="{html.escape(page.body_class)}">

@@ -8,6 +8,18 @@
   <meta name="author" content="橘子豆">
   <link rel="icon" href="/assets/img/beautiful_fighter.png">
   <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
   
 </head>
 <body class="page-tags">
@@ -26,39 +38,21 @@
       <p>按主题快速浏览已有内容。</p>
     </section>
     <section class="site-shell tags-page">
-      <div class="tag-cloud"><a class="tag-chip" href="#tag-HuggingFace">HuggingFace <span>1</span></a><a class="tag-chip" href="#tag-code">code <span>1</span></a><a class="tag-chip" href="#tag-dual-tower">dual-tower <span>1</span></a><a class="tag-chip" href="#tag-gpt">gpt <span>2</span></a><a class="tag-chip" href="#tag-indexing">indexing <span>1</span></a><a class="tag-chip" href="#tag-multi-interest">multi-interest <span>1</span></a><a class="tag-chip" href="#tag-negative-sampling">negative-sampling <span>1</span></a><a class="tag-chip" href="#tag-openai">openai <span>2</span></a><a class="tag-chip" href="#tag-recsys">recsys <span>4</span></a><a class="tag-chip" href="#tag-retrieval">retrieval <span>4</span></a></div>
+      <div class="tag-cloud"><a class="tag-chip" href="#tag-diversity">diversity <span>1</span></a><a class="tag-chip" href="#tag-dual-tower">dual-tower <span>1</span></a><a class="tag-chip" href="#tag-gpt">gpt <span>2</span></a><a class="tag-chip" href="#tag-indexing">indexing <span>1</span></a><a class="tag-chip" href="#tag-multi-interest">multi-interest <span>1</span></a><a class="tag-chip" href="#tag-negative-sampling">negative-sampling <span>1</span></a><a class="tag-chip" href="#tag-openai">openai <span>2</span></a><a class="tag-chip" href="#tag-ranking">ranking <span>1</span></a><a class="tag-chip" href="#tag-recsys">recsys <span>5</span></a><a class="tag-chip" href="#tag-retrieval">retrieval <span>4</span></a></div>
       
-            <section id="tag-HuggingFace" class="tag-section">
+            <section id="tag-diversity" class="tag-section">
               <div class="section-head">
-                <h2>HuggingFace</h2>
+                <h2>diversity</h2>
                 <span class="tag-count">1 篇</span>
               </div>
               <div class="listing-grid">
     <article class="listing-card">
-      <div class="listing-card__eyebrow">AI工具</div>
-      <h3><a href="/knowledge/ai-tools/2023-03-14-hugging-face-set-transform-error/">Training CLIP image KeyError when using HuggingFace set_transform</a></h3>
-      <p>记录一次 HuggingFace 训练 CLIP 时的踩坑排查，从 set_transform 到 Trainer 删列逻辑的完整定位过程。</p>
+      <div class="listing-card__eyebrow">经验分享</div>
+      <h3><a href="/knowledge/experience/2026-04-23-recommender-diversity-practice/">推荐系统的多样性提升实践</a></h3>
+      <p>从指标、召回优化、排序策略和频控四个角度整理推荐系统多样性提升方法。</p>
       <div class="listing-card__meta">
-        <time datetime="2023-03-14">2023.03.14</time>
-        <div class="listing-card__tags"><span>code</span><span>HuggingFace</span></div>
-      </div>
-    </article>
-    </div>
-            </section>
-            
-            <section id="tag-code" class="tag-section">
-              <div class="section-head">
-                <h2>code</h2>
-                <span class="tag-count">1 篇</span>
-              </div>
-              <div class="listing-grid">
-    <article class="listing-card">
-      <div class="listing-card__eyebrow">AI工具</div>
-      <h3><a href="/knowledge/ai-tools/2023-03-14-hugging-face-set-transform-error/">Training CLIP image KeyError when using HuggingFace set_transform</a></h3>
-      <p>记录一次 HuggingFace 训练 CLIP 时的踩坑排查，从 set_transform 到 Trainer 删列逻辑的完整定位过程。</p>
-      <div class="listing-card__meta">
-        <time datetime="2023-03-14">2023.03.14</time>
-        <div class="listing-card__tags"><span>code</span><span>HuggingFace</span></div>
+        <time datetime="2026-04-23">2026.04.23</time>
+        <div class="listing-card__tags"><span>recsys</span><span>diversity</span><span>ranking</span></div>
       </div>
     </article>
     </div>
@@ -192,12 +186,40 @@
     </div>
             </section>
             
+            <section id="tag-ranking" class="tag-section">
+              <div class="section-head">
+                <h2>ranking</h2>
+                <span class="tag-count">1 篇</span>
+              </div>
+              <div class="listing-grid">
+    <article class="listing-card">
+      <div class="listing-card__eyebrow">经验分享</div>
+      <h3><a href="/knowledge/experience/2026-04-23-recommender-diversity-practice/">推荐系统的多样性提升实践</a></h3>
+      <p>从指标、召回优化、排序策略和频控四个角度整理推荐系统多样性提升方法。</p>
+      <div class="listing-card__meta">
+        <time datetime="2026-04-23">2026.04.23</time>
+        <div class="listing-card__tags"><span>recsys</span><span>diversity</span><span>ranking</span></div>
+      </div>
+    </article>
+    </div>
+            </section>
+            
             <section id="tag-recsys" class="tag-section">
               <div class="section-head">
                 <h2>recsys</h2>
-                <span class="tag-count">4 篇</span>
+                <span class="tag-count">5 篇</span>
               </div>
               <div class="listing-grid">
+    <article class="listing-card">
+      <div class="listing-card__eyebrow">经验分享</div>
+      <h3><a href="/knowledge/experience/2026-04-23-recommender-diversity-practice/">推荐系统的多样性提升实践</a></h3>
+      <p>从指标、召回优化、排序策略和频控四个角度整理推荐系统多样性提升方法。</p>
+      <div class="listing-card__meta">
+        <time datetime="2026-04-23">2026.04.23</time>
+        <div class="listing-card__tags"><span>recsys</span><span>diversity</span><span>ranking</span></div>
+      </div>
+    </article>
+    
     <article class="listing-card">
       <div class="listing-card__eyebrow">论文解读</div>
       <h3><a href="/knowledge/papers/2026-04-22-retrieval-methods-diversity/">多兴趣双塔召回</a></h3>
