@@ -629,6 +629,13 @@ pre {
   padding-bottom: 28px;
 }
 
+.page-hero__heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+}
+
 .page-hero--compact {
   padding-top: 48px;
 }
@@ -651,45 +658,18 @@ pre {
   padding-top: 8px;
 }
 
-.section-layout {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 30px;
-  align-items: start;
-}
-
 .section-directory {
-  position: sticky;
-  top: 92px;
-  padding: 20px 22px;
-  border: 1px solid var(--light-gray);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--shadow);
-}
-
-.section-directory__title {
-  margin-bottom: 12px;
-  color: var(--heading);
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.section-directory ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.section-directory li + li {
-  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px 18px;
 }
 
 .section-directory a {
-  color: var(--dark-gray);
-  font-size: 0.96rem;
+  color: var(--dark-teal);
+  font-size: 1rem;
+  font-weight: 700;
   line-height: 1.55;
 }
 
@@ -699,6 +679,8 @@ pre {
 
 .section-groups {
   min-width: 0;
+  width: min(100%, 920px);
+  margin: 0 auto;
 }
 
 .section-group + .section-group {
@@ -706,10 +688,7 @@ pre {
 }
 
 .section-group__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
+  display: block;
   margin-bottom: 6px;
   padding-bottom: 14px;
   border-bottom: 1px solid rgba(188, 204, 214, 0.62);
@@ -721,13 +700,6 @@ pre {
   font-size: clamp(1.4rem, 2vw, 1.9rem);
   letter-spacing: -0.03em;
   line-height: 1.1;
-}
-
-.section-group__count {
-  color: var(--gray);
-  font-size: 0.9rem;
-  font-weight: 600;
-  white-space: nowrap;
 }
 
 .article-list {
@@ -1480,11 +1452,6 @@ pre {
     grid-template-columns: 1fr;
   }
 
-  .section-layout {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
   .home-hero__panel,
   .home-profile {
     flex-direction: column;
@@ -1500,10 +1467,6 @@ pre {
   }
 
   .article-toc {
-    position: static;
-  }
-
-  .section-directory {
     position: static;
   }
 }
@@ -1522,6 +1485,12 @@ pre {
 
   .site-main {
     padding-top: 28px;
+  }
+
+  .page-hero__heading-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
 
   .home-hero__panel,

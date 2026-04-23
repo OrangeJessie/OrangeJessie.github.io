@@ -676,7 +676,7 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
     groups = build_section_groups(section_key, posts)
     if posts:
         nav_items = "".join(
-            f'<li><a href="#group-{section_key}-{html.escape(str(group["key"]))}">{html.escape(str(group["label"]))}</a></li>'
+            f'<a href="#group-{section_key}-{html.escape(str(group["key"]))}">{html.escape(str(group["label"]))}</a>'
             for group in groups
         )
         group_sections = []
@@ -691,7 +691,6 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
                 <section id="group-{section_key}-{html.escape(str(group["key"]))}" class="section-group">
                   <div class="section-group__head">
                     <h2>{html.escape(str(group["label"]))}</h2>
-                    <span class="section-group__count">{len(items)} 篇</span>
                   </div>
                   <div class="article-list article-list--grouped">
                     {listing_html}
@@ -700,19 +699,13 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
                 """
             )
         listing_html = f"""
-        <div class="section-layout">
-          <aside class="section-directory">
-            <div class="section-directory__title">目录</div>
-            <ul>{nav_items}</ul>
-          </aside>
-          <div class="section-groups">
-            {''.join(group_sections)}
-          </div>
+        <div class="section-groups">
+          {''.join(group_sections)}
         </div>
         """
     else:
         nav_items = "".join(
-            f'<li><a href="#group-{section_key}-{group_key}">{html.escape(label)}</a></li>'
+            f'<a href="#group-{section_key}-{group_key}">{html.escape(label)}</a>'
             for group_key, label in SECTION_GROUPS.get(section_key, [])
         )
         group_sections = "".join(
@@ -720,7 +713,6 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
             <section id="group-{section_key}-{group_key}" class="section-group">
               <div class="section-group__head">
                 <h2>{html.escape(label)}</h2>
-                <span class="section-group__count">0 篇</span>
               </div>
               <div class="empty-state"><p>{html.escape(empty_text)}</p></div>
             </section>
@@ -728,19 +720,16 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
             for group_key, label in SECTION_GROUPS.get(section_key, [])
         )
         listing_html = f"""
-        <div class="section-layout">
-          <aside class="section-directory">
-            <div class="section-directory__title">目录</div>
-            <ul>{nav_items}</ul>
-          </aside>
-          <div class="section-groups">
-            {group_sections}
-          </div>
+        <div class="section-groups">
+          {group_sections}
         </div>
         """
     body = f"""
     <section class="site-shell page-hero page-hero--archive">
-      <h1>{html.escape(title)}</h1>
+      <div class="page-hero__heading-row">
+        <h1>{html.escape(title)}</h1>
+        <nav class="section-directory section-directory--inline">{nav_items}</nav>
+      </div>
     </section>
     <section class="site-shell article-index article-index--grouped">
       {listing_html}
