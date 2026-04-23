@@ -689,9 +689,6 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
             group_sections.append(
                 f"""
                 <section id="group-{section_key}-{html.escape(str(group["key"]))}" class="section-group">
-                  <div class="section-group__head">
-                    <h2>{html.escape(str(group["label"]))}</h2>
-                  </div>
                   <div class="article-list article-list--grouped">
                     {listing_html}
                   </div>
@@ -699,8 +696,11 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
                 """
             )
         listing_html = f"""
-        <div class="section-groups">
-          {''.join(group_sections)}
+        <div class="section-layout">
+          <aside class="section-directory">{nav_items}</aside>
+          <div class="section-groups">
+            {''.join(group_sections)}
+          </div>
         </div>
         """
     else:
@@ -711,25 +711,22 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
         group_sections = "".join(
             f"""
             <section id="group-{section_key}-{group_key}" class="section-group">
-              <div class="section-group__head">
-                <h2>{html.escape(label)}</h2>
-              </div>
               <div class="empty-state"><p>{html.escape(empty_text)}</p></div>
             </section>
             """
             for group_key, label in SECTION_GROUPS.get(section_key, [])
         )
         listing_html = f"""
-        <div class="section-groups">
-          {group_sections}
+        <div class="section-layout">
+          <aside class="section-directory">{nav_items}</aside>
+          <div class="section-groups">
+            {group_sections}
+          </div>
         </div>
         """
     body = f"""
     <section class="site-shell page-hero page-hero--archive">
-      <div class="page-hero__heading-row">
-        <h1>{html.escape(title)}</h1>
-        <nav class="section-directory section-directory--inline">{nav_items}</nav>
-      </div>
+      <h1>{html.escape(title)}</h1>
     </section>
     <section class="site-shell article-index article-index--grouped">
       {listing_html}
