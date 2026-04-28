@@ -157,9 +157,7 @@ SECTION_GROUPS: dict[str, list[tuple[str, str]]] = {
         ("language-model", "语言模型"),
     ],
     "ai-tools": [
-        ("workflow", "工作流"),
-        ("debugging", "工程排错"),
-        ("training", "模型训练"),
+        ("technical-research", "技术调研"),
     ],
     "experience": [
         ("projects", "项目实践"),
@@ -207,6 +205,7 @@ class Post:
     source_path: Path
     html: str
     toc: str
+    standalone_source: Path | None = None
 
 
 def parse_post_datetime(meta_value: object, fallback_stem: str) -> datetime:
@@ -315,6 +314,7 @@ def clean_markdown(markdown_text: str) -> str:
 
 
 def strip_tags(text: str) -> str:
+    text = re.sub(r"<(script|style)\b[^>]*>.*?</\1>", "", text, flags=re.I | re.S)
     text = re.sub(r"<[^>]+>", "", text)
     return html.unescape(text).strip()
 
@@ -968,10 +968,19 @@ def load_posts() -> list[Post]:
         meta, markdown_body = parse_front_matter(raw_text)
         section_key = path.parent.relative_to(CONTENT_KNOWLEDGE).parts[0]
         date_value = parse_post_datetime(meta.get("date"), path.stem)
-        html_fragment, toc_html = markdown_to_html(markdown_body, path.parent)
-        has_structured_cards = 'class="article-overview-card"' in html_fragment or 'class="paper-card"' in html_fragment
-        if bool(meta.get("single_card", False)) or not has_structured_cards:
-            html_fragment = f'<section class="paper-card paper-card--single">{html_fragment}</section>'
+        standalone_source = None
+        standalone_html = str(meta.get("standalone_html", "")).strip()
+        if standalone_html:
+            standalone_source = (path.parent / standalone_html).resolve()
+            if not standalone_source.is_file():
+                raise FileNotFoundError(f"standalone_html not found: {standalone_source}")
+            html_fragment = standalone_source.read_text(encoding="utf-8", errors="replace")
+            toc_html = ""
+        else:
+            html_fragment, toc_html = markdown_to_html(markdown_body, path.parent)
+            has_structured_cards = 'class="article-overview-card"' in html_fragment or 'class="paper-card"' in html_fragment
+            if bool(meta.get("single_card", False)) or not has_structured_cards:
+                html_fragment = f'<section class="paper-card paper-card--single">{html_fragment}</section>'
         group_key = str(meta.get("group", "general"))
         posts.append(
             Post(
@@ -988,6 +997,7 @@ def load_posts() -> list[Post]:
                 source_path=path,
                 html=html_fragment,
                 toc=toc_html,
+                standalone_source=standalone_source,
             )
         )
     posts.sort(key=lambda item: (item.date, item.source_path.stem), reverse=True)
@@ -1080,9 +1090,15 @@ def build() -> None:
     write_text("404.html", render_404())
 
     for idx, post in enumerate(posts):
-        previous_post = posts[idx + 1] if idx + 1 < len(posts) else None
-        next_post = posts[idx - 1] if idx - 1 >= 0 else None
-        write_text(f"{post.url.strip('/')}/index.html", render_post(post, previous_post, next_post))
+        if post.standalone_source is not None:
+            write_text(
+                f"{post.url.strip('/')}/index.html",
+                post.standalone_source.read_text(encoding="utf-8", errors="replace"),
+            )
+        else:
+            previous_post = posts[idx + 1] if idx + 1 < len(posts) else None
+            next_post = posts[idx - 1] if idx - 1 >= 0 else None
+            write_text(f"{post.url.strip('/')}/index.html", render_post(post, previous_post, next_post))
 
     write_text(".nojekyll", "")
 

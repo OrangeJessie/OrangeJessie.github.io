@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>生成式召回近期进展 · Reading List</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root {
+    --bg: #f7f8fb;
+    --ink: #111827;
+    --muted: #617084;
+    --line: #dfe5ee;
+    --card: #ffffff;
+    --blue: #3158d4;
+    --teal: #087f8c;
+    --green: #087a53;
+    --amber: #a55b00;
+    --rose: #bd2b4b;
+    --violet: #6d3fc0;
+    --shadow: 0 18px 50px rgba(30, 41, 59, 0.08);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC",
+      "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    line-height: 1.68;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #eef2f7;
+    border-radius: 5px;
+    padding: 0.08rem 0.28rem;
+    font-size: 0.92em;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(247, 248, 251, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topnav .inner {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .brand-mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+  }
+  .navlinks {
+    margin-left: auto;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .navlinks a {
+    color: #465367;
+    font-size: 0.84rem;
+    border-radius: 7px;
+    padding: 5px 9px;
+  }
+  .navlinks a:hover {
+    background: #eaf0ff;
+    color: var(--blue);
+    text-decoration: none;
+  }
+  header.hero {
+    background:
+      radial-gradient(circle at 18% 12%, rgba(49, 88, 212, 0.16), transparent 30%),
+      radial-gradient(circle at 92% 18%, rgba(8, 127, 140, 0.14), transparent 32%),
+      linear-gradient(180deg, #ffffff 0%, #f7f8fb 100%);
+    border-bottom: 1px solid var(--line);
+    padding: 58px 0 38px;
+  }
+  .eyebrow {
+    color: var(--teal);
+    font-size: 0.84rem;
+    font-weight: 850;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: 12px 0 15px;
+    font-size: clamp(2rem, 4.8vw, 4.05rem);
+    line-height: 1.06;
+    letter-spacing: -0.045em;
+  }
+  .subtitle {
+    max-width: 900px;
+    margin: 0;
+    color: #465367;
+    font-size: 1.08rem;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 22px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .pill.blue { color: #2647ad; background: #eaf0ff; border-color: #d5defd; }
+  .pill.green { color: #08704d; background: #e8f7ef; border-color: #caead8; }
+  .pill.amber { color: #875100; background: #fff3dc; border-color: #f1d6a5; }
+  .pill.violet { color: #6234ad; background: #f2ebff; border-color: #dfd0ff; }
+  .pill.rose { color: #a02643; background: #fff0f4; border-color: #ffd3df; }
+  main { padding: 32px 0 70px; }
+  section { margin-top: 34px; scroll-margin-top: 78px; }
+  h2 {
+    margin: 0 0 14px;
+    font-size: 1.82rem;
+    line-height: 1.2;
+    letter-spacing: -0.028em;
+  }
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1.08rem;
+    letter-spacing: -0.012em;
+  }
+  .lead { margin: 0 0 16px; color: var(--muted); }
+  .grid { display: grid; gap: 16px; }
+  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 18px;
+  }
+  .metric {
+    font-size: 2.35rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    margin-bottom: 7px;
+  }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.9rem; }
+  .table-wrap {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 980px;
+    font-size: 0.9rem;
+  }
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: 11px 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  th {
+    background: #f1f4f8;
+    color: #344154;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+  }
+  tr:last-child td { border-bottom: 0; }
+  .tagrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: #eef2f7;
+    color: #4e5c70;
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+  .tag.p0 { color: #a02643; background: #fff0f4; }
+  .tag.p1 { color: #2647ad; background: #eaf0ff; }
+  .tag.p2 { color: #875100; background: #fff3dc; }
+  .tag.ind { color: #08704d; background: #e8f7ef; }
+  .tag.sys { color: #6234ad; background: #f2ebff; }
+  .paper-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .paper {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+  .paper-title {
+    font-weight: 850;
+    line-height: 1.34;
+    letter-spacing: -0.012em;
+  }
+  .paper-meta {
+    margin: 5px 0 8px;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+  .paper p { margin: 8px 0 0; }
+  .callout {
+    border-left: 4px solid var(--blue);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 15px 17px;
+  }
+  .callout.green { border-left-color: var(--green); }
+  .callout.amber { border-left-color: var(--amber); }
+  .callout.violet { border-left-color: var(--violet); }
+  .mermaid {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  .timeline { display: grid; gap: 12px; }
+  .time-item { display: grid; grid-template-columns: 125px 1fr; gap: 14px; align-items: start; }
+  .time-date { color: var(--teal); font-weight: 900; font-size: 0.88rem; }
+  .time-body {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 15px;
+    box-shadow: var(--shadow);
+  }
+  .source-list li { margin: 8px 0; }
+  footer {
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    padding: 24px 0 46px;
+    font-size: 0.88rem;
+  }
+  @media (max-width: 900px) {
+    .grid.two, .grid.three, .grid.four, .paper-list { grid-template-columns: 1fr; }
+    .navlinks { display: none; }
+    .time-item { grid-template-columns: 1fr; gap: 5px; }
+    .wrap { padding: 0 18px; }
+    header.hero { padding-top: 38px; }
+  }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="wrap inner">
+    <div class="brand"><span class="brand-mark"></span><span>Paper Reader · HTML Report</span></div>
+    <div class="navlinks">
+      <a href="#summary">摘要</a>
+      <a href="#map">技术地图</a>
+      <a href="#reading">阅读清单</a>
+      <a href="#papers">论文简介</a>
+      <a href="#industry">工业落地</a>
+      <a href="#takeaways">实现建议</a>
+      <a href="#sources">来源</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="summary">
+  <div class="wrap">
+    <div class="eyebrow">Generative Recall / Generative Recommendation · Updated 2026-04-28</div>
+    <h1>生成式召回近期进展阅读报告</h1>
+    <p class="subtitle">
+      这份报告聚焦推荐/广告/电商里的“生成式召回”：模型不再只做 user/item embedding 后 ANN 检索，
+      而是把 item 表示成 Semantic IDs 或离散 token 序列，由 Transformer/LLM/diffusion 类模型直接生成候选集合。
+      本文不逐篇精读，而是给出阅读路线、关键论文简介和工程判断。
+    </p>
+    <div class="hero-meta">
+      <span class="pill blue">范围：Generative retrieval for RecSys</span>
+      <span class="pill green">核心：Semantic ID / SID</span>
+      <span class="pill amber">重点：2025-2026</span>
+      <span class="pill violet">输出：阅读 list + 简介</span>
+      <span class="pill rose">不覆盖：纯聊天式推荐泛论文</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <div class="grid four">
+      <div class="card">
+        <div class="metric">31</div>
+        <div class="muted">纳入阅读视野的论文/技术报告</div>
+      </div>
+      <div class="card">
+        <div class="metric">10</div>
+        <div class="muted">建议优先读的 P0/P1 论文</div>
+      </div>
+      <div class="card">
+        <div class="metric">5</div>
+        <div class="muted">明确工业落地或工业规模验证案例</div>
+      </div>
+      <div class="card">
+        <div class="metric">4</div>
+        <div class="muted">主要技术瓶颈：SID、解码、训练、评估</div>
+      </div>
+    </div>
+    <div class="callout green" style="margin-top: 16px;">
+      <strong>一句话结论：</strong>
+      生成式召回已经从“用 Transformer 生成短 Semantic ID”进入到“SID 全生命周期优化”的阶段：
+      近两年最重要的进展集中在可微/端到端 SID、长 SID 与并行解码、search+recommendation 统一建模、
+      召回+排序统一、以及工业级 post-training / preference alignment。
+    </div>
+  </section>
+
+  <section id="map">
+    <h2>技术地图</h2>
+    <p class="lead">把最近论文放到一张系统图里，大致可以分成 SID 生成、生成模型、后训练、服务与评估四层。</p>
+    <div class="mermaid">
+flowchart LR
+  A["用户历史 / Query / Session / Context"] --> B["Generative Recall Model"]
+  I["Item Content<br/>text/image/video/attrs"] --> S["Semantic ID Tokenizer"]
+  C["Collaborative Signals<br/>co-click/co-view/user-item"] --> S
+  S --> SID["SID sequence<br/>short / long / variable-length"]
+  SID --> B
+  B --> D["Candidate SID generation"]
+  D --> V["validity constraint<br/>prefix tree / graph / codebook"]
+  V --> R["候选 item 集合"]
+  R --> K["Ranking / Re-ranking / Business goals"]
+  P["Post-training<br/>DPO / RL / OPD / distillation"] --> B
+  E["Online metrics<br/>watch time / saves / clicks / diversity"] --> P
+    </div>
+  </section>
+
+  <section>
+    <h2>主要发展脉络</h2>
+    <div class="grid two">
+      <div class="card">
+        <h3>1. SID 从“离线 tokenizer”变成核心优化对象</h3>
+        <p class="muted">
+          TIGER/RQ-KMeans/RQ-VAE 这条线证明了 SID 可行，但 2025-2026 的新工作都在指出同一个问题：
+          SID 如果只为了内容重构或聚类优化，会和推荐目标错位。因此出现了 DAS/DOS/UniSID/DIGER/STAR 等对齐、可微、端到端方法。
+        </p>
+      </div>
+      <div class="card">
+        <h3>2. 解码效率成为召回落地瓶颈</h3>
+        <p class="muted">
+          自回归生成 SID 需要 beam search，多 token 长度和多候选召回会放大延迟。
+          RPG、PinRec、LLaDA-Rec、ACERec 等都在减少串行解码成本，或用并行/扩散/多 token 方式提升多样性和吞吐。
+        </p>
+      </div>
+      <div class="card">
+        <h3>3. 从单一 recommendation 走向 search + recommendation 统一</h3>
+        <p class="muted">
+          Spotify/RecSys 线的工作强调：query-driven search 和 query-free recommendation 对 SID 空间的要求不同。
+          多任务 bi-encoder 或统一 generative backbone 正在成为重要方向。
+        </p>
+      </div>
+      <div class="card">
+        <h3>4. 工业系统开始验证“召回+排序统一”</h3>
+        <p class="muted">
+          OneRec、PinRec、TBGRecall、DAS、DOS、Snapchat SID 说明生成式召回不再只是 academic benchmark。
+          但工业论文也暴露了现实问题：多目标、业务约束、热度偏置、在线收敛、valid ID、冷启动和系统回滚。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="reading">
+    <h2>推荐阅读路线</h2>
+    <p class="lead">如果时间有限，建议按 P0/P1/P2 读。P0 建立范式，P1 看 2025-2026 的关键突破，P2 用于补齐专题。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>优先级</th>
+            <th>主题</th>
+            <th>论文</th>
+            <th>为什么读</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag p0">P0</span></td>
+            <td>范式起点</td>
+            <td>TIGER / Recommender Systems with Generative Retrieval; TokenRec</td>
+            <td>理解“生成 item ID/SID 作为召回”的基本建模、SID 设计和与 ANN/two-tower 的差异。</td>
+          </tr>
+          <tr>
+            <td><span class="tag p0">P0</span></td>
+            <td>工业统一模型</td>
+            <td>OneRec; PinRec; TBGRecall</td>
+            <td>看真实业务中如何把生成式模型接入召回、排序、多目标、session-wise generation、数据增量和在线指标。</td>
+          </tr>
+          <tr>
+            <td><span class="tag p0">P0</span></td>
+            <td>SID 生成升级</td>
+            <td>DIGER; UniSID; DAS; DOS</td>
+            <td>这些论文共同回答：SID 如何和推荐目标、协同信号、上下文生成空间对齐，避免 two-stage 量化的信息损失。</td>
+          </tr>
+          <tr>
+            <td><span class="tag p1">P1</span></td>
+            <td>开源与 scaling</td>
+            <td>GRID Handbook; MiniOneRec; Understanding GR with SIDs from a Model-scaling View</td>
+            <td>适合做实验复现。也提醒 SID-based GR 在扩大 encoder/tokenizer/RS 参数时可能很快饱和。</td>
+          </tr>
+          <tr>
+            <td><span class="tag p1">P1</span></td>
+            <td>效率和解码</td>
+            <td>RPG; LLaDA-Rec; ACERec; Variable-Length SID</td>
+            <td>关注长 SID、并行生成、扩散生成、可变长 ID，核心是提升表达力和降低解码成本。</td>
+          </tr>
+          <tr>
+            <td><span class="tag p1">P1</span></td>
+            <td>Search + Rec 统一</td>
+            <td>Bridging Search and Recommendation; Semantic IDs for Joint Generative Search and Recommendation; SynerGen</td>
+            <td>如果业务同时有搜索和推荐入口，这条线比纯 next-item recommendation 更贴近现实。</td>
+          </tr>
+          <tr>
+            <td><span class="tag p2">P2</span></td>
+            <td>补充专题</td>
+            <td>HiD-VAE; Purely Semantic Indexing; CRAB; SIDReasoner; Text-as-Vision; FusID; GenCDR</td>
+            <td>分别补齐可解释层级、唯一性、热度偏置、reasoning over SID、多模态、跨域等问题。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="papers">
+    <h2>论文阅读 List 与简介</h2>
+    <p class="lead">下面每篇只保留“为什么值得读”和“看点”，不展开精读。</p>
+
+    <h3>Foundation / 起点</h3>
+    <div class="paper-list">
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2305.05065">Recommender Systems with Generative Retrieval</a></div>
+        <div class="paper-meta">2023 · NeurIPS · TIGER / Google</div>
+        <p>生成式召回的经典起点：用 item Semantic ID 代替 ANN 检索，seq2seq 模型从用户历史生成下一个 item 的 SID。重点看 SID tuple、autoregressive decoding 和 cold-start 表现。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag">Semantic ID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2406.10450">TokenRec: Learning to Tokenize ID for LLM-based Generative Recommendation</a></div>
+        <div class="paper-meta">2024, updated 2025 · IEEE TKDE · code available</div>
+        <p>强调为 LLM 推荐学习用户/物品 token，Masked Vector-Quantized tokenizer 捕捉协同知识，并尝试避免昂贵的自回归 beam search。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag">ID tokenizer</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2411.18814">Unifying Generative and Dense Retrieval for Sequential Recommendation</a></div>
+        <div class="paper-meta">2024 · LIGER</div>
+        <p>公平比较 dense retrieval 和 generative retrieval，并提出混合方案 LIGER。适合作为工程选型时的“不要盲目替代 ANN”的参考。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">hybrid</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2507.22224">Generative Recommendation with Semantic IDs: A Practitioner's Handbook</a></div>
+        <div class="paper-meta">2025-07 · CIKM 2025 / Snap · GRID framework</div>
+        <p>实践手册和开源框架，覆盖 embedding generation、RQ-KMeans/RQ-VAE/RVQ、TIGER 类生成模型和消融。适合作为实验平台入口。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag sys">framework</span></div>
+      </article>
+    </div>
+
+    <h3 style="margin-top: 24px;">工业系统 / 召回与排序统一</h3>
+    <div class="paper-list">
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2502.18965">OneRec: Unifying Retrieve and Rank with Generative Recommender and Iterative Preference Alignment</a></div>
+        <div class="paper-meta">2025-02 · Kuaishou · MoE + DPO</div>
+        <p>把 retrieve-and-rank 级联改成统一 encoder-decoder generative model，支持 session-wise generation，并用 DPO/偏好对齐提升结果质量；线上 watch-time +1.6%。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag ind">industrial</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2504.10507">PinRec: Outcome-Conditioned, Multi-Token Generative Retrieval</a></div>
+        <div class="paper-meta">2025-04, updated 2026-03 · Pinterest</div>
+        <p>面向 Pinterest 工业规模，支持 outcome-conditioned generation，让系统按 saves/clicks 等业务目标调节召回；multi-token generation 用于提升多样性与效率。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag ind">industrial</span><span class="tag">multi-objective</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2508.11977">TBGRecall: A Generative Retrieval Model for E-commerce Recommendation Scenarios</a></div>
+        <div class="paper-meta">2025-08, updated 2025-11 · Alibaba/Taobao</div>
+        <p>针对电商召回，引入 Next Session Prediction，把一次请求里的多个 item 看成 set/session token 序列；强调近期数据、部分增量训练和 scaling law。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag ind">e-commerce</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2504.16454">Killing Two Birds with One Stone: Unifying Retrieval and Ranking with a Single Generative Recommendation Model</a></div>
+        <div class="paper-meta">2025-04 · SIGIR 2025 · UniGRF</div>
+        <p>把 retrieval 和 ranking 都建模为 sequence generation，用 ranking-driven enhancer 和 adaptive weighting 让两个阶段互相增强。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">retrieval+ranking</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2509.21777">SynerGen: Contextualized Generative Recommender for Unified Search and Recommendation</a></div>
+        <div class="paper-meta">2025-09 · unified search/recommendation/ranking</div>
+        <p>单一 decoder-only Transformer 同时覆盖 personalized search、query-free recommendation、retrieval 和 ranking；训练结合 InfoNCE 与 pointwise-pairwise ranking loss。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">unified backbone</span></div>
+      </article>
+    </div>
+
+    <h3 style="margin-top: 24px;">SID 生成与对齐</h3>
+    <div class="paper-list">
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2508.10584">DAS: Dual-Aligned Semantic IDs Empowered Industrial Recommender System</a></div>
+        <div class="paper-meta">2025-08 · CIKM 2025 · Kuaishou Ads</div>
+        <p>一阶段同时优化 quantization 和 alignment，引入多视角 contrastive alignment、user/ad dual learning；已部署在快手广告，服务 4 亿+ DAU 级场景。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag ind">industrial SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2602.04460">DOS: Dual-Flow Orthogonal Semantic IDs for Recommendation in Meituan</a></div>
+        <div class="paper-meta">2026-02 · WWW 2026 short · Meituan</div>
+        <p>用户-物品双流框架把协同信号对齐到生成空间，orthogonal residual quantization 旋转语义空间以减少量化损失；有离线和线上 A/B。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag ind">industrial SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2602.10445">End-to-End Semantic ID Generation for Generative Advertisement Recommendation</a></div>
+        <div class="paper-meta">2026-02 · Tencent/Wuhan University · UniSID</div>
+        <p>直接从广告图文、视频、结构化属性端到端生成 SID 和 item embedding，替代 embedding -> RQ 的两阶段流程；报告最高相对 strongest baseline HR +4.62%。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag">end-to-end SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2601.19711">Differentiable Semantic ID for Generative Recommendation</a></div>
+        <div class="paper-meta">2026-01, updated 2026-04 · SIGIR 2026 · DIGER</div>
+        <p>让推荐 loss 能直接反传到 SID tokenizer，核心挑战是 codebook collapse；用 Gumbel noise 和 uncertainty decay 做探索到收敛的过渡。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag">differentiable SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2509.16446">Purely Semantic Indexing for LLM-based Generative Recommendation and Retrieval</a></div>
+        <div class="paper-meta">2025-09 · unique semantic IDs</div>
+        <p>解决相似 item 分配到相同 SID 后追加随机 token 的问题，提出 ECM/RRS 生成唯一且语义保持的 ID；适合关注 valid ID 和 cold-start 的同学读。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">ID uniqueness</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2508.04618">HiD-VAE: Hierarchical and Disentangled Semantic IDs</a></div>
+        <div class="paper-meta">2025-08 · interpretable SID</div>
+        <p>用层级监督 quantization 让 codebook 对齐多级 item tags，并加入 uniqueness loss 处理 ID collision；看点是可解释路径和层级 SID。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">hierarchical SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2512.10388">Harmonizing Semantic and Hash IDs for Sequential Recommendation</a></div>
+        <div class="paper-meta">2025-12 · H2Rec</div>
+        <p>把 SID 和传统 Hash ID 双分支结合，缓解 SID 对头部 item 唯一性不足、Hash ID 对长尾泛化弱的 seesaw。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">SID + HID</span></div>
+      </article>
+    </div>
+
+    <h3 style="margin-top: 24px;">解码效率、长 SID 与新生成范式</h3>
+    <div class="paper-list">
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2506.05781">Generating Long Semantic IDs in Parallel for Recommendation</a></div>
+        <div class="paper-meta">2025-06 · KDD 2025 · RPG / Meta</div>
+        <p>把 SID 长度扩到 64，并用 unordered long SID + multi-token prediction 并行生成，推理时用图约束避免 invalid ID；NDCG@10 平均 +12.6%。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">parallel decoding</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2511.06254">LLaDA-Rec: Discrete Diffusion for Parallel Semantic ID Generation</a></div>
+        <div class="paper-meta">2025-11 · diffusion-style recommendation</div>
+        <p>把推荐从左到右自回归改成离散扩散的并行 SID 生成，利用双向 attention 和 adaptive generation order 缓解错误累积。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">diffusion</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2602.13573">Unleash the Potential of Long Semantic IDs for Generative Recommendation</a></div>
+        <div class="paper-meta">2026-02 · ACERec</div>
+        <p>用 Attentive Token Merger 把长 SID 的细粒度 token 压缩成 compact latent，并用 Intent Token 做动态预测锚点，试图兼顾表达力和效率。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">long SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2602.16375">Variable-Length Semantic IDs for Recommender Systems</a></div>
+        <div class="paper-meta">2026-02 · variable-length SID</div>
+        <p>批判固定长度 SID 对热门/长尾 item 一刀切；用 discrete VAE + Gumbel-Softmax 学自适应长度的 item 表达。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">adaptive length</span></div>
+      </article>
+    </div>
+
+    <h3 style="margin-top: 24px;">Search + Recommendation、多模态与专题扩展</h3>
+    <div class="paper-list">
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2410.16823">Bridging Search and Recommendation in Generative Retrieval</a></div>
+        <div class="paper-meta">2024-10 · RecSys 2024</div>
+        <p>研究统一 search 和 recommendation 是否互相帮助，提出 joint training 可正则化 item popularity 与 latent representation，是 Spotify 后续 SID 工作的背景。</p>
+        <div class="tagrow"><span class="tag p1">P1</span><span class="tag">search+rec</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2508.10478">Semantic IDs for Joint Generative Search and Recommendation</a></div>
+        <div class="paper-meta">2025-08 · RecSys 2025 LBR · Spotify</div>
+        <p>比较 search-specific、recommendation-specific 和 cross-task SID；结论是 multi-task bi-encoder 生成统一 SID 空间在两个任务间取得更好 trade-off。</p>
+        <div class="tagrow"><span class="tag p0">P0</span><span class="tag">joint SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2503.24193">Text2Tracks: Prompt-based Music Recommendation via Generative Retrieval</a></div>
+        <div class="paper-meta">2025-03 · music generative retrieval</div>
+        <p>把自然语言音乐请求映射到 track IDs，说明 ID 表示策略对生成式检索效果影响最大，semantic IDs 优于直接生成歌曲标题。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">prompt retrieval</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2601.08764">FusID: Modality-Fused Semantic IDs for Generative Music Recommendation</a></div>
+        <div class="paper-meta">2026-01 · multimodal music SID</div>
+        <p>先融合多模态信息再做 product quantization，避免不同模态单独 tokenization 的冗余和冲突；报告 zero ID conflicts。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">multimodal</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2601.14697">When Text-as-Vision Meets Semantic IDs in Generative Recommendation</a></div>
+        <div class="paper-meta">2026-01 · text-as-vision empirical study</div>
+        <p>发现推荐数据中的 item 描述常是属性、数字、单位和缩写，标准 text encoder 不一定合适；把文本渲染成图像再用 OCR/vision encoder 可能更稳。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">text-as-vision</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2511.08006">GenCDR: Generative Cross-Domain Recommendation with Adaptive Semantic Tokenization</a></div>
+        <div class="paper-meta">2025-11 · AAAI 2026</div>
+        <p>跨域推荐场景下动态路由 universal encoder 和 domain-specific adapters 生成 disentangled SIDs，并用 domain-aware prefix tree 做生成约束。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">cross-domain</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2603.23183">Reasoning over Semantic IDs Enhances Generative Recommendation</a></div>
+        <div class="paper-meta">2026-03 · SIDReasoner</div>
+        <p>把 reasoning model 思路引入 SID：先强化 SID-language alignment，再用 outcome-driven reinforced optimization 训练有效 reasoning trajectories。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">reasoning over SID</span></div>
+      </article>
+      <article class="paper">
+        <div class="paper-title"><a href="https://arxiv.org/abs/2604.05113">CRAB: Codebook Rebalancing for Bias Mitigation in Generative Recommendation</a></div>
+        <div class="paper-meta">2026-04 · popularity bias</div>
+        <p>指出生成式推荐可能继承并放大 popularity bias；用 codebook rebalancing 拆分过热 token，并用树结构正则保持语义一致。</p>
+        <div class="tagrow"><span class="tag p2">P2</span><span class="tag">bias</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="industry">
+    <h2>工业落地信号</h2>
+    <p class="lead">这些论文说明生成式召回正在从 benchmark 走进真实业务，但不同公司采用的切入点不一样。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>公司/场景</th>
+            <th>代表工作</th>
+            <th>技术切入点</th>
+            <th>线上/规模信号</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Kuaishou 主推荐</td>
+            <td>OneRec</td>
+            <td>统一召回+排序，MoE encoder-decoder，session-wise generation，DPO preference alignment。</td>
+            <td>主场景部署，watch-time +1.6%。</td>
+          </tr>
+          <tr>
+            <td>Pinterest</td>
+            <td>PinRec</td>
+            <td>Outcome-conditioned generation，多目标控制，multi-token generation 增加多样性。</td>
+            <td>论文称为 Pinterest 规模 generative retrieval 的严格研究，并有用户正向影响。</td>
+          </tr>
+          <tr>
+            <td>Alibaba / Taobao 电商</td>
+            <td>TBGRecall</td>
+            <td>Next Session Prediction，有限历史预训练 + stochastic partial incremental training，强调数据新鲜度。</td>
+            <td>淘宝大规模工业数据 + public benchmark，报告 scaling law 趋势。</td>
+          </tr>
+          <tr>
+            <td>Kuaishou Ads</td>
+            <td>DAS</td>
+            <td>一阶段 Dual-Aligned SID，多视角协同对齐，用户/广告双量化。</td>
+            <td>部署于快手多个广告场景，服务 4 亿+ DAU。</td>
+          </tr>
+          <tr>
+            <td>Meituan</td>
+            <td>DOS</td>
+            <td>用户-物品双流、orthogonal residual quantization、生成空间对齐。</td>
+            <td>美团 App 部署，论文报告服务数亿用户。</td>
+          </tr>
+          <tr>
+            <td>Snapchat</td>
+            <td>Semantic IDs for Recommender Systems at Snapchat</td>
+            <td>SID 作为 ranking auxiliary features 和额外 retrieval sources，讨论生产中的设计选择。</td>
+            <td>SIGIR 2026 industry track，多个 production models 已上线 SID variants。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="takeaways">
+    <h2>实现与研究建议</h2>
+    <div class="grid two">
+      <div class="card">
+        <h3>如果你要做实验复现</h3>
+        <p class="muted">
+          从 GRID 或 MiniOneRec 入手最省事：先跑 TIGER/RQ-KMeans/RQ-VAE baseline，再替换 SID tokenizer 或 generative backbone。
+          不建议一开始就实现端到端 SID，因为 codebook collapse、valid ID 约束和 beam search 成本会同时出现。
+        </p>
+      </div>
+      <div class="card">
+        <h3>如果你要做业务落地</h3>
+        <p class="muted">
+          不要只和 ANN/two-tower 比 HitRate。需要同时看召回覆盖、tail item、冷启动、延迟、invalid ID、候选多样性、在线业务指标和回滚方案。
+          PinRec/OneRec/TBGRecall 的价值在于暴露了这些工程约束。
+        </p>
+      </div>
+      <div class="card">
+        <h3>SID 设计优先级</h3>
+        <p class="muted">
+          当前最值得投入的是 SID 对齐而不是单纯换 backbone：把 content semantics、collaborative signals、search signals、generation-space objectives 拉到同一套离散码空间里。
+        </p>
+      </div>
+      <div class="card">
+        <h3>生成范式选择</h3>
+        <p class="muted">
+          短 SID + 自回归适合先做 baseline；长 SID/可变长/并行预测适合追求表达力和效率；
+          diffusion-style 方向很新，值得跟踪但工程成熟度还需要验证。
+        </p>
+      </div>
+      <div class="card">
+        <h3>一个重要反方观点</h3>
+        <p class="muted">
+          2025 的 scaling-view 论文认为 SID-based GR 在扩大 encoder/tokenizer/RS 规模时可能很快饱和，
+          LLM-as-RS 反而有更好的 model scaling。它提醒我们：SID 是工程上高效的压缩接口，但也可能成为表达瓶颈。
+        </p>
+      </div>
+      <div class="card">
+        <h3>下一步值得跟踪</h3>
+        <p class="muted">
+          端到端可微 SID、post-training/RL for generative recommendation、search+rec+ads 多任务统一、工业级 online convergence、以及 codebook debiasing。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>7 天阅读计划</h2>
+    <div class="timeline">
+      <div class="time-item">
+        <div class="time-date">Day 1</div>
+        <div class="time-body"><strong>范式入门：</strong>TIGER + TokenRec。目标：说清 SID、生成式召回和 ANN 召回的差异。</div>
+      </div>
+      <div class="time-item">
+        <div class="time-date">Day 2</div>
+        <div class="time-body"><strong>工业系统：</strong>OneRec + PinRec + TBGRecall。目标：理解生成式召回如何接入多目标和 session。</div>
+      </div>
+      <div class="time-item">
+        <div class="time-date">Day 3</div>
+        <div class="time-body"><strong>SID 对齐：</strong>DAS + DOS + UniSID + DIGER。目标：整理 two-stage RQ 的问题和端到端/可微方案。</div>
+      </div>
+      <div class="time-item">
+        <div class="time-date">Day 4</div>
+        <div class="time-body"><strong>效率与解码：</strong>RPG + LLaDA-Rec + ACERec + Variable-Length SID。目标：理解长 SID 与低延迟如何折中。</div>
+      </div>
+      <div class="time-item">
+        <div class="time-date">Day 5</div>
+        <div class="time-body"><strong>Search+Rec：</strong>Bridging Search and Recommendation + Spotify Joint SID + SynerGen。目标：理解多任务 SID 空间。</div>
+      </div>
+      <div class="time-item">
+        <div class="time-date">Day 6</div>
+        <div class="time-body"><strong>开源复现：</strong>GRID + MiniOneRec。目标：选一个框架跑通 public benchmark。</div>
+      </div>
+      <div class="time-item">
+        <div class="time-date">Day 7</div>
+        <div class="time-body"><strong>补专题：</strong>Pure Semantic Indexing、HiD-VAE、CRAB、SIDReasoner、Snapchat SID。目标：形成下一步研究题目。</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sources">
+    <h2>主要来源和入口</h2>
+    <p class="lead">检索日期为 2026-04-28。主要使用 arXiv、Hugging Face papers、Spotify Research、GitHub 和论文摘要页。</p>
+    <ul class="source-list">
+      <li><a href="https://arxiv.org/abs/2305.05065">TIGER / Recommender Systems with Generative Retrieval</a></li>
+      <li><a href="https://arxiv.org/abs/2406.10450">TokenRec: Learning to Tokenize ID for LLM-based Generative Recommendation</a></li>
+      <li><a href="https://arxiv.org/abs/2502.18965">OneRec: Unifying Retrieve and Rank with Generative Recommender and Iterative Preference Alignment</a></li>
+      <li><a href="https://arxiv.org/abs/2504.10507">PinRec: Outcome-Conditioned, Multi-Token Generative Retrieval for Industry-Scale Recommendation Systems</a></li>
+      <li><a href="https://arxiv.org/abs/2508.11977">TBGRecall: A Generative Retrieval Model for E-commerce Recommendation Scenarios</a></li>
+      <li><a href="https://arxiv.org/abs/2507.22224">Generative Recommendation with Semantic IDs: A Practitioner's Handbook</a> and <a href="https://github.com/snap-research/GRID">GRID GitHub</a></li>
+      <li><a href="https://research.atspotify.com/2025/9/semantic-ids-for-generative-search-and-recommendation">Spotify Research: Semantic IDs for Generative Search and Recommendation</a> and <a href="https://arxiv.org/abs/2508.10478">paper</a></li>
+      <li><a href="https://arxiv.org/abs/2601.19711">DIGER: Differentiable Semantic ID for Generative Recommendation</a></li>
+      <li><a href="https://arxiv.org/abs/2602.10445">UniSID: End-to-End Semantic ID Generation for Generative Advertisement Recommendation</a></li>
+      <li><a href="https://arxiv.org/abs/2510.24431">MiniOneRec: An Open-Source Framework for Scaling Generative Recommendation</a></li>
+      <li><a href="https://arxiv.org/abs/2604.03949">Semantic IDs for Recommender Systems at Snapchat</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    Generated by paper-reader. Scope note: 本报告中的“生成式召回”主要指推荐系统中的 generative retrieval / generative recommendation，
+    不系统覆盖通用文档生成式检索、RAG 推荐解释或纯 LLM conversational recommendation。
+  </div>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      fontFamily: "Inter, Noto Sans SC, sans-serif",
+      fontSize: '13px',
+      primaryColor: '#eaf0ff',
+      primaryBorderColor: '#3158d4',
+      primaryTextColor: '#172033',
+      lineColor: '#8fa0b8'
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' }
+  });
+</script>
+</body>
+</html>
