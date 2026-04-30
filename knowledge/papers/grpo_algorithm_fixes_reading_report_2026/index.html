@@ -611,7 +611,7 @@
               <p>这有两个后果：正确长推理里的关键中间步骤学得慢，错误长输出里的重复、乱码、绕圈也罚得轻。</p>
               <p>DAPO 改成 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-token-aggregation">token-level 聚合</button><span id="glossary-token-aggregation" class="glossary-popover" role="tooltip"><span class="glossary-title">token-level 聚合</span>原 GRPO 常见做法是先在每条 response 内对 token loss 求平均，再对 response 求平均，所以每条 response 权重相同，长答案里的单个 token 权重更小。DAPO 改成把 group 内所有 response 的 token loss 展开后一起求平均，即除以总 token 数；这样每个 token 权重相同，长 response 的总权重按 token 数增加。</span></span> 后，优化信号跟 token 数量对齐。一个模式只要持续贡献好/坏 reward，就会被按出现的 token 充分强化或抑制，而不是被“这条答案很长”稀释掉。</p>
               <div class="formula mt-3">
-                <p class="mini ink-muted">DAPO 原文 Eq. 12 是 maximize objective \(J_{\mathrm{DAPO}}\)。这里按训练代码里的 loss 写成 \(L=-J\)，所以多一个负号；分母口径与原文一致。</p>
+                <p class="mini ink-muted formula-note">DAPO 原文 Eq. 12 是 maximize objective：<span class="param">J_DAPO</span>；这里按训练代码里的 loss 写成 <span class="param">L = -J</span>，所以多一个负号；分母口径与原文一致。</p>
                 $$L_{\mathrm{DAPO}}(\theta)=
                 -\frac{1}{\sum_{i=1}^{G}m_i}
                 \sum_{i=1}^{G}\sum_{t=1}^{m_i}l_{i,t},
