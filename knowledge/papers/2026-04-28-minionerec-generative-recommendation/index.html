@@ -680,5 +680,91 @@ R_{\mathrm{rule}}(e_k,e_t)=
     <a href="https://huggingface.co/kkknight/MiniOneRec">Hugging Face model page</a>.
   </div>
 </footer>
+
+  <style id="oj-blog-bridge-style">
+    .oj-blog-bridge {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2147483000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 16px 42px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+    }
+    .oj-blog-bridge a,
+    .oj-blog-bridge button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #334155;
+      font: 700 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .oj-blog-bridge a:hover,
+    .oj-blog-bridge button:hover {
+      background: #eef2f7;
+      color: #0f172a;
+      text-decoration: none;
+    }
+    .oj-blog-bridge .oj-blog-bridge__primary {
+      background: #111827;
+      color: #ffffff;
+    }
+    .oj-blog-bridge .oj-blog-bridge__primary:hover {
+      background: #020617;
+      color: #ffffff;
+    }
+    @media (max-width: 640px) {
+      .oj-blog-bridge {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        border-radius: 16px;
+      }
+      .oj-blog-bridge a,
+      .oj-blog-bridge button {
+        flex: 1 1 auto;
+        padding: 0 10px;
+      }
+    }
+  </style>
+  <nav class="oj-blog-bridge" aria-label="博客导航">
+    <button type="button" data-oj-blog-back>&larr; 返回</button>
+    <a class="oj-blog-bridge__primary" href="/knowledge/papers/">论文解读</a>
+    <a href="/knowledge/papers/#group-papers-retrieval">召回</a>
+    <a href="/">首页</a>
+  </nav>
+  <script>
+    (function () {
+      var fallbackUrl = "/knowledge/papers/";
+      document.querySelectorAll("[data-oj-blog-back]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            window.location.href = fallbackUrl;
+          }
+        });
+      });
+    })();
+  </script>
+
 </body>
 </html>
