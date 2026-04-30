@@ -190,7 +190,11 @@
     padding: 1.15rem;
     overflow-x: auto;
   }
-  .formula mjx-container { margin: 0 !important; min-width: max-content; }
+  .formula mjx-container[display="true"] { margin: 0 !important; min-width: max-content; }
+  .formula-note {
+    max-width: none;
+    white-space: normal;
+  }
   .callout {
     border-left: 4px solid var(--accent);
     background: white;
@@ -249,6 +253,28 @@
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 0.84em;
     font-weight: 600;
+  }
+  .source-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.45rem;
+  }
+  .link-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid #c7d2fe;
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 0.08rem 0.5rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .link-chip:hover {
+    background: #e0e7ff;
+    text-decoration: none;
   }
   .glossary {
     position: relative;
@@ -367,24 +393,29 @@
   <div>
     <div class="flex flex-wrap gap-2 mb-4">
       <span class="pill pill-indigo">RLVR / GRPO</span>
-      <span class="pill pill-ok">6 Papers</span>
+      <span class="pill pill-ok">7 精读 + 3 补充</span>
       <span class="pill pill-amber">2025-2026</span>
       <span class="pill pill-rose">Stability · Bias · Utilization</span>
     </div>
     <h1 class="text-4xl md:text-6xl font-extrabold leading-tight heading-grad">GRPO 算法修正论文阅读报告</h1>
     <p class="mt-5 text-lg ink-muted max-w-3xl">
-      阅读范围覆盖 DAPO、Dr. GRPO、VAPO、GSPO、DCPO 与 AReaL。重点是四类问题：
-      训练不稳定、长度偏置、零梯度、rollout 利用率低。
+      阅读范围覆盖 DAPO、Dr. GRPO、GSPO、DCPO、ASPO、SAPO、LUSPO 七篇精读，
+      另附 TreeAdv、DHPO、Stabilizing RL with LLMs 三篇补充快读。重点是几类问题：
+      训练不稳定、长度偏置、零梯度、rollout 利用率低，以及 GRPO/GSPO 后续的 ratio、clipping 和长度修正。
+      REINFORCE++、GPG、REAL、VAPO 与 AReaL 已单独整理到
+      <a href="grpo_algorithm_fixes_reading_report_2_2026.html">GRPO 算法修正论文阅读报告二</a>。
     </p>
     <div class="mt-5 callout">
       <div class="tldr-lines">
         <p class="tldr-line">TL;DR</p>
         <p class="tldr-line">DAPO：复现 R1-Zero 风格 RLVR 的第一个强开源 recipe，重点修 entropy collapse、零梯度和超长截断噪声。</p>
         <p class="tldr-line">Dr. GRPO：指出长度归一化与组内 std 归一化会改变优化目标，训练中的 length increase 不一定是能力涌现。</p>
-        <p class="tldr-line">VAPO：重新引入 value model，用 value pretraining、decoupled GAE 和 length-adaptive GAE 提升 long-CoT credit assignment 上限。</p>
         <p class="tldr-line">GSPO：把 token-level importance ratio 改成 sequence-level ratio，解决 reward 粒度和优化粒度不匹配，尤其适合 MoE。</p>
         <p class="tldr-line">DCPO：针对固定 clipping 和同奖赏零梯度，提出动态 clipping、平滑 advantage 与 OTM，提高有效 rollout 利用率。</p>
-        <p class="tldr-line">AReaL：从系统侧解决同步 rollout 等待最长样本导致的 GPU 空转，用异步 pipeline 配合 staleness-aware PPO。</p>
+        <p class="tldr-line">ASPO：把正 advantage token 的 IS ratio 反过来当权重，修“好 token 越低概率越学不到”的错配。</p>
+        <p class="tldr-line">SAPO：把 GRPO/GSPO 的 hard clipping 改成 temperature-controlled soft gate，保留近 on-policy token 的有效梯度。</p>
+        <p class="tldr-line">LUSPO：修 GSPO 的长度偏置，让 sequence-level optimization 不再诱发 response length collapse。</p>
+        <p class="tldr-line">补充快读：TreeAdv/DHPO/Stabilizing RL 继续沿树状 advantage、混合 ratio 和 MoE 稳定性推进。</p>
       </div>
     </div>
   </div>
@@ -393,7 +424,10 @@
     <div class="card p-4"><div class="text-3xl font-extrabold">DAPO</div><div class="ink-muted text-sm mt-1">复现级 GRPO recipe</div></div>
     <div class="card p-4"><div class="text-3xl font-extrabold">Dr.</div><div class="ink-muted text-sm mt-1">去长度/难度偏置</div></div>
     <div class="card p-4"><div class="text-3xl font-extrabold">GSPO</div><div class="ink-muted text-sm mt-1">sequence-level ratio</div></div>
-    <div class="card p-4"><div class="text-3xl font-extrabold">AReaL</div><div class="ink-muted text-sm mt-1">异步 rollout 系统</div></div>
+    <div class="card p-4"><div class="text-3xl font-extrabold">DCPO</div><div class="ink-muted text-sm mt-1">动态 clipping / RUR</div></div>
+    <div class="card p-4"><div class="text-3xl font-extrabold">ASPO</div><div class="ink-muted text-sm mt-1">asymmetric IS weighting</div></div>
+    <div class="card p-4"><div class="text-3xl font-extrabold">SAPO</div><div class="ink-muted text-sm mt-1">soft adaptive clipping</div></div>
+    <div class="card p-4"><div class="text-3xl font-extrabold">LUSPO</div><div class="ink-muted text-sm mt-1">length-unbiased GSPO</div></div>
   </div>
 </section>
 
@@ -416,9 +450,10 @@
           <td>
             <ul class="cell-list">
               <li>DAPO: Clip-Higher、Soft Overlong Punishment</li>
-              <li>VAPO: value pretraining + decoupled/length-adaptive GAE</li>
               <li>GSPO: sequence-level clipping</li>
               <li>DCPO: DAC</li>
+              <li>ASPO: 正 advantage token 的 asymmetric IS weighting</li>
+              <li>SAPO: soft gate 替代 hard clipping</li>
             </ul>
           </td>
           <td>不要只看 reward 曲线；同时监控 entropy、长度、clipping ratio、RUR、截断率。</td>
@@ -429,7 +464,8 @@
           <td>
             <ul class="cell-list">
               <li>Dr. GRPO: 移除 <span class="param">|o_i|</span> 与 <span class="param">std(R)</span> 归一化</li>
-              <li>DAPO/VAPO: token-level loss 修正长序列 token 权重不足</li>
+              <li>DAPO: token-level loss 修正长序列 token 权重不足</li>
+              <li>LUSPO: 修 GSPO 的 response length collapse</li>
             </ul>
           </td>
           <td>“输出变长”不能直接解释为推理涌现；必须拆 correct/incorrect length。</td>
@@ -441,21 +477,19 @@
             <ul class="cell-list">
               <li>DAPO: dynamic sampling 过滤全对/全错</li>
               <li>DCPO: smooth advantage standardization 用历史分布保留信号</li>
-              <li>VAPO: group-sampling + positive-example LM loss</li>
             </ul>
           </td>
           <td>只提升采样数不够，要看生成样本有多少真正进入 policy update。</td>
         </tr>
         <tr>
-          <td><strong>rollout 利用率低 / GPU 空转</strong></td>
-          <td>同步 RL 需要等 batch 中最长输出；DAPO 的过滤也会增加生成数量；长 CoT 输出长度分布极不均匀。</td>
+          <td><strong>有效 rollout 利用率低 / token 被裁掉</strong></td>
+          <td>同一 prompt 全对/全错时 advantage 消失；固定 clipping 又会让大量 token 无法参与有效更新，生成预算没有充分转化为 policy gradient。</td>
           <td>
             <ul class="cell-list">
               <li>DCPO: RUR 从 GRPO 平均约 43.8% 提到 71.8%</li>
-              <li>AReaL: 完全异步 rollout/training、interruptible rollout、staleness-aware PPO</li>
             </ul>
           </td>
-          <td>算法 sample efficiency 与系统 throughput 必须一起优化，否则 AIME 分数提升会被 GPU 小时吞掉。</td>
+          <td>不要只看 rollout 数量；要看 RUR/TCR 等有效更新指标。系统侧异步 rollout 已移到报告二 AReaL。</td>
         </tr>
       </tbody>
     </table>
@@ -484,7 +518,7 @@
             <td>Reward / Advantage</td>
             <td>整条 response 一个 reward，例如数学题最终答对为 1、答错为 0；GRPO 再把同组 rollout 的 reward 做相对化，得到每条 response 一个 advantage。</td>
             <td>每个 token 或每个 reasoning step 有自己的 advantage，例如 value model/GAE 把终点 reward 分配回中间步骤。</td>
-            <td>VAPO 关心 long-CoT 的 token credit assignment；vanilla GRPO 通常是 sequence advantage 复制到所有 token。</td>
+            <td>vanilla GRPO 通常是 sequence advantage 复制到所有 token；value-based 的 token credit assignment 放到报告二的 VAPO 里单独讲。</td>
           </tr>
           <tr>
             <td>Ratio / Clipping</td>
@@ -530,7 +564,7 @@
       <summary>一句话记法</summary>
       <div class="fold-body">
         <p><strong>GRPO 原始直觉：</strong>用同一 prompt 下多条 response 的相对好坏，决定每条 response 里的 token 概率该整体上调还是下调。</p>
-        <p><strong>后续改进：</strong>DAPO/DCPO 修 token clipping 和 token loss 利用率；Dr. GRPO 修长度与 std 归一化带来的目标偏置；GSPO 修 sequence reward 与 token ratio 的粒度错配；VAPO 重新引入 value，让 advantage 更细地回传到 token/step。</p>
+        <p><strong>后续改进：</strong>DAPO/DCPO/ASPO/SAPO 修 token weighting、clipping 和 token loss 利用率；Dr. GRPO/LUSPO 修长度与 std 归一化带来的目标偏置；GSPO 修 sequence reward 与 token ratio 的粒度错配。value-based、分类视角和系统异步 rollout 放到报告二。</p>
       </div>
     </details>
   </div>
@@ -576,6 +610,14 @@
               <p>sample-level mean 会让每条 response 在 loss 中权重相同，因此长 CoT 内每个 token 的边际权重更小。</p>
               <p>这有两个后果：正确长推理里的关键中间步骤学得慢，错误长输出里的重复、乱码、绕圈也罚得轻。</p>
               <p>DAPO 改成 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-token-aggregation">token-level 聚合</button><span id="glossary-token-aggregation" class="glossary-popover" role="tooltip"><span class="glossary-title">token-level 聚合</span>原 GRPO 常见做法是先在每条 response 内对 token loss 求平均，再对 response 求平均，所以每条 response 权重相同，长答案里的单个 token 权重更小。DAPO 改成把 group 内所有 response 的 token loss 展开后一起求平均，即除以总 token 数；这样每个 token 权重相同，长 response 的总权重按 token 数增加。</span></span> 后，优化信号跟 token 数量对齐。一个模式只要持续贡献好/坏 reward，就会被按出现的 token 充分强化或抑制，而不是被“这条答案很长”稀释掉。</p>
+              <div class="formula mt-3">
+                <p class="mini ink-muted">DAPO 原文 Eq. 12 是 maximize objective \(J_{\mathrm{DAPO}}\)。这里按训练代码里的 loss 写成 \(L=-J\)，所以多一个负号；分母口径与原文一致。</p>
+                $$L_{\mathrm{DAPO}}(\theta)=
+                -\frac{1}{\sum_{i=1}^{G}m_i}
+                \sum_{i=1}^{G}\sum_{t=1}^{m_i}l_{i,t},
+                \quad m_i=|o_i|.$$
+              </div>
+              <p>DAPO 的分母是当前 batch/group 内 active token 总数。它不是无脑鼓励长 response，而是让每个 active token 拿到同一量级的权重：好长答案会获得更多总正更新，坏长答案也会获得更多总惩罚。</p>
             </dd>
           </div>
           <div class="term">
@@ -614,10 +656,24 @@
         这篇的核心不是再堆 recipe，而是指出 GRPO 常见实现存在<strong>优化目标偏置</strong>。作者把 Dr. GRPO 称为 Group Relative Policy Optimization Done Right。
       </p>
       <div class="formula mt-4">
-        $$\hat A_i^{\mathrm{GRPO}}=\frac{R(q,o_i)-\mathrm{mean}(R)}{\mathrm{std}(R)},\quad
-        L \propto \frac{1}{|o_i|}\sum_t \ell_{i,t}$$
-        <br/>
-        $$\tilde A_i = R(q,o_i)-\mathrm{mean}(R),\quad \text{Dr. GRPO removes } |o_i| \text{ and } \mathrm{std}(R).$$
+        <p class="mini ink-muted formula-note">Dr. GRPO 原文 Sec. 3.2 要移除 <span class="param">1 / m_i</span> 和 reward std normalization，并在实现里用固定 generation budget <span class="param">L</span> 代替随样本变化的长度分母。</p>
+        $$L_{\mathrm{Dr.GRPO}}(\theta)=
+        -\frac{1}{G L}
+        \sum_{i=1}^{G}\sum_{t=1}^{m_i}l_{i,t},
+        \quad L=\text{max completion length}.$$
+      </div>
+      <div class="callout mt-4">
+        <h4 class="card-title">DAPO 与 Dr. GRPO 的关系</h4>
+        <p class="mini ink-muted mt-2">
+          二者都在修原始 GRPO 的 response-length normalization，但不是同一个开关，也不是“一个鼓励长、一个鼓励短”。
+          DAPO 把分母换成当前 batch/group 的 active token 总数 <span class="param">sum m_i</span>；
+          Dr. GRPO 把分母换成固定常数 <span class="param">G * L</span>，其中 <span class="param">L</span> 通常取最大生成长度。
+        </p>
+        <p class="mini ink-muted mt-2">
+          直觉上，DAPO 让所有 active token 按 token 维度平均；Dr. GRPO 则让每个 active token 的系数不再依赖自己这条 response 的实际长度。
+          所以 Dr. GRPO 不是“对 response 长度再归一化”，恰好相反，它是在去掉 <span class="param">1 / m_i</span> 这种随当前生成长度变化的归一化。
+          从优化方向看，<span class="param">1 / (G * L)</span> 只是固定缩放，核心差异是分母不再随 response 长度变化。
+        </p>
       </div>
       <div class="callout mt-4">
         <h4 class="card-title">偏置原理</h4>
@@ -650,96 +706,6 @@
       <div class="mt-4 callout">
         <strong>关键判断：</strong>如果训练中看到 response length 上升，不能立即归因于“模型学会深度思考”。必须拆分 correct 与 incorrect 的长度曲线。
         Dr. GRPO 的经验结果显示，它能显著压低错误答案长度，同时保持或提升 reasoning benchmark。
-      </div>
-    </article>
-
-    <article class="card p-5 issue">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="pill pill-indigo">VAPO</span>
-        <span class="pill pill-slate">arXiv:2504.05118v3</span>
-        <span class="pill pill-ok">ByteDance Seed</span>
-      </div>
-      <h3 class="card-title text-2xl mt-3">VAPO: Value-model-based Augmented PPO</h3>
-      <p class="ink-muted mt-2">
-        VAPO 的立场和 DAPO 相反：不是继续 value-free，而是认为 value model 如果训练好，credit assignment 上限更高。
-        它在 Qwen2.5-32B 上报告 AIME24 avg@32 约 60.4，超过 DAPO 10 分以上。
-      </p>
-      <div class="callout mt-4">
-        <h4 class="card-title">机制原理</h4>
-        <dl class="term-list mt-3 mini">
-          <div class="term">
-            <dt>先分清三种信号</dt>
-            <dd>
-              <p>在数学/代码这类 verifiable task 里，训练信号通常只有终点一个 <span class="param">R</span>：答案对就是 1，错就是 0。中间第 10 个、第 100 个 reasoning token 本身没有独立 reward。</p>
-              <p>PPO 需要的是每个 token 的 advantage：这个 token 相比当前模型平均水平，是应该提高概率还是降低概率。这一步叫 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-credit-assignment">credit assignment</button><span id="glossary-credit-assignment" class="glossary-popover" role="tooltip"><span class="glossary-title">Credit assignment</span>把“最终答对/答错”的全局结果拆回到每个生成动作上。对于 long-CoT，难点是最终 reward 离早期 token 很远，算法必须判断哪些中间推理步骤真正提高了最终正确率。</span></span>。</p>
-              <p><span class="param">reward model/verifier</span>回答“完整答案最后对不对”；<span class="param">value model</span>回答“给定当前 prefix，如果从这里继续生成，最终能拿到多少期望 reward”。后者不是给 prefix 打分，而是在估计从这个 prefix 出发的成功概率。</p>
-            </dd>
-          </div>
-          <div class="term">
-            <dt>Value model bias</dt>
-            <dd>
-              <p>为什么不能直接拿 reward model 当 value model？因为 reward model 是在完整回答上训练的。一个 prefix 还没写完证明或答案，reward model 往往会给低分；但 value model 要估计的是“这个 prefix 继续写下去之后最终答对的概率”。</p>
-              <p>举个例子：一条 200 token 的轨迹最后答对了，Monte Carlo 视角下，这条轨迹上每个 prefix 的最终 return 都是 1。早期 prefix 看起来“不完整”，但它并不等于没价值；它可能已经走在正确推理路径上。</p>
-              <p>如果 reward-initialized value 在早期 prefix 给低分、越接近 <span class="param">&lt;EOS&gt;</span> 越高，<span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-gae">GAE</button><span id="glossary-gae" class="glossary-popover" role="tooltip"><span class="glossary-title">GAE: Generalized Advantage Estimation</span>PPO 中常用的 advantage 估计方法。它把从当前位置开始的一串 TD error 按 lambda 衰减加权求和，得到每个 token/state 的 advantage。lambda 越大，看得越远，越接近完整轨迹回报；lambda 越小，越依赖 value model 的一步估计。</span></span> 里的 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-td-error">TD error</button><span id="glossary-td-error" class="glossary-popover" role="tooltip"><span class="glossary-title">TD error: Temporal-Difference Error</span>一步 value 预测误差：delta_t = r_t + gamma V(s_{t+1}) - V(s_t)。在 long-CoT verifier reward 里，中间 r_t 通常为 0，所以它主要比较“生成这个 token 后的新 prefix 价值”与“旧 prefix 价值”的差。</span></span> <span class="param">V(s_{t+1})-V(s_t)</span> 会在很多位置变成正数。模型会把“上下文变完整导致 value 上升”误读成“这些 token 都有正贡献”，这就是 VAPO 说的初始化偏置。</p>
-              <p>VAPO 的 value pretraining 是先固定一个 policy 采样，用最终 reward 作为 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-mc-return">Monte Carlo return</button><span id="glossary-mc-return" class="glossary-popover" role="tooltip"><span class="glossary-title">Monte Carlo return</span>沿一条完整采样轨迹真正拿到的累计回报。这里中间 reward 为 0、终点 reward 为 0/1，且 gamma=1，所以一条轨迹上任意 prefix 的 sampled return 都等于最终 0/1。多条轨迹平均后就近似“从该 prefix 出发的期望成功率”。</span></span> 去训练 value。它想让 value 先学会“prefix 到最终正确性”的映射，再让 PPO 用它做 baseline。</p>
-            </dd>
-          </div>
-          <div class="term">
-            <dt>GAE 为什么在长 CoT 上失真</dt>
-            <dd>
-              <p>GAE 会把每步 TD error 加权求和：越远的未来信号权重越小，约按 <span class="param">lambda^distance</span> 衰减。</p>
-              <div class="formula mt-2">
-                $$\delta_t = r_t + V(s_{t+1}) - V(s_t),\quad
-                \hat A_t=\sum_{k\ge 0}\lambda^k\delta_{t+k}$$
-              </div>
-              <p>long-CoT 的问题是中间几乎没有 reward，真正的 0/1 reward 在终点。若固定 <span class="param">lambda=0.95</span>，距离终点 100 步的终端 reward 权重只有 <span class="param">0.95^100≈0.006</span>，早期 token 几乎看不到最终答对信号。</p>
-              <p>这时 early token 的 advantage 主要来自 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-bootstrap-bias">bootstrapping</button><span id="glossary-bootstrap-bias" class="glossary-popover" role="tooltip"><span class="glossary-title">Bootstrapping bias</span>不用等真实最终 reward，而用 value model 对后继状态的估计来更新当前状态。好处是方差低，坏处是如果 value model 本身有偏，偏差会沿长序列一步步传回来。</span></span> 项，也就是 value model 自己的估计差。如果 value 已经因为 reward-model 初始化而有偏，长序列会把这个偏差放大。</p>
-            </dd>
-          </div>
-          <div class="term">
-            <dt>Decoupled GAE</dt>
-            <dd>
-              <p>critic/value 的目标是学准：它最好直接贴近真实 return，少被 bootstrap 目标带偏。policy 的目标是更新稳：它不一定要用最高方差的纯 Monte Carlo advantage。</p>
-              <p>这里的 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-decoupled-gae">decoupled</button><span id="glossary-decoupled-gae" class="glossary-popover" role="tooltip"><span class="glossary-title">Decoupled GAE</span>不是指“把共享底座拆成两个模型”或“训完 value 后固定 value”。它指 advantage/target 的计算解耦：critic/value 更新用接近真实 return 的 lambda_critic，policy 更新用另一个 lambda_policy。value pretraining 阶段会用固定 policy 采样来 warm up value；进入 PPO 后，policy 和 value 仍一起训练。</span></span> 是 GAE 计算目标的解耦，不是冻结 value model。</p>
-              <p>VAPO 把两者拆开：value 更新侧用 <span class="param">lambda_critic=1.0</span>，更接近 Monte Carlo return，降低 critic 偏差；policy 更新侧单独用 <span class="param">lambda_policy</span>，继续在 bias 和 variance 之间折中。</p>
-              <p>这解决的是“value 学歪了会污染 advantage，advantage 又反过来带歪 policy”的闭环。</p>
-            </dd>
-          </div>
-          <div class="term">
-            <dt>Length-Adaptive GAE</dt>
-            <dd>
-              <p>固定 <span class="param">lambda_policy</span> 在长短混合 response 上不合理。短回答如果 lambda 太大，少量随机终端 reward 会让 advantage 方差很高；长回答如果 lambda 不够大，终端 reward 又传不到前面。</p>
-              <p>VAPO 让 <span class="param">lambda_policy</span> 随输出长度 <span class="param">l</span> 变化，并让 GAE 的有效窗口大致与长度成比例：</p>
-              <div class="formula mt-2">
-                $$\sum_{k=0}^{\infty}\lambda_{\mathrm{policy}}^k \approx \frac{1}{1-\lambda_{\mathrm{policy}}}=\alpha l,\quad
-                \lambda_{\mathrm{policy}}=1-\frac{1}{\alpha l}$$
-              </div>
-              <p>直觉是：长 CoT 需要更长的 credit assignment 窗口，短回答不需要承受那么大的方差。</p>
-              <p>原理不是“长答案给更多奖励”，而是让长短答案的 credit assignment 尺度一致。</p>
-            </dd>
-          </div>
-          <div class="term">
-            <dt>稀疏正样本利用</dt>
-            <dd>
-              <p>verifier reward 多数时候只有对/错，正确 rollout 在训练早期很稀少。</p>
-              <p>VAPO 保留 DAPO 的 Clip-Higher、token-level loss，并加入 positive-example LM loss 和 group sampling，核心是把来之不易的正确轨迹当作可模仿信号，同时仍用 RL 的相对 advantage 抑制错误路径。</p>
-              <p>这也是为什么 VAPO 的贡献不是“回到 vanilla PPO”，而是为 long-CoT verifier reward 重做 value-based PPO。</p>
-            </dd>
-          </div>
-        </dl>
-      </div>
-      <div class="mt-4 overflow-x-auto">
-        <table class="layered">
-          <thead><tr><th>消融</th><th>AIME24 avg@32</th><th>含义</th></tr></thead>
-          <tbody>
-            <tr><td>Vanilla PPO</td><td>5</td><td>value collapse，输出长度塌缩，直接答题。</td></tr>
-            <tr><td>DAPO</td><td>50</td><td>value-free 强基线。</td></tr>
-            <tr><td>VAPO w/o Value-Pretraining</td><td>11</td><td>value 初始化偏置是硬问题。</td></tr>
-            <tr><td>VAPO w/o Decoupled-GAE</td><td>33</td><td>长 CoT reward 衰减严重。</td></tr>
-            <tr><td>VAPO w/o Length-adaptive GAE</td><td>45</td><td>混合长短序列需要自适应 bias-variance。</td></tr>
-            <tr><td><strong>VAPO</strong></td><td><strong>60</strong></td><td>value-based 方法在同类设置下报告更高上限。</td></tr>
-          </tbody>
-        </table>
       </div>
     </article>
 
@@ -892,64 +858,231 @@
 
     <article class="card p-5 issue">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="pill pill-indigo">AReaL</span>
-        <span class="pill pill-slate">arXiv:2505.24298v5 · NeurIPS 2025</span>
-        <span class="pill pill-ok">Tsinghua / Ant Group / HKUST</span>
+        <span class="pill pill-indigo">ASPO</span>
+        <span class="pill pill-slate">arXiv:2510.06062v1</span>
+        <span class="pill pill-ok">Kuaishou + Tsinghua</span>
       </div>
-      <h3 class="card-title text-2xl mt-3">AReaL: Asynchronous RL System for Language Reasoning</h3>
+      <h3 class="card-title text-2xl mt-3">ASPO: Asymmetric Importance Sampling Policy Optimization</h3>
       <p class="ink-muted mt-2">
-        AReaL 不是 GRPO objective 的小修，而是系统级答案：同步 RL 中 generation 必须等 batch 内最长 response，导致 rollout GPU 空转；
-        AReaL 完全解耦 generation 与 training，让 rollout worker 流式持续生成。
+        ASPO 沿着 DAPO/DCPO 的 token weighting 问题继续往下挖：在 outcome-supervised RL 里，token-level
+        <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-is-ratio">IS ratio</button><span id="glossary-is-ratio" class="glossary-popover" role="tooltip"><span class="glossary-title">IS ratio: Importance Sampling Ratio</span>新策略给某个已采样 token 的概率，除以旧策略采样它时的概率：r = pi_new(token) / pi_old(token)。r &gt; 1 表示当前模型比旧模型更喜欢这个 token；r &lt; 1 表示当前模型更不喜欢它。</span></span>
+        很多时候已经不再像经典 RL 里的分布校正项，而更像直接乘在 token loss 上的训练权重。问题是，正 advantage token 的权重方向和我们想要的学习动态相反。
       </p>
       <div class="callout mt-4">
         <h4 class="card-title">机制原理</h4>
         <dl class="term-list mt-3 mini">
           <div class="term">
-            <dt>同步等待浪费</dt>
+            <dt>正样本 IS ratio 错配</dt>
             <dd>
-              <p>长 CoT 的 response length 分布高度长尾。同步 rollout 要等一个 batch 里最长的样本生成完，短样本对应的 GPU worker 已经空闲，trainer 又必须等完整 batch 才能更新。</p>
-              <p>AReaL 的核心不是改 reward，而是把 generation 和 training 从批处理锁步改成流式 pipeline。</p>
-              <p>这样 rollout worker 可以持续产出样本，trainer 也可以持续消费样本。</p>
+              <p>在 GRPO/DAPO 这类 outcome reward 设置里，一条正确 response 的所有 token 通常共享同一个正 advantage。</p>
+              <p>若某个正样本 token 在当前 policy 下已经比旧 policy 概率更高，普通 IS ratio 会给它更大权重；若某个 token 当前概率反而低于旧 policy，普通 ratio 会给它更小权重。</p>
+              <p>这会导致一个很别扭的效果：已经会的高概率 token 被继续放大，真正“落后但属于正确轨迹”的 token 学得更慢，训练更容易 entropy collapse 和 repetition 增长。</p>
             </dd>
           </div>
           <div class="term">
-            <dt>Interruptible rollout</dt>
+            <dt>AIS: 只翻转正 advantage token</dt>
             <dd>
-              <p>异步系统中，rollout 正在生成时 policy 可能已经更新。若不中断，样本会越来越 stale；若每次更新都等当前生成结束，又退回同步瓶颈。</p>
-              <p>AReaL 在新权重到达时允许中断生成，丢弃旧 KV cache，用新权重重算 prefix 后继续 decode。</p>
-              <p>论文给出的关键论证是：这种被多个 policy 片段生成的 trajectory，仍可视为某个 behavior policy 下的样本，因此可以用 importance sampling 纳入 PPO。</p>
+              <p>ASPO 的 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-ais">AIS</button><span id="glossary-ais" class="glossary-popover" role="tooltip"><span class="glossary-title">AIS: Asymmetric Importance Sampling</span>非对称重要性采样。ASPO 里“非对称”指正 advantage token 和负 advantage token 用不同权重规则：正样本 token 用倒数权重，负样本 token 保持普通 IS ratio。</span></span> 保持负 advantage token 的 ratio 不变，但对正 advantage token 使用 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="glossary-reciprocal-weight">reciprocal weight</button><span id="glossary-reciprocal-weight" class="glossary-popover" role="tooltip"><span class="glossary-title">reciprocal weight: 倒数权重</span>如果普通 IS ratio 是 r = pi_new / pi_old，那么 reciprocal weight 就是 1 / r = pi_old / pi_new。它不是把 token 概率取倒数，而是把这个 token 在 loss 里的训练权重取倒数。</span></span>。</p>
+              <p>直觉是：正样本里，当前概率越低的 token 越应该被补课；当前概率已经很高的 token 反而应该降权，避免过拟合到少数高置信路径。</p>
+              <p>这不是把 reward 改成 token-level reward，而是在 sequence-level reward 广播到 token 后，重新设计每个 token 的训练权重。</p>
             </dd>
           </div>
           <div class="term">
-            <dt>Staleness control</dt>
+            <dt>Soft dual-clipping</dt>
             <dd>
-              <p>异步训练的代价是样本由旧 policy 生成，和当前 policy 有分布差。</p>
-              <p>staleness 太小，系统吞吐回到同步；staleness 太大，PPO clipping 中心错位，最新 policy 会被旧样本拉偏。</p>
-              <p>AReaL 用最大 staleness 约束训练 batch，实质是在“吞吐提升”和“off-policy 偏差”之间设一个可控边界。</p>
-            </dd>
-          </div>
-          <div class="term">
-            <dt>Decoupled PPO</dt>
-            <dd>
-              <p>标准 PPO 默认 behavior policy 和 proximal policy 是同一个旧策略。异步场景里，如果直接用很旧的 behavior policy 当 clipping center，会把当前模型往旧策略附近拉。</p>
-              <p>Decoupled PPO 把“样本来自谁”和“更新时靠近谁”拆开：behavior policy 用于重要性采样校正，proximal policy 用于限制当前更新步长。</p>
-              <p>这样异步样本可用，但不会主导优化方向。</p>
+              <p>翻转 ratio 后，正样本里极端小概率 token 的权重可能过大。ASPO 因此加入 soft dual-clipping：限制数值爆炸，但保留梯度流。</p>
+              <p>这和 hard clipping 的差别很关键：hard clip 会把越界 token 的梯度直接盖掉；soft clipping 只是把值压住，让这个 token 仍然能参与更新。</p>
             </dd>
           </div>
         </dl>
       </div>
       <div class="card p-0 mt-4 overflow-x-auto">
         <table class="layered">
-          <thead><tr><th>任务/模型</th><th>同步基线训练小时</th><th>AReaL 训练小时</th><th>最终表现</th></tr></thead>
+          <thead>
+            <tr>
+              <th>同一条正确 response 里的 token</th>
+              <th>旧策略概率</th>
+              <th>当前策略概率</th>
+              <th>普通 IS ratio</th>
+              <th>ASPO 正样本权重</th>
+              <th>直觉</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td>Math 1.5B AIME24</td><td>VeRL 33.6 / Sync.AReaL 41.0</td><td>14.8</td><td>AReaL 42.2 vs Sync 42.0</td></tr>
-            <tr><td>Math 7B AIME24</td><td>Sync.AReaL 57.7</td><td>25.4</td><td>AReaL 63.1 vs Sync 63.0</td></tr>
-            <tr><td>Code 14B LiveCodeBench</td><td>VeRL 44.4 / Sync.AReaL 48.8</td><td>21.9</td><td>AReaL 58.1 vs Sync 56.7</td></tr>
-            <tr><td>Code 32B LiveCodeBench</td><td>Sync.AReaL 51.1</td><td>31.1</td><td>AReaL 61.0 vs Sync 61.2</td></tr>
+            <tr>
+              <td>token A：模型已经很会</td>
+              <td>0.10</td>
+              <td>0.20</td>
+              <td>r = 0.20 / 0.10 = 2.0</td>
+              <td>1 / r = 0.5</td>
+              <td>普通 GRPO 会继续强推它；ASPO 降权，避免只强化已经高概率的路径。</td>
+            </tr>
+            <tr>
+              <td>token B：属于正确轨迹，但当前概率掉了</td>
+              <td>0.10</td>
+              <td>0.05</td>
+              <td>r = 0.05 / 0.10 = 0.5</td>
+              <td>1 / r = 2.0</td>
+              <td>普通 GRPO 会少学它；ASPO 加权补课，让低概率但正确的 token 更容易被拉回来。</td>
+            </tr>
           </tbody>
         </table>
       </div>
+      <div class="mt-4 callout">
+        <strong>一句话：</strong>普通 IS ratio 在正样本里容易“越会越奖励、越不会越不学”；ASPO 的 AIS 把正样本权重反过来，让正确轨迹里当前低概率的 token 获得更大训练权重。负样本不反过来，因为如果模型正在更喜欢一个错误 token，普通 ratio 变大正好会加重惩罚。
+      </div>
+      <div class="card p-0 mt-4 overflow-x-auto">
+        <table class="layered">
+          <thead><tr><th>实验设置</th><th>关键数字</th><th>报告含义</th></tr></thead>
+          <tbody>
+            <tr><td>Math · DeepSeek-R1-Distill-Qwen-1.5B</td><td>ASPO-Math 平均 59.3；DAPO 平均 53.5</td><td>在 AIME/AMC/MATH/Minerva/Olympiad 等数学基准上超过 DAPO 和多个 1.5B baseline。</td></tr>
+            <tr><td>Code · LiveCodeBench v5/v6</td><td>ASPO-Code 平均 31.0；DAPO 平均 26.8</td><td>收益不只出现在数学题，也覆盖代码生成。</td></tr>
+            <tr><td>实现</td><td>batch 64、mini-batch 32、每 prompt 采 16 条、最大输出 32768</td><td>基于 DAPO/verl 做改动，主要变量集中在 IS weighting 和 clipping。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4 callout">
+        <strong>关键判断：</strong>ASPO 和 DCPO 都在修“低概率好 token 学不到”，但入口不同：DCPO 改 clipping bound，ASPO 改 IS ratio 作为 token weight 的方向。它更适合和 DAPO/DCPO 一起看，而不是放到报告二的 value/classification 路线里。
+      </div>
     </article>
+
+    <article class="card p-5 issue">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="pill pill-indigo">SAPO</span>
+        <span class="pill pill-slate">arXiv:2511.20347v2</span>
+        <span class="pill pill-ok">Qwen Team, Alibaba</span>
+      </div>
+      <h3 class="card-title text-2xl mt-3">Soft Adaptive Policy Optimization</h3>
+      <p class="ink-muted mt-2">
+        SAPO 站在 GSPO 和 GRPO 中间：它认同 sequence-level coherence 很重要，但认为 hard clipping 太脆。
+        一条 sequence 里只要少数 token 高度 off-policy，GSPO 的 sequence-level hard clip 可能压掉整条样本的梯度；GRPO 的 token hard clip 又会让 token-level ratio 高方差直接造成不稳定。
+      </p>
+      <div class="callout mt-4">
+        <h4 class="card-title">机制原理</h4>
+        <dl class="term-list mt-3 mini">
+          <div class="term">
+            <dt>Soft gate 替代 hard clipping</dt>
+            <dd>
+              <p>SAPO 用 temperature-controlled sigmoid gate 给 token update 连续降权，而不是在 clipping 边界外直接把梯度截断。</p>
+              <p>ratio 接近 1 时，梯度几乎完整保留；ratio 偏离越远，权重越小。它形成的是一个连续 trust region，而不是 GRPO/GSPO 的硬边界。</p>
+              <p>这让“稍微 off-policy 但仍有信息”的 token 继续贡献学习信号，同时压制极端 off-policy token 的噪声。</p>
+            </dd>
+          </div>
+          <div class="term">
+            <dt>Sequence-coherent + token-adaptive</dt>
+            <dd>
+              <p>当一条 response 内 token log-ratio 分散不大时，SAPO 的平均 token gate 会接近一个平滑的 sequence-level gate，行为类似 GSPO。</p>
+              <p>但当只有少数 token 是 outlier 时，SAPO 不会像 GSPO 那样把整条 sequence 都压掉，而是只降低这些 token 的权重，保留其他近 on-policy token 的梯度。</p>
+            </dd>
+          </div>
+          <div class="term">
+            <dt>正负 token 非对称温度</dt>
+            <dd>
+              <p>SAPO 认为负 advantage token 的梯度更容易引入不稳定：负更新会降低 sampled token，同时相对抬高大量未采样 token，在大词表下噪声扩散更明显。</p>
+              <p>因此它给负 token 使用更强的衰减温度，让负梯度在 off-policy 时更快降权；正 token 则保留更多有效学习信号。</p>
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <div class="card p-0 mt-4 overflow-x-auto">
+        <table class="layered">
+          <thead><tr><th>对比对象</th><th>SAPO 的差别</th><th>实验结论</th></tr></thead>
+          <tbody>
+            <tr><td>GRPO</td><td>从 token hard clipping 改成 smooth scaling</td><td>数学推理基准下训练更稳定、Pass@1 更高。</td></tr>
+            <tr><td>GSPO</td><td>保留 sequence coherence，但不因少数 off-policy token 压掉整条 sequence</td><td>同等预算下稳定学习时间更长，样本效率更好。</td></tr>
+            <tr><td>Qwen3-VL 训练</td><td>用于 Qwen3-VL 系列的实际 RL 训练</td><td>在文本、多模态、数学、代码、逻辑任务上相对 GSPO/GRPO-R2 持续提升。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4 callout">
+        <strong>关键判断：</strong>SAPO 不是推翻 GSPO，而是把 GSPO 的“按 sequence 保持一致”变得更软、更局部。读它时重点看 hard clipping 的信息损失，而不是只看它有没有新 reward。
+      </div>
+    </article>
+
+    <article class="card p-5 issue">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="pill pill-indigo">LUSPO</span>
+        <span class="pill pill-slate">arXiv:2602.05261v1</span>
+        <span class="pill pill-ok">Meituan</span>
+      </div>
+      <h3 class="card-title text-2xl mt-3">Length-Unbiased Sequence Policy Optimization</h3>
+      <p class="ink-muted mt-2">
+        LUSPO 接在 GSPO 后面读最顺：GSPO 把 ratio/clipping 提到 sequence level，但它的长度归一化和 token 平均仍可能改变 response length 动态。
+        LUSPO 的问题意识是：RLVR 里 response length 的增长、塌缩或稳定，不一定只是能力变化，也可能是算法目标的长度偏置。
+      </p>
+      <div class="callout mt-4">
+        <h4 class="card-title">机制原理</h4>
+        <dl class="term-list mt-3 mini">
+          <div class="term">
+            <dt>GSPO 的长度偏置</dt>
+            <dd>
+              <p>GSPO 用 sequence-level ratio 解决 reward/ratio 粒度错配，但它仍需要把不同长度 response 放到可比较尺度上。</p>
+              <p>如果 loss 里的长度归一化处理不当，长 response 的梯度贡献会被系统性缩放，训练可能诱发 response length collapse，尤其在 VL 或复杂推理任务里会限制探索空间。</p>
+            </dd>
+          </div>
+          <div class="term">
+            <dt>Length-unbiased objective</dt>
+            <dd>
+              <p>LUSPO 目标是让 sequence-level policy optimization 对 response length 无偏：算法不应因为答案更长或更短而自动改变其优化权重，除非 reward 本身明确包含长度项。</p>
+              <p>它修正 GSPO loss 中与 response length 相关的权重，使 length 变化更多反映任务需求和 reward，而不是实现细节。</p>
+            </dd>
+          </div>
+          <div class="term">
+            <dt>长度不是越长越好</dt>
+            <dd>
+              <p>LUSPO 不是简单鼓励长回答。论文还在训练 reward 中加入 accuracy、format 与 overlong reward，说明长度仍要受任务正确性和最大生成长度约束。</p>
+              <p>它真正想避免的是：算法本身把模型推向短到无法探索，或者制造看似“会思考”的虚假长度收益。</p>
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <div class="card p-0 mt-4 overflow-x-auto">
+        <table class="layered">
+          <thead><tr><th>模型/任务</th><th>GSPO</th><th>LUSPO</th><th>变化</th></tr></thead>
+          <tbody>
+            <tr><td>Qwen2.5-7B-Base · text avg</td><td>37.3</td><td>41.3</td><td>+4.0</td></tr>
+            <tr><td>Qwen3-30B-A3B-Instruct · AIME avg</td><td>68.0</td><td>80.0</td><td>+12.0</td></tr>
+            <tr><td>Qwen2.5-VL-7B-Instruct · multimodal avg</td><td>43.6</td><td>45.6</td><td>+2.0</td></tr>
+            <tr><td>Validation response length · Qwen2.5-7B</td><td>2611</td><td>3940</td><td>约 1.5×</td></tr>
+            <tr><td>Validation response length · Qwen3-30B-A3B</td><td>6757</td><td>11014</td><td>约 1.6×</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4 callout">
+        <strong>关键判断：</strong>LUSPO 和 Dr. GRPO 是一组呼应：Dr. GRPO 批评 GRPO 实现里的 response-length normalization，LUSPO 则批评 GSPO 后续实现里的长度偏置。二者都在提醒：length curve 是算法目标的一部分，不能只当能力指标看。
+      </div>
+    </article>
+
+    <div class="card p-5">
+      <h3 class="card-title text-2xl">补充快读：留在报告一的后续 GRPO/GSPO 修正</h3>
+      <p class="mt-2 mini ink-muted">
+        下面几篇不放到报告二，因为它们没有换到 value-based 或 classification 的大视角，
+        而是继续沿着报告一的主线修 ratio、clipping、长度、advantage redistribution 和 MoE 稳定性。
+      </p>
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <div class="callout">
+          <h4 class="card-title">TreeAdv</h4>
+          <p class="mini ink-muted mt-2">
+            把 group rollouts 显式组织成树，在高不确定位置分支、低不确定 token 共享，
+            再把 leaf rollout advantage 重新分配给内部 tree segments，缓解 flat response advantage 的样本浪费和冗长偏置。
+          </p>
+        </div>
+        <div class="callout">
+          <h4 class="card-title">DHPO</h4>
+          <p class="mini ink-muted mt-2">
+            在一个 clipped surrogate 里混合 token-level ratio 和 sequence-level ratio：
+            token 分支保留细粒度 credit assignment，sequence 分支降低高方差；再用 branch-specific clipping 防止某一支 outlier 主导更新。
+          </p>
+        </div>
+        <div class="callout">
+          <h4 class="card-title">Stabilizing RL with LLMs</h4>
+          <p class="mini ink-muted mt-2">
+            从训练-推理差异和 policy staleness 解释 token-level surrogate 何时能近似 sequence-level reward。
+            对 MoE 来说，importance sampling、clipping 和 Routing Replay 是控制 off-policy 与 routing 漂移的稳定性工具。
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -982,13 +1115,6 @@
           <td>不是完整大规模 recipe；主要证明 objective/implementation bias。</td>
         </tr>
         <tr>
-          <td>VAPO</td>
-          <td>value-free ceiling 与 credit assignment 粗糙</td>
-          <td>Value pretraining、decoupled GAE、length-adaptive GAE、positive LM loss</td>
-          <td>同类 32B math 设置下报告最高 AIME24</td>
-          <td>需要 value model，系统成本和调参复杂度明显更高。</td>
-        </tr>
-        <tr>
           <td>GSPO</td>
           <td>token-level IS ratio 噪声、MoE RL collapse</td>
           <td>Sequence-level likelihood ratio 与 sequence-level clipping</td>
@@ -1003,11 +1129,25 @@
           <td>实验以数学任务为主；response max length 3072，和 DAPO 20K 长 CoT 设置不同。</td>
         </tr>
         <tr>
-          <td>AReaL</td>
-          <td>同步 rollout 等待最长样本、GPU 利用率低</td>
-          <td>异步 rollout/training、interruptible generation、staleness-aware decoupled PPO</td>
-          <td>最高报告 2.77× 训练加速，性能不降</td>
-          <td>需要较复杂分布式系统；inference/training 设备比例仍需动态优化。</td>
+          <td>ASPO</td>
+          <td>正 advantage token 的 IS ratio 权重方向错配</td>
+          <td>Asymmetric IS：正样本 ratio 取 reciprocal + soft dual-clipping</td>
+          <td>直接修 token weighting，缓解 entropy collapse 和 repetition</td>
+          <td>实验主要在 1.5B 规模；结论更适用于 GRPO/DAPO 这类 outcome-supervised token-ratio 设置。</td>
+        </tr>
+        <tr>
+          <td>SAPO</td>
+          <td>hard clipping 在 token/sequence 两端都会丢失有效梯度</td>
+          <td>Temperature-controlled soft gate + positive/negative asymmetric temperature</td>
+          <td>同时保持 sequence coherence 和 token adaptivity，适合 MoE/VL 大规模训练</td>
+          <td>温度超参需要调；论文公开细节主要来自 Qwen3-VL 训练叙述，复现成本较高。</td>
+        </tr>
+        <tr>
+          <td>LUSPO</td>
+          <td>GSPO 的 length normalization 可能诱发 response length collapse</td>
+          <td>Length-unbiased sequence objective + accuracy/format/overlong reward</td>
+          <td>把 sequence-level optimization 与长度偏置拆开，文本和多模态都有收益</td>
+          <td>收益和任务是否需要长推理有关；不能把更长 response 自动等同于更强 reasoning。</td>
         </tr>
       </tbody>
     </table>
@@ -1021,39 +1161,29 @@
       <h3 class="card-title text-lg">小到中等规模 math RLVR</h3>
       <p class="mt-2 mini ink-muted">
         先用 DAPO 作为可复现 baseline；如果出现错误答案越来越长，优先引入 Dr. GRPO 的去长度偏置实现；
-        如果全对/全错组变多、有效 batch 下降，再看 DCPO 的 SAS 或 DAPO dynamic sampling。
+        如果全对/全错组变多、有效 batch 下降，再看 DCPO 的 SAS 或 DAPO dynamic sampling；如果 entropy/repetition 先坏掉，再看 ASPO/SAPO 的 token weighting 与 soft clipping。
       </p>
     </div>
     <div class="card p-5">
-      <h3 class="card-title text-lg">追求上限且能承担 critic 成本</h3>
+      <h3 class="card-title text-lg">想比较替代优化范式</h3>
       <p class="mt-2 mini ink-muted">
-        VAPO 是值得读和试的方向，但不要直接把 vanilla PPO 搬过去。value pretraining、decoupled GAE 和 length-adaptive GAE 是必要组件，不是可选优化。
+        REINFORCE++、GPG、REAL、VAPO、AReaL 已移到
+        <a href="grpo_algorithm_fixes_reading_report_2_2026.html">报告二</a>。它们更适合回答“是否还要 GRPO 这个 surrogate 形式”以及“value/classification 视角是否更稳”。
       </p>
     </div>
     <div class="card p-5">
       <h3 class="card-title text-lg">MoE 与超大模型 RL</h3>
       <p class="mt-2 mini ink-muted">
-        GSPO 比 DAPO/DCPO 更像 objective 粒度修正。MoE routing 会让 token-level ratio 抖动，sequence-level ratio 能绕开 Routing Replay 的额外复杂度。
+        GSPO 比 DAPO/DCPO 更像 objective 粒度修正。MoE routing 会让 token-level ratio 抖动，sequence-level ratio 能绕开 Routing Replay 的额外复杂度；若 hard sequence clipping 过脆，再看 SAPO。
       </p>
     </div>
     <div class="card p-5">
       <h3 class="card-title text-lg">GPU 小时成为瓶颈</h3>
       <p class="mt-2 mini ink-muted">
-        AReaL 是系统侧必读。长 CoT 训练的吞吐瓶颈通常不是 optimizer step，而是 rollout 等待最长样本。异步化后必须配套 staleness 控制和 decoupled PPO。
+        系统侧异步 rollout 已移到
+        <a href="grpo_algorithm_fixes_reading_report_2_2026.html">报告二的 AReaL</a>。报告一只保留 RUR/TCR 这类算法侧有效更新指标。
       </p>
     </div>
-  </div>
-
-  <div class="card p-5 mt-5">
-    <h3 class="card-title text-lg">推荐阅读顺序</h3>
-    <ol class="list-decimal pl-5 mt-2 mini ink-muted space-y-2">
-      <li><strong>DAPO</strong>：建立 RLVR recipe 与常见训练症状的直觉。</li>
-      <li><strong>Dr. GRPO</strong>：理解为什么“长度变长”可能是 objective bug，而不是能力涌现。</li>
-      <li><strong>DCPO</strong>：把 zero-gradient、RUR、TCR 这些监控指标补齐。</li>
-      <li><strong>GSPO</strong>：从重要性采样粒度理解 token-level ratio 的根本问题。</li>
-      <li><strong>VAPO</strong>：在 value-free 之后看 value-based 如何重新做 credit assignment。</li>
-      <li><strong>AReaL</strong>：最后看系统，把 rollout 利用率和异步 stale data 问题串起来。</li>
-    </ol>
   </div>
 </section>
 
@@ -1072,39 +1202,93 @@
       <tbody>
         <tr>
           <td>DAPO</td>
-          <td><a href="https://arxiv.org/abs/2503.14476">DAPO: An Open-Source LLM Reinforcement Learning System at Scale</a></td>
+          <td>
+            DAPO: An Open-Source LLM Reinforcement Learning System at Scale
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2503.14476">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2503.14476">PDF</a></div>
+          </td>
           <td>v2, 2025-05-20</td>
           <td><a href="https://dapo-sia.github.io/">Project Page</a>; built on <a href="https://github.com/volcengine/verl">verl</a></td>
         </tr>
         <tr>
           <td>Dr. GRPO</td>
-          <td><a href="https://arxiv.org/abs/2503.20783">Understanding R1-Zero-Like Training: A Critical Perspective</a></td>
+          <td>
+            Understanding R1-Zero-Like Training: A Critical Perspective
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2503.20783">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2503.20783">PDF</a></div>
+          </td>
           <td>v2, 2025-10-06, COLM 2025</td>
           <td><a href="https://github.com/sail-sg/understand-r1-zero">understand-r1-zero</a>; <a href="https://github.com/sail-sg/oat">Oat</a></td>
         </tr>
         <tr>
-          <td>VAPO</td>
-          <td><a href="https://arxiv.org/abs/2504.05118">VAPO: Efficient and Reliable Reinforcement Learning for Advanced Reasoning Tasks</a></td>
-          <td>v3, 2025-04-11</td>
-          <td>未在论文首页提供代码链接</td>
-        </tr>
-        <tr>
           <td>GSPO</td>
-          <td><a href="https://arxiv.org/abs/2507.18071">Group Sequence Policy Optimization</a></td>
+          <td>
+            Group Sequence Policy Optimization
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2507.18071">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2507.18071">PDF</a></div>
+          </td>
           <td>v2, 2025-07-28</td>
           <td>未在论文首页提供代码链接</td>
         </tr>
         <tr>
           <td>DCPO</td>
-          <td><a href="https://arxiv.org/abs/2509.02333">DCPO: Dynamic Clipping Policy Optimization</a></td>
+          <td>
+            DCPO: Dynamic Clipping Policy Optimization
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2509.02333">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2509.02333">PDF</a></div>
+          </td>
           <td>v2, 2025-09-08</td>
           <td><a href="https://github.com/lime-RL/DCPO">lime-RL/DCPO</a></td>
         </tr>
         <tr>
-          <td>AReaL</td>
-          <td><a href="https://arxiv.org/abs/2505.24298">AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning</a></td>
-          <td>v5, 2026-03-02, NeurIPS 2025</td>
-          <td><a href="https://github.com/inclusionAI/AReaL/">inclusionAI/AReaL</a></td>
+          <td>ASPO</td>
+          <td>
+            ASPO: Asymmetric Importance Sampling Policy Optimization
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2510.06062">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2510.06062">PDF</a></div>
+          </td>
+          <td>v1, 2025-10-07</td>
+          <td><a href="https://github.com/wizard-III/Archer2.0">wizard-III/Archer2.0</a></td>
+        </tr>
+        <tr>
+          <td>SAPO</td>
+          <td>
+            Soft Adaptive Policy Optimization
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2511.20347">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2511.20347">PDF</a></div>
+          </td>
+          <td>v2, 2025-12-01</td>
+          <td>未在论文首页提供代码链接</td>
+        </tr>
+        <tr>
+          <td>LUSPO</td>
+          <td>
+            Length-Unbiased Sequence Policy Optimization: Revealing and Controlling Response Length Variation in RLVR
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2602.05261">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2602.05261">PDF</a></div>
+          </td>
+          <td>v1, 2026-02-05</td>
+          <td>未在论文首页提供代码链接</td>
+        </tr>
+        <tr>
+          <td>TreeAdv</td>
+          <td>
+            TreeAdv: Tree-Structured Advantage Redistribution for Group-Based RL
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2601.03703">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2601.03703">PDF</a></div>
+          </td>
+          <td>v2, 2026-04-09</td>
+          <td>未在论文首页提供代码链接</td>
+        </tr>
+        <tr>
+          <td>DHPO</td>
+          <td>
+            Orchestrating Tokens and Sequences: Dynamic Hybrid Policy Optimization for RLVR
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2601.05607">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2601.05607">PDF</a></div>
+          </td>
+          <td>v1, 2026-01-09</td>
+          <td>论文称 acceptance 后发布代码</td>
+        </tr>
+        <tr>
+          <td>Stabilizing RL</td>
+          <td>
+            Stabilizing Reinforcement Learning with LLMs: Formulation and Practices
+            <div class="source-actions"><a class="link-chip" href="https://arxiv.org/abs/2512.01374">arXiv</a><a class="link-chip" href="https://arxiv.org/pdf/2512.01374">PDF</a></div>
+          </td>
+          <td>v3, 2025-12-03</td>
+          <td>未在论文首页提供代码链接</td>
         </tr>
       </tbody>
     </table>
