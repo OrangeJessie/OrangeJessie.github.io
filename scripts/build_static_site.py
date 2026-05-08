@@ -453,6 +453,26 @@ def write_text(relative_path: str, content: str) -> None:
     target.write_text(content, encoding="utf-8")
 
 
+def copy_standalone_assets(post: Post) -> None:
+    if post.standalone_source is None:
+        return
+
+    asset_paths = set()
+    for match in re.finditer(r"""(?:src|href)=["'](assets/[^"'?#]+)(?:[?#][^"']*)?["']""", post.html, flags=re.I):
+        asset_path = Path(match.group(1))
+        if asset_path.is_absolute() or ".." in asset_path.parts:
+            continue
+        asset_paths.add(asset_path)
+
+    for asset_path in sorted(asset_paths):
+        source = post.standalone_source.parent / asset_path
+        if not source.is_file():
+            continue
+        target = output_path(f"{post.url.strip('/')}/{asset_path.as_posix()}")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
+
 def remove_output(target: Path) -> None:
     if target.is_dir():
         shutil.rmtree(target)
@@ -1192,6 +1212,7 @@ def build() -> None:
                     post,
                 ),
             )
+            copy_standalone_assets(post)
         else:
             previous_post = posts[idx + 1] if idx + 1 < len(posts) else None
             next_post = posts[idx - 1] if idx - 1 >= 0 else None

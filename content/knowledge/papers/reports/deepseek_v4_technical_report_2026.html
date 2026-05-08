@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DeepSeek-V4 技术报告精读 · Paper Reader</title>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #dbe3ef;
+    --soft: #f1f5f9;
+    --accent: #2563eb;
+    --accent-2: #0891b2;
+    --ok: #059669;
+    --warn: #b45309;
+    --risk: #be123c;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    font-family: Inter, "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+  body { line-height: 1.72; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .min-h-screen { min-height: 100vh; }
+  .sticky { position: sticky; }
+  .top-0 { top: 0; }
+  .z-50 { z-index: 50; }
+  .max-w-6xl { max-width: 72rem; }
+  .mx-auto { margin-left: auto; margin-right: auto; }
+  .ml-auto { margin-left: auto; }
+  .hidden { display: none; }
+  .grid { display: grid; }
+  .flex { display: flex; }
+  .flex-wrap { flex-wrap: wrap; }
+  .items-center { align-items: center; }
+  .gap-2 { gap: .5rem; }
+  .gap-3 { gap: .75rem; }
+  .gap-4 { gap: 1rem; }
+  .gap-5 { gap: 1.25rem; }
+  .gap-6 { gap: 1.5rem; }
+  .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .py-3 { padding-top: .75rem; padding-bottom: .75rem; }
+  .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+  .pt-14 { padding-top: 3.5rem; }
+  .pb-8 { padding-bottom: 2rem; }
+  .p-4 { padding: 1rem; }
+  .p-5 { padding: 1.25rem; }
+  .mt-1 { margin-top: .25rem; }
+  .mt-2 { margin-top: .5rem; }
+  .mt-3 { margin-top: .75rem; }
+  .mt-4 { margin-top: 1rem; }
+  .mt-5 { margin-top: 1.25rem; }
+  .mt-6 { margin-top: 1.5rem; }
+  .mb-3 { margin-bottom: .75rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .w-6 { width: 1.5rem; }
+  .h-6 { height: 1.5rem; }
+  .rounded { border-radius: .25rem; }
+  .overflow-x-auto { overflow-x: auto; }
+  .text-sm { font-size: .875rem; line-height: 1.35rem; }
+  .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+  .text-xl { font-size: 1.25rem; line-height: 1.8rem; }
+  .text-2xl { font-size: 1.55rem; line-height: 2.05rem; }
+  .text-3xl { font-size: 1.9rem; line-height: 2.25rem; }
+  .font-semibold { font-weight: 600; }
+  .font-extrabold { font-weight: 800; }
+  .leading-tight { line-height: 1.12; }
+  @media (min-width: 768px) {
+    .md\:flex { display: flex; }
+    .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .md\:text-6xl { font-size: 3.6rem; line-height: 1; }
+  }
+  section { scroll-margin-top: 5rem; }
+  code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  nav.topnav {
+    backdrop-filter: blur(10px);
+    background: rgba(248, 250, 252, .86);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.topnav a {
+    display: inline-flex;
+    color: #475569;
+    font-size: .82rem;
+    padding: .28rem .55rem;
+    border-radius: .4rem;
+    white-space: nowrap;
+  }
+  nav.topnav a:hover { background: #e0f2fe; color: #0369a1; text-decoration: none; }
+  .logo { background: linear-gradient(135deg, #2563eb, #06b6d4); }
+  .ink-muted { color: #475569; }
+  .heading-grad {
+    background: linear-gradient(100deg, #0f172a 0%, #1d4ed8 48%, #0e7490 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .pill {
+    display: inline-flex; align-items: center;
+    padding: .18rem .55rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .pill-blue { background: #dbeafe; color: #1d4ed8; }
+  .pill-cyan { background: #cffafe; color: #0e7490; }
+  .pill-green { background: #dcfce7; color: #047857; }
+  .pill-amber { background: #fef3c7; color: #92400e; }
+  .pill-rose { background: #ffe4e6; color: #be123c; }
+  .pill-slate { background: #e2e8f0; color: #334155; }
+  .card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .card-title { font-weight: 800; letter-spacing: 0; }
+  h2.section {
+    display: flex;
+    align-items: baseline;
+    gap: .85rem;
+    font-size: clamp(1.45rem, 2.2vw, 1.95rem);
+    line-height: 1.15;
+    letter-spacing: 0;
+    font-weight: 800;
+  }
+  h2.section .num { color: #60a5fa; font-size: 1rem; font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 600; }
+  .hero-grid { display: grid; gap: 1rem; }
+  @media (min-width: 900px) { .hero-grid { grid-template-columns: 1.5fr .85fr; } }
+  .metric-grid { display: grid; gap: .85rem; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+  .metric {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: .9rem;
+    background: #fff;
+  }
+  .metric .v { font-size: 1.6rem; line-height: 1.1; font-weight: 800; color: #0f172a; }
+  .metric .k { margin-top: .25rem; color: var(--muted); font-size: .82rem; }
+  .tldr-lines { display: grid; gap: .35rem; margin: 0; }
+  .tldr-line { margin: 0; color: #0f172a; line-height: 1.65; font-weight: 400; }
+  .callout {
+    border-left: 4px solid var(--accent);
+    border-top: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    background: white;
+  }
+  .callout.cyan { border-left-color: var(--accent-2); }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout.risk { border-left-color: var(--risk); }
+  .mini { font-size: .88rem; line-height: 1.7; }
+  .param {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    border-radius: .35rem;
+    background: #eef2f7;
+    color: #334155;
+    padding: .05rem .34rem;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: .84em;
+    font-weight: 600;
+  }
+  .term-list { display: grid; gap: .7rem; }
+  .term {
+    display: grid;
+    grid-template-columns: minmax(9rem, 13rem) 1fr;
+    gap: .85rem;
+    padding: .85rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .term:last-child { border-bottom: 0; padding-bottom: 0; }
+  .term dt { font-weight: 800; color: #334155; }
+  .term dd { margin: 0; color: #475569; }
+  .term dd p { margin: 0; }
+  .term dd p + p { margin-top: .55rem; }
+  @media (max-width: 720px) { .term { grid-template-columns: 1fr; gap: .2rem; } }
+  table.layered { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  table.layered th, table.layered td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: .72rem .8rem; }
+  table.layered th { background: #f8fafc; color: #334155; font-weight: 800; }
+  table.layered td { color: #334155; }
+  .score { font-weight: 800; color: #0f172a; }
+  .cell-list { margin: 0; padding-left: 1rem; }
+  .cell-list li + li { margin-top: .25rem; }
+  .formula {
+    overflow-x: auto;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: .95rem 1rem;
+  }
+  .formula mjx-container { margin: 0 !important; min-width: max-content; }
+  .paper-figure,
+  .mhc-diagram {
+    margin: 1rem 0 0;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+  .figure-grid .paper-figure { margin: 0; }
+  .paper-figure a,
+  .mhc-diagram a {
+    display: block;
+    cursor: zoom-in;
+  }
+  .paper-figure img,
+  .mhc-diagram img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .paper-figure.compact img {
+    max-height: 32rem;
+    object-fit: contain;
+    background: #fff;
+  }
+  .paper-figure figcaption,
+  .mhc-diagram figcaption {
+    border-top: 1px solid var(--line);
+    padding: .75rem 1rem;
+    color: #475569;
+    font-size: .88rem;
+    line-height: 1.65;
+    background: #f8fafc;
+  }
+  .glossary { display: inline-block; }
+  .glossary-trigger {
+    border: 0;
+    border-bottom: 1px dotted #64748b;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+  .glossary-trigger:hover, .glossary-trigger:focus-visible { color: var(--accent); outline: none; }
+  .glossary-popover {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 60;
+    display: none;
+    width: min(23rem, 78vw);
+    transform: translate3d(var(--popover-x, 0), var(--popover-y, 0), 0);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, .16);
+    color: #334155;
+    padding: .8rem .9rem;
+    font-size: .84rem;
+    line-height: 1.65;
+  }
+  .glossary-popover::after {
+    content: none;
+  }
+  .glossary-title { display: block; margin-bottom: .25rem; color: #0f172a; font-weight: 800; }
+  .glossary.is-open .glossary-popover { display: block; }
+  .tagline { color: #475569; font-size: 1.05rem; max-width: 58rem; }
+  .source-list { margin: 0; padding-left: 1.15rem; }
+  .source-list li + li { margin-top: .45rem; }
+</style>
+</head>
+<body class="min-h-screen">
+<nav class="topnav sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-6 py-3 flex items-center gap-6">
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded logo"></div>
+      <span class="font-semibold text-sm">Paper Reader · HTML Report</span>
+    </div>
+    <div class="ml-auto hidden md:flex items-center gap-2">
+      <a href="#summary">总览</a>
+      <a href="#mechanism">机制</a>
+      <a href="#training">训练</a>
+      <a href="#results">结果</a>
+      <a href="#risks">限制</a>
+      <a href="#sources">来源</a>
+    </div>
+  </div>
+</nav>
+
+<section id="summary" class="max-w-6xl mx-auto px-6 pt-14 pb-8">
+  <div class="flex flex-wrap items-center gap-2">
+    <span class="pill pill-blue">DeepSeek-V4</span>
+    <span class="pill pill-cyan">1M Context</span>
+    <span class="pill pill-green">MoE + Hybrid Attention</span>
+    <span class="pill pill-amber">2026 Technical Report</span>
+  </div>
+  <h1 class="heading-grad md:text-6xl text-4xl font-extrabold leading-tight mt-3">DeepSeek-V4 技术报告精读</h1>
+  <p class="tagline mt-3">这份报告的主线不是“又大又强”，而是把长上下文推到工程上可常态使用：用混合压缩注意力降低 1M token 推理成本，用 mHC 和 Muon 稳定超大 MoE 训练，再用 specialist + OPD 把多个能力专家合成一个统一模型。</p>
+
+  <div class="hero-grid mt-5">
+    <div class="callout">
+      <div class="tldr-lines">
+        <p class="tldr-line">TL;DR</p>
+        <p class="tldr-line">V4-Pro：1.6T total / 49B activated，目标是开源模型上限，支持 Non-think、High、Max 三档 reasoning effort。</p>
+        <p class="tldr-line">V4-Flash：284B total / 13B activated，目标是成本效率；在更大 thinking budget 下，推理任务接近 Pro。</p>
+        <p class="tldr-line">架构核心：CSA 负责“压缩后再稀疏选择”，HCA 负责“更猛烈压缩但保持 dense attention”，两者交错使用，让 1M context 的 FLOPs 和 KV cache 都大幅下降。</p>
+        <p class="tldr-line">训练核心：Muon 不是简单替换 AdamW；V4 还需要 mHC、FP4 QAT、anticipatory routing、SwiGLU clamping 和一整套确定性/容错基础设施托住训练。</p>
+        <p class="tldr-line">后训练核心：先训练数学、代码、agent、instruction 等 specialist，再用 full-vocabulary OPD 做统一模型合并，避免传统 weight merge 或 mixed RL 的能力互相冲掉。</p>
+      </div>
+    </div>
+    <div class="card p-5">
+      <h3 class="card-title text-xl">报告定位</h3>
+      <p class="ink-muted mt-2 mini">本文按官方 PDF 和 Hugging Face model card 整理。闭源模型对比、内部 Codeforces/R&D/白领任务评测均为 DeepSeek 官方报告中的作者结果，未独立复现。</p>
+      <div class="metric-grid mt-4">
+        <div class="metric"><div class="v">58</div><div class="k">PDF pages</div></div>
+        <div class="metric"><div class="v">33T</div><div class="k">Pro pretrain tokens</div></div>
+        <div class="metric"><div class="v">1M</div><div class="k">native context length</div></div>
+        <div class="metric"><div class="v">MIT</div><div class="k">model repo license</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-4 gap-4 mt-5">
+    <div class="card p-4"><h3 class="card-title text-lg">CSA/HCA</h3><p class="ink-muted mini mt-1">长上下文效率主引擎</p></div>
+    <div class="card p-4"><h3 class="card-title text-lg">mHC</h3><p class="ink-muted mini mt-1">稳定 residual scaling</p></div>
+    <div class="card p-4"><h3 class="card-title text-lg">Muon</h3><p class="ink-muted mini mt-1">矩阵更新正交化</p></div>
+    <div class="card p-4"><h3 class="card-title text-lg">OPD</h3><p class="ink-muted mini mt-1">多专家能力合并</p></div>
+  </div>
+</section>
+
+<section id="mechanism" class="max-w-6xl mx-auto px-6 py-8">
+  <h2 class="section"><span class="num">01</span>方法机制</h2>
+  <article class="card p-5 mt-4">
+    <h3 class="card-title text-2xl">整体架构：DeepSeek-V3 路线的长上下文版本</h3>
+    <p class="ink-muted mt-2">V4 不是从零换架构。它保留 DeepSeekMoE 和 MTP，把 attention、residual、optimizer 和系统实现同时升级。这样做的好处是主能力栈延续，风险集中在长上下文瓶颈和训练稳定性上。</p>
+    <figure class="paper-figure compact">
+      <a href="assets/deepseek_v4_technical/dsv4_fig2_overall_architecture.png" target="_blank" rel="noopener">
+        <img src="assets/deepseek_v4_technical/dsv4_fig2_overall_architecture.png" alt="DeepSeek-V4 原报告 Figure 2：整体模型架构图" />
+      </a>
+      <figcaption>DeepSeek-V4 原报告 Figure 2。一个 Transformer block 内先走 CSA/HCA attention，再走 DeepSeekMoE；block 前后有 pre/post/residual mixing，对应 mHC 的多 residual channel 读写；顶部仍保留 prediction head 和 MTP modules。</figcaption>
+    </figure>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>组件</th><th>V4 做法</th><th>解决的问题</th></tr></thead>
+        <tbody>
+          <tr><td><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-moe">MoE</button><span id="g-moe" class="glossary-popover" role="tooltip"><span class="glossary-title">MoE: Mixture-of-Experts</span>每个 token 只激活部分专家，因此 total parameters 很大，但 activated parameters 可控。V4-Pro 是 1.6T total、49B activated；V4-Flash 是 284B total、13B activated。</span></span></td><td>沿用 DeepSeekMoE，所有 Transformer block 使用 MoE；前 3 个 MoE 层用 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-hash-routing">Hash routing</button><span id="g-hash-routing" class="glossary-popover" role="tooltip"><span class="glossary-title">Hash routing: static token-id to expert-id routing</span>浅层 MoE 的专家集合不完全靠 learned router 临时选择，而是用 checkpoint 中固定的 token-id -> expert-id 查表来决定候选专家；learned gate 仍会给这些专家打分加权。V4 只在前 3 个 bootstrap MoE 层使用。</span></span>。</td><td>MoE 解决“模型容量 vs 每 token 计算量”的矛盾：总参数可变大，但单个 token 只激活少量专家。Hash routing 给浅层一个稳定的 routing bootstrap，降低早期表征还弱时的路由抖动。</td></tr>
+          <tr><td><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-mtp">MTP</button><span id="g-mtp" class="glossary-popover" role="tooltip"><span class="glossary-title">MTP: Multi-Token Prediction</span>训练时不只预测下一个 token，也预测未来 token。V4 沿用 V3 配置，MTP depth=1，训练中大部分阶段 loss weight=0.3，学习率衰减阶段降为 0.1。</span></span></td><td>沿用 DeepSeek-V3 的 MTP modules 和 objective。</td><td>提升 token-level 表征和推理吞吐相关能力。</td></tr>
+          <tr><td>Attention</td><td>Hybrid CSA/HCA，前两层 Flash 用 pure SWA；Pro 前两层用 HCA；后续 CSA/HCA 交错。</td><td>让 1M context 不被 attention FLOPs 和 KV cache 拖死。</td></tr>
+          <tr><td>Residual</td><td>加入 mHC，把 residual stream 扩成多个 channel，并约束 residual mixing。</td><td>提高深层信号传播能力，同时控制数值不炸。</td></tr>
+          <tr><td>Optimizer</td><td>大部分模块用 Muon；embedding、prediction head、RMSNorm、mHC 静态 bias/gate 仍用 AdamW。</td><td>更快收敛和更稳定的大规模训练。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">Hybrid Attention：CSA 管选择，HCA 管极限压缩</h3>
+    <p class="ink-muted mt-2">1M token 的核心成本来自 attention：每生成一个 token，都要看很长的历史。V4 的答案不是单一 sparse attention，而是把两种压缩注意力交错使用。</p>
+    <div class="figure-grid grid md:grid-cols-2 gap-4 mt-4">
+      <figure class="paper-figure">
+        <a href="assets/deepseek_v4_technical/dsv4_fig3_csa_architecture.png" target="_blank" rel="noopener">
+          <img src="assets/deepseek_v4_technical/dsv4_fig3_csa_architecture.png" alt="DeepSeek-V4 原报告 Figure 3：Compressed Sparse Attention 架构" />
+        </a>
+        <figcaption>Figure 3 的 CSA：最近 token 走 sliding-window KV；更早历史先被 token-level compressor 压成 compressed KV，再由 lightning indexer 按当前 query 选 top-k，最后与窗口 KV 拼接进入 shared KV multi-query attention。</figcaption>
+      </figure>
+      <figure class="paper-figure">
+        <a href="assets/deepseek_v4_technical/dsv4_fig4_hca_architecture.png" target="_blank" rel="noopener">
+          <img src="assets/deepseek_v4_technical/dsv4_fig4_hca_architecture.png" alt="DeepSeek-V4 原报告 Figure 4：Heavily Compressed Attention 架构" />
+        </a>
+        <figcaption>Figure 4 的 HCA：历史 KV 被更强压缩成少量 entries，不再走 lightning indexer/top-k；这些 heavily compressed KV 与 sliding-window KV 拼接后直接做 shared KV multi-query attention。</figcaption>
+      </figure>
+    </div>
+    <div class="callout mt-4">
+      <h4 class="card-title">机制链路</h4>
+      <dl class="term-list mt-3 mini">
+        <div class="term">
+          <dt><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-csa">CSA</button><span id="g-csa" class="glossary-popover" role="tooltip"><span class="glossary-title">CSA: Compressed Sparse Attention</span>先用 learned compressor 把历史 KV 压短，再用轻量相关性打分器对每个 query 选 top-k compressed entries 做 attention。V4 的 c4a 输出长度约为原来的 1/4，但每个 compressed entry 来自一个带学习权重的局部窗口，不是简单平均。</span></span></dt>
+          <dd>
+            <p>CSA 先把历史 KV 沿 sequence dimension 压缩：V4 中 <span class="param">m=4</span>，所以 1M 历史先变成约 250K 个 compressed KV entry。</p>
+            <p>这里的压缩不是删除 3/4 token，也不是固定 average pooling。对 c4a，第 <span class="param">j</span> 个 compressed token 是原始位置 <span class="param">[4j-4, 4j+3]</span> 这 8 个 token 的 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-softmax-pooling">softmax-gated weighted pooling</button><span id="g-softmax-pooling" class="glossary-popover" role="tooltip"><span class="glossary-title">Softmax-gated weighted pooling</span>压缩器先给窗口内 token 计算 gate logits，加上 learned positional bias 后做 softmax，得到归一化权重；compressed KV 是窗口内 KV 的加权和。权重由模型学习，所以可以偏向更有用的位置。</span></span>；窗口每次滑动 4 个 token，因此整体数量约变成 <span class="param">n/4</span>。</p>
+            <p>但 250K 仍然太多，于是 CSA 再用 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-lightning-indexer">lightning indexer</button><span id="g-lightning-indexer" class="glossary-popover" role="tooltip"><span class="glossary-title">Lightning Indexer: cheap top-k selector</span>一个轻量级相关性打分器：把当前 query 和每个 compressed KV entry 投到较小的 indexer 空间，用 ReLU-scored multi-head dot product 估计相关性，再保留分数最高的 top-k entries。它负责候选召回，不是最终 attention。</span></span> 给每个 query 选 <span class="param">top-k</span>。Flash 的 top-k 是 512，Pro 是 1024。也就是说，每个 token 不再扫全历史，而是扫“压缩后的少量相关块”。</p>
+            <p>关键区别是：indexer 的 top-k 分数只决定“哪些 compressed entries 值得拿进来”；拿进来之后，核心 attention 仍会用正常的 query/key/value 在这些 entries 上重新计算 softmax attention。可以把它理解成检索系统里的“先召回候选，再精排”。</p>
+            <p>为避免压缩块内部和最近 token 细节丢失，CSA 额外拼一个 sliding window attention 分支，V4 中窗口为 128 token。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-hca">HCA</button><span id="g-hca" class="glossary-popover" role="tooltip"><span class="glossary-title">HCA: Heavily Compressed Attention</span>把每 m′ 个 token 的 KV 压成一个 entry，m′ 远大于 m；V4 中 m′=128。它不做 top-k sparse selection，而是在更少的 compressed entries 上保持 dense attention。</span></span></dt>
+          <dd>
+            <p>HCA 更激进：V4 中 <span class="param">m′=128</span>，1M 历史约变成 7812 个 compressed KV entry。</p>
+            <p>HCA 不再额外做 sparse top-k。直觉是压缩已经很强，候选数足够小，可以保留 dense attention，减少 indexer 选择带来的复杂性。</p>
+            <p>CSA 像“先压缩再找相关块”，HCA 像“压得很狠后全看”。两者交错，是在细粒度检索能力和极限内存/算力压缩之间做混合。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt>效率数字</dt>
+          <dd>
+            <p>官方报告称，在 1M-token context 下，V4-Pro 只需要 DeepSeek-V3.2 的 27% single-token inference FLOPs 和 10% KV cache；V4-Flash 则是 10% FLOPs 和 7% KV cache。</p>
+            <p>如果拿常见 BF16 GQA8、head dimension 128 当 baseline，V4 的 KV cache 在 1M context 下约降到该 baseline 的 2%。这个数字很激进，关键依赖压缩 KV、FP8/BF16 混合存储、FP4 indexer 和专门 cache layout。</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">mHC：多条 residual 通道 + 受控混合</h3>
+    <p class="ink-muted mt-2">这节可以先不要看公式。普通 Transformer 的 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-residual-stream">residual stream</button><span id="g-residual-stream" class="glossary-popover" role="tooltip"><span class="glossary-title">Residual stream</span>Transformer 层与层之间传递的主 hidden state。每个 attention/MLP block 都先读这条状态，算出一个更新量，再把更新量加回去：x_{l+1}=x_l+F_l(x_l)。它像模型的工作记忆主干道，承载前面 token、前面层已经积累的信息。</span></span> 像一条主干道：每层都在同一个 hidden state 上加一段更新。mHC 的想法是把这条主干道拆成多条 residual channel，让不同层可以从不同通道读信息、再把新信息写回这些通道。</p>
+    <p class="ink-muted mt-2">问题也随之出现：通道变多以后，如果每层都能随便放大、相减、重混这些通道，几百层叠起来后信号可能被越混越大，或者被互相抵消。mHC 里的 “manifold-constrained” 就是在限制这种混合：可以换道和重分配，但不能把 residual 信息任意放大或乱消掉。</p>
+    <figure class="paper-figure">
+      <a href="assets/deepseek_v4_technical/mhc_fig1_residual_paradigms.png" target="_blank" rel="noopener">
+        <img src="assets/deepseek_v4_technical/mhc_fig1_residual_paradigms.png" alt="mHC 原论文 Figure 1：Residual Connection、Hyper-Connections 和 Manifold-Constrained Hyper-Connections 的结构对比" />
+      </a>
+      <figcaption>mHC 原论文 Figure 1。左侧是标准 residual connection；中间是 unconstrained Hyper-Connections；右侧是 mHC，把 pre / res / post mappings 投影到受约束的 manifold，从而保留多 residual stream 的表达力，同时恢复稳定的 identity mapping 性质。</figcaption>
+    </figure>
+    <div class="formula mt-4">$$X_{l+1}=B_lX_l+C_lF_l(A_lX_l)$$</div>
+    <div class="callout cyan mt-4">
+      <h4 class="card-title">把公式拆开看</h4>
+      <dl class="term-list mt-3 mini">
+        <div class="term">
+          <dt><span class="param">X_l</span></dt>
+          <dd>
+            <p>不再是一条 residual stream，而是多条 residual channels。可以把它理解成模型在每一层都保留了几条并行的“记忆轨道”。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt><span class="param">A_lX_l</span></dt>
+          <dd>
+            <p><span class="param">A_l</span> 决定当前 Transformer block 要从这些通道里读哪种组合。比如某层可以主要读通道 1，同时少量参考通道 2/3。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt><span class="param">C_lF_l(...)</span></dt>
+          <dd>
+            <p><span class="param">F_l</span> 是这一层真正做 attention/MLP 后得到的新信息，<span class="param">C_l</span> 决定这些新信息写回哪些 residual channels。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt><span class="param">B_lX_l</span></dt>
+          <dd>
+            <p><span class="param">B_l</span> 决定旧 residual channels 怎么传到下一层。mHC 最关键的约束就在这里：<span class="param">B_l</span> 不是任意矩阵，而是被投影到 doubly stochastic matrix manifold，也就是 Birkhoff polytope。</p>
+            <p>直觉上，doubly stochastic matrix 像“带权重的换道规则”：每条旧通道的信息可以分配到新通道，但权重非负、行列和受控，所以它更像重新分配，不像随便乘 3 倍或拿一条通道去减另一条通道。</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+    <div class="callout mt-4 mini">
+      <p><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-mhc">mHC</button><span id="g-mhc" class="glossary-popover" role="tooltip"><span class="glossary-title">mHC: Manifold-Constrained Hyper-Connections</span>把 residual stream 扩成多条 channel，并学习输入映射 A、旧通道混合 B、输出写回 C；其中 B 被限制在 doubly stochastic matrix manifold 上，让旧 residual 信息只能稳定重分配，不能被任意放大或抵消。</span></span> 解决的是“深层 residual 信号怎么传得更丰富但仍稳定”。宽 residual 带来更多路径，<span class="param">B_l</span> 的约束让这些路径的旧信息传播满足 <span class="param">||B_l||_2 ≤ 1</span>，因此 residual transformation 是 non-expansive：层数加深时，旧信号不容易被一层层放大到失控。</p>
+      <p>报告还把 <span class="param">A_l</span> 和 <span class="param">C_l</span> 约束为非负且有界，进一步避免 signal cancellation。对 V4 来说，mHC 不是简单“加宽 hidden size”，而是增加 residual 路径数量，并给路径之间的读、写、传递都加稳定规则。</p>
+    </div>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">Muon：不是 AdamW everywhere，而是矩阵更新几何</h3>
+    <p class="ink-muted mt-2">V4 把大部分模块交给 Muon，但保留 AdamW 处理 embedding、prediction head、RMSNorm 和 mHC 的部分参数。这说明 Muon 是主力优化器，不是无脑全替换。</p>
+    <div class="callout mt-4 mini">
+      <dl class="term-list mini">
+        <div class="term">
+          <dt>AdamW 视角</dt>
+          <dd>
+            <p>AdamW 把一个权重矩阵 <span class="param">W</span> 当成很多独立标量参数。它为每个元素 <span class="param">w_ij</span> 维护一阶、二阶动量，再按 <span class="param">m_ij / sqrt(v_ij)</span> 更新。</p>
+            <p>这很稳，但它不显式关心 <span class="param">W</span> 作为线性层的几何含义：行对应输出方向，列对应输入方向，整个更新 <span class="param">ΔW</span> 本身也是一个矩阵变换。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt>Muon 视角</dt>
+          <dd>
+            <p><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-muon">Muon</button><span id="g-muon" class="glossary-popover" role="tooltip"><span class="glossary-title">Muon optimizer</span>MomentUm Orthogonalized by Newton-Schulz。面向 hidden layer 的二维矩阵参数；先做 momentum / Nesterov update，再把更新矩阵近似正交化，最后按 RMS rescaling 和 weight decay 更新参数。</span></span> 先像 SGD-momentum 一样得到一个更新矩阵 <span class="param">M</span>，然后不直接用 <span class="param">M</span> 更新，而是看它的矩阵形状。如果 <span class="param">M = UΣV^T</span>，<span class="param">Σ</span> 代表各个输入-输出耦合方向上的更新强度。</p>
+            <p>Transformer 里很多矩阵梯度会接近低秩：少数 singular direction 很大，大量方向很小。Muon 的做法是保留方向 <span class="param">U,V</span>，把奇异值压到接近 1，也就是把 <span class="param">M</span> 换成近似 <span class="param">UV^T</span>。这叫更新矩阵正交化。</p>
+            <p>所以“矩阵更新几何”的意思是：Muon 不是逐元素判断哪个坐标该大该小，而是把一次更新看成线性变换，先让这个变换在不同方向上更均衡、更少病态，再落到参数上。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt>Newton-Schulz 做什么</dt>
+          <dd>
+            <p>真正算 <span class="param">M = UΣV^T</span> 的 SVD 太慢，所以 Muon 用 Newton-Schulz 迭代近似得到 <span class="param">UV^T</span>。先把 <span class="param">M</span> 归一化，再反复做多项式矩阵迭代 <span class="param">X ← aX + b(XX^T)X + c(XX^T)^2X</span>。</p>
+            <p>从奇异值角度看，这个迭代把 <span class="param">σ</span> 变成 <span class="param">aσ + bσ^3 + cσ^5</span>，多次迭代后把不同大小的 singular values 推近 1。V4 使用 10 次 hybrid Newton-Schulz：前 8 步快速靠近 1，后 2 步稳定到 1。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt>为什么不是 everywhere</dt>
+          <dd>
+            <p>Muon 的假设是参数天然是二维 hidden weight matrix，适合谈“输入方向到输出方向”的矩阵更新几何。embedding 表、prediction head、RMSNorm、bias、gate 这类参数要么是 lookup/输出语义特殊，要么是一维/标量参数，不适合硬套矩阵正交更新。</p>
+            <p>所以 V4 的配置是混合优化：大部分 hidden matrices 用 Muon；embedding、prediction head、RMSNorm、mHC 静态 bias/gate 仍用 AdamW。它与 V4 attention 也配合：CSA/HCA 可直接对 query 和 compressed KV entry 做 RMSNorm，因此报告称不需要 QK-Clip 来压 attention logits。</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<section id="training" class="max-w-6xl mx-auto px-6 py-8">
+  <h2 class="section"><span class="num">02</span>训练与后训练</h2>
+  <article class="card p-5 mt-4">
+    <h3 class="card-title text-2xl">预训练设置</h3>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>项目</th><th>V4-Flash</th><th>V4-Pro</th></tr></thead>
+        <tbody>
+          <tr><td>Total / Activated Params</td><td>284B / 13B</td><td>1.6T / 49B</td></tr>
+          <tr><td>Layers / Hidden</td><td>43 / 4096</td><td>61 / 7168</td></tr>
+          <tr><td>CSA top-k</td><td>512</td><td>1024</td></tr>
+          <tr><td>HCA compression</td><td><span class="param">m′=128</span></td><td><span class="param">m′=128</span></td></tr>
+          <tr><td>MoE experts</td><td>1 shared + 256 routed, activate 6</td><td>1 shared + 384 routed, activate 6</td></tr>
+          <tr><td>Training tokens</td><td>32T</td><td>33T</td></tr>
+          <tr><td>Max batch</td><td>75.5M tokens</td><td>94.4M tokens</td></tr>
+          <tr><td>Peak / final LR</td><td>2.7e-4 / 2.7e-5</td><td>2.0e-4 / 2.0e-5</td></tr>
+          <tr><td>Length schedule</td><td>4K → 16K → 64K → 1M</td><td>4K → 16K → 64K → 1M</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ink-muted mini mt-3">注意：报告没有公开完整数据配比、硬件规模和总训练成本。它公开了数据类别、token 规模、关键 hyperparameters、架构配置和稳定性技巧。</p>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">训练稳定性：MoE routing 是 spike 入口</h3>
+    <div class="callout warn mt-4">
+      <dl class="term-list mini">
+        <div class="term">
+          <dt>Anticipatory Routing</dt>
+          <dd>
+            <p>报告认为 loss spike 与 MoE outliers 和 routing 机制相关。V4 的做法是在 step <span class="param">t</span> 使用当前参数做 feature computation，但 routing indices 来自历史参数 <span class="param">θ_{t-Δt}</span>。</p>
+            <p>这样 routing 网络不再和 backbone 同步剧烈变化，能打断“routing 导致 outlier，outlier 又放大 routing 偏移”的循环。工程上它通过提前取 step <span class="param">t</span> 的数据并预计算 routing indices，额外 wall-clock 控制在约 20%；只在 loss spike 触发后短期启用，整体开销很小。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt>SwiGLU Clamping</dt>
+          <dd>
+            <p>V4 对 SwiGLU 的 linear component clamp 到 <span class="param">[-10, 10]</span>，gate component 上界设为 <span class="param">10</span>。这是直接抑制异常值的工程手段。</p>
+            <p>报告坦率说，这两招的理论机制还不充分；它们是实证有效的 training-stability recipe。</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">后训练：specialist → OPD 合并</h3>
+    <p class="ink-muted mt-2">V4 把 DeepSeek-V3.2 的 mixed RL 阶段完全替换为 On-Policy Distillation。主线可以拆成两步：先把数学、代码、agent、instruction following 等方向各自训练成 specialist；再让一个统一 student 在自己生成的 trajectories 上，对齐这些 specialists 的 full-vocabulary logits。</p>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>阶段</th><th>输入信号</th><th>训练目标</th><th>产物</th></tr></thead>
+        <tbody>
+          <tr><td>Domain SFT</td><td>高质量、领域特定的 SFT 数据</td><td>让 base model 先学会该领域的基本格式、知识和解题风格</td><td>每个领域的初始 specialist</td></tr>
+          <tr><td>Domain RL</td><td>领域 prompt、reward/verifier、rubric-guided 数据</td><td>用 GRPO 把 specialist 往该领域成功标准推；数学/代码偏可验证，hard-to-verify 任务用 GRM</td><td>十多个 domain teacher / expert models</td></tr>
+          <tr><td>OPD 合并</td><td>student 自己采样出的 trajectories + 对应 teacher 的 logits</td><td>最小化 student 分布到 teacher 分布的 reverse KL，把多个物理上独立的专家能力压回一个参数空间</td><td>最终统一 DeepSeek-V4 model</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout mt-4">
+      <dl class="term-list mini">
+        <div class="term">
+          <dt>Specialist Training</dt>
+          <dd>
+            <p>数学、代码、agent、instruction following 等目标域不是混在一起直接训。每个领域都先从同一个 base 出发，走一轮领域 SFT，再走一轮领域 RL。这样每个 expert 的 reward、prompt 格式、上下文长度、工具环境都可以按该领域单独设计。</p>
+            <p>RL 算法是 <span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-grpo">GRPO</button><span id="g-grpo" class="glossary-popover" role="tooltip"><span class="glossary-title">GRPO: Group Relative Policy Optimization</span>DeepSeek-R1 使用的 value-free RL 算法。对同一 prompt 采多条 response，用组内相对 reward 构造 advantage，避免训练 value model。</span></span>。对 easy-to-verify 任务，reward 可以来自规则、测试用例或 verifier；对 agent / instruction 这类不容易自动验真的任务，V4 引入 GRM 来做轨迹评价。</p>
+            <p>三档 reasoning mode 也在 specialist 阶段被拆开训练：Non-think、Think High、Think Max 使用不同 length penalty 和 context window。Think Max 还会在 system prompt 注入“absolute maximum reasoning effort”指令，所以它不是推理时简单把 max_tokens 开大，而是后训练时就学了更长、更彻底的思考分布。</p>
+            <p>这一步的代价是能力被分散在多个物理 checkpoint 里：math expert 很会数学，code expert 很会代码，agent expert 会工具和环境交互，但不能直接把这些 checkpoint 端给用户，也不能简单平均权重。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt>Thinking management</dt>
+          <dd>
+            <p>V4 对 thinking trace 的处理分两类。带工具调用时，完整 reasoning history 会跨 tool result、tool call，甚至跨 user message boundary 保留；普通多轮对话则沿用旧策略：新用户消息到来时丢弃上一轮 reasoning content，只保留可见对话。</p>
+            <p>这件事看似是 prompt 格式，实际影响后训练数据构造。agent specialist 的轨迹要保留中间思考、工具调用和工具结果，让模型学会长程任务状态；聊天 specialist 则要避免把旧 thinking 变成下一轮可见输入，防止普通对话被不必要的历史思考拖长。</p>
+            <figure class="paper-figure compact">
+              <a href="assets/deepseek_v4_technical/dsv4_fig7_thinking_management.png" target="_blank" rel="noopener">
+                <img src="assets/deepseek_v4_technical/dsv4_fig7_thinking_management.png" alt="DeepSeek-V4 原报告 Figure 7：工具场景和普通对话场景下的 thinking trace 管理" />
+              </a>
+              <figcaption>DeepSeek-V4 原报告 Figure 7。上半部分展示 tool-use 场景中 thinking/tool call/tool result 的连续传递；下半部分展示 without-tools 场景中只保留可见对话，不把上一轮 thinking 继续塞给下一轮。</figcaption>
+            </figure>
+          </dd>
+        </div>
+        <div class="term">
+          <dt><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-grm">GRM</button><span id="g-grm" class="glossary-popover" role="tooltip"><span class="glossary-title">GRM: Generative Reward Model</span>让模型生成带 rubric 的评估/打分，而不是输出一个标量 reward。V4 还对 GRM 本身做 RL，使 actor 同时学习生成能力和 judging 能力。</span></span></dt>
+          <dd>
+            <p>对 hard-to-verify 任务，V4 不再依赖传统 scalar reward model。传统 reward model 通常直接输出一个分数，训练它需要大量人工偏好或打分数据；而 GRM 是让模型按 rubric 生成评价过程和判断。</p>
+            <p>DeepSeek 的说法是，actor network 本身也作为 GRM 被 RL 优化，因此模型既学“怎么生成答案”，也学“怎么判断答案”。这让 judging 能力和 reasoning 能力绑定在一起，适合 agent、长写作、复杂 instruction following 这类没有明确单元测试的任务。</p>
+            <p>在 specialist 阶段，GRM 提供的是领域内 RL 的 reward 信号；到了 OPD 阶段，GRM 本身训练出来的能力会作为某些 teacher 的行为分布，被蒸馏进统一 student。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-opd">OPD</button><span id="g-opd" class="glossary-popover" role="tooltip"><span class="glossary-title">OPD: On-Policy Distillation</span>学生模型在自己生成的 trajectories 上学习多个 teacher/specialist 的输出分布。V4 使用 reverse KL，把多个物理上独立的专家能力合并到统一参数空间。</span></span></dt>
+          <dd>
+            <p>OPD 的关键不是“拿专家答案做 SFT”。SFT 只告诉 student 某个 token 是正确示范；OPD 则让 teacher 在 student 当前走到的每一个前缀上，给出整个 vocabulary 的概率分布。student 学的是 teacher 对所有候选 token 的相对偏好。</p>
+            <p>“On-policy” 的意思是训练前缀来自 student 自己，而不是固定离线数据。流程是：student 先按当前策略生成一条 trajectory；系统判断这条样本应由哪些 teacher 提供信号；teacher 在同一上下文前缀上 forward，输出 logits；student 用 KL loss 把自己的分布往 teacher 分布贴近。</p>
+            <p>官方目标可以写成：</p>
+            <div class="formula mt-2">$$L_{OPD}(\theta)=\sum_{i=1}^{N} w_i \cdot D_{KL}(\pi_\theta \Vert \pi_{E_i})$$</div>
+            <p>更展开地看，在每个 token 位置上，student 的分布是 <span class="param">πθ(· | x, y&lt;t)</span>，teacher 的分布是 <span class="param">πEi(· | x, y&lt;t)</span>。reverse KL 会惩罚 student 把概率放到 teacher 认为很差的 token 上；如果当前样本是数学题，数学 teacher 的 logits 会更有权重，如果是代码题，代码 teacher 更相关。</p>
+            <p>这比 weight merge 更稳：weight merge 是直接混参数，两个 expert 的 internal representation 可能不对齐；mixed RL 是在一个模型里同时吃多个 reward，reward 之间可能互相拉扯。OPD 让 expert 保持独立强能力，再通过 logits-level alignment 把行为压进一个 student。</p>
+          </dd>
+        </div>
+        <div class="term">
+          <dt>Full-vocabulary KL</dt>
+          <dd>
+            <p>很多 OPD/蒸馏实现会偷懒：只看 student 实际采样出来的 token，在这个 token 上估一个 KL 或 advantage。这很省显存和算力，但梯度方差大，因为一次只观察到 vocabulary 里的一个点。</p>
+            <p>V4 选择 full-vocabulary logit distillation：对每个位置保留完整 vocabulary 分布来算精确 KL。这样 student 不只知道“当前 token 应该更像 teacher”，还知道 teacher 认为哪些替代 token 也可接受、哪些 token 明显不该选。</p>
+            <p>代价是工程很重：词表超过 100K，十多个 teacher 都吐 full logits 会爆内存。V4 的做法是不落盘完整 logits，而是缓存 teacher 最后一层 hidden states；训练时按 teacher index 排 batch，只加载一个 teacher prediction head，把 hidden states 临时还原成 logits，再用 TileLang kernel 计算精确 KL。</p>
+            <p>所以这节真正的工程点是：OPD 不是一个小 loss trick，而是一整套多 teacher 调度、hidden-state cache、prediction-head 按需加载、rollout 容错和长上下文数据管线。</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">系统基础设施：让 1M context 真能跑起来</h3>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>系统点</th><th>机制</th><th>为什么重要</th></tr></thead>
+        <tbody>
+          <tr><td>FP4 QAT</td><td><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-qat">QAT</button><span id="g-qat" class="glossary-popover" role="tooltip"><span class="glossary-title">QAT: Quantization-Aware Training</span>训练时模拟量化误差，让模型适应低精度部署。V4 对 MoE expert weights 和 CSA indexer QK path 做 FP4 QAT。</span></span>；推理/rollout 阶段直接用真实 FP4 quantized weights。</td><td>降低 memory loading 和采样延迟，并让 rollout 行为与线上部署一致。</td></tr>
+          <tr><td>KV cache layout</td><td><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-kv">KV cache</button><span id="g-kv" class="glossary-popover" role="tooltip"><span class="glossary-title">KV cache: Key-Value Cache</span>自回归解码时保存历史 token 的 key/value，避免每生成一个 token 都重新计算完整历史。V4 因 CSA/HCA/SWA 混合，KV cache 类型和更新规则不一致，需要自定义布局。</span></span> 拆为 classical KV cache 和 state cache；SWA 与未压缩 tail tokens 放 state cache。</td><td>标准 PagedAttention 假设不再成立，必须为混合注意力重新设计 cache 管理。</td></tr>
+          <tr><td>On-disk KV</td><td>CSA/HCA compressed KV 直接落盘；SWA 提供 full caching、periodic checkpointing、zero caching 三种策略。</td><td>共享 prefix 请求可跳过重复 prefill，在长上下文服务里非常值钱。</td></tr>
+          <tr><td>Rollout WAL</td><td><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-wal">WAL</button><span id="g-wal" class="glossary-popover" role="tooltip"><span class="glossary-title">WAL: Write-Ahead Log</span>每生成一个 token 就立即写入日志。训练/rollout 任务被抢占或故障后，可用已生成 token 和保存的 KV cache 继续解码，而不是从头重采样。</span></span> token-granular 持久化。</td><td>从头重采样会产生 length bias：短 response 更容易幸存，长 response 更容易被中断重来。</td></tr>
+          <tr><td>DSec Sandbox</td><td>Function call、container、microVM、fullVM 四种 substrate 统一 API。</td><td>agentic post-training/eval 需要可复现、可抢占、可高并发的执行环境。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure class="paper-figure compact">
+      <a href="assets/deepseek_v4_technical/dsv4_fig6_kv_cache_layout.png" target="_blank" rel="noopener">
+        <img src="assets/deepseek_v4_technical/dsv4_fig6_kv_cache_layout.png" alt="DeepSeek-V4 原报告 Figure 6：KV cache layout" />
+      </a>
+      <figcaption>DeepSeek-V4 原报告 Figure 6。左侧 state cache 管 SWA KV 和尚未凑够压缩窗口的 tail states；右侧 classical KV cache 管 CSA/HCA 已压缩后的 KV blocks。这个布局解释了为什么 V4 不能直接套普通 PagedAttention 假设。</figcaption>
+    </figure>
+  </article>
+</section>
+
+<section id="results" class="max-w-6xl mx-auto px-6 py-8">
+  <h2 class="section"><span class="num">03</span>实验结果</h2>
+  <article class="card p-5 mt-4">
+    <h3 class="card-title text-2xl">Base model：Flash 更省，Pro 更强</h3>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>Benchmark</th><th>V3.2-Base</th><th>V4-Flash-Base</th><th>V4-Pro-Base</th><th>解读</th></tr></thead>
+        <tbody>
+          <tr><td>Activated Params</td><td>37B</td><td>13B</td><td>49B</td><td>Flash 以更小 activated params 跑赢很多 V3.2 指标。</td></tr>
+          <tr><td>Total Params</td><td>671B</td><td>284B</td><td>1.6T</td><td>Pro 的知识能力明显吃参数规模。</td></tr>
+          <tr><td>MMLU-Pro</td><td>65.5</td><td>68.3</td><td class="score">73.5</td><td>V4-Pro base 在高难知识/理解任务提升大。</td></tr>
+          <tr><td>SimpleQA verified</td><td>28.3</td><td>30.1</td><td class="score">55.2</td><td>知识 factuality 是 Pro 最明显优势之一。</td></tr>
+          <tr><td>HumanEval</td><td>62.8</td><td>69.5</td><td class="score">76.8</td><td>代码生成 base 能力提升。</td></tr>
+          <tr><td>LongBench-V2</td><td>40.2</td><td>44.7</td><td class="score">51.5</td><td>长上下文收益不是只靠 post-training。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure class="paper-figure compact">
+      <a href="assets/deepseek_v4_technical/dsv4_fig10_reasoning_effort.png" target="_blank" rel="noopener">
+        <img src="assets/deepseek_v4_technical/dsv4_fig10_reasoning_effort.png" alt="DeepSeek-V4 原报告 Figure 10：不同 reasoning effort 下 HLE 和 TerminalBench 的 token/score 关系" />
+      </a>
+      <figcaption>DeepSeek-V4 原报告 Figure 10。HLE 和 TerminalBench 都显示：提高 reasoning effort 会增加 token budget，并通常带来更高通过率；但 Flash/Pro 的收益曲线不同，Max 的额外 token 不总是线性换分。</figcaption>
+    </figure>
+    <figure class="paper-figure compact">
+      <a href="assets/deepseek_v4_technical/dsv4_fig9_mrcr.png" target="_blank" rel="noopener">
+        <img src="assets/deepseek_v4_technical/dsv4_fig9_mrcr.png" alt="DeepSeek-V4 原报告 Figure 9：MRCR 8-needle 随输入长度变化的表现" />
+      </a>
+      <figcaption>DeepSeek-V4 原报告 Figure 9。MRCR 8-needle 在 128K 前较稳，256K 后开始下滑，1M 仍可用但并非无损；这也是读 V4 长上下文结果时不能只看“支持 1M”的原因。</figcaption>
+    </figure>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">Instruct / Max：开源最强之一，但不是所有闭源都赢</h3>
+    <p class="ink-muted mt-2">下表只摘最有信息量的官方对比。注意这些是官方评测，闭源模型 API、prompt、可用性和时间点都会影响可比性。</p>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>Benchmark</th><th>DeepSeek-V4-Pro-Max</th><th>领先/落后对象</th><th>读法</th></tr></thead>
+        <tbody>
+          <tr><td>SimpleQA-Verified</td><td class="score">57.9</td><td>低于 Gemini-3.1-Pro 75.6，高于 Opus/GPT-5.4/K2.6/GLM</td><td>开源知识 factuality 大幅推进，但顶级闭源仍领先。</td></tr>
+          <tr><td>Chinese-SimpleQA</td><td class="score">84.4</td><td>接近 Gemini-3.1-Pro 85.9</td><td>中文事实问答非常强。</td></tr>
+          <tr><td>LiveCodeBench</td><td class="score">93.5</td><td>高于 Gemini-3.1-Pro 91.7、Opus 88.8</td><td>代码 benchmark 是亮点。</td></tr>
+          <tr><td>Codeforces Rating</td><td class="score">3206</td><td>高于 GPT-5.4 3168、Gemini-3.1-Pro 3052</td><td>作者称首次开源模型在该设置匹配/超过闭源。</td></tr>
+          <tr><td>MRCR 1M</td><td>83.5</td><td>低于 Opus 92.9，高于 Gemini 76.3</td><td>1M retrieval 能力强，但不是全局第一。</td></tr>
+          <tr><td>SWE Verified</td><td>80.6</td><td>约等于 Gemini 80.6、略低 Opus 80.8</td><td>软件工程 agent 公共集已到闭源附近。</td></tr>
+          <tr><td>Toolathlon</td><td>51.8</td><td>低于 GPT-5.4 54.6，高于 Gemini 48.8</td><td>工具使用强，但仍有差距。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">Reasoning effort：Max 不是免费午餐</h3>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>任务</th><th>Flash Non / High / Max</th><th>Pro Non / High / Max</th><th>结论</th></tr></thead>
+        <tbody>
+          <tr><td>HLE</td><td>8.1 / 29.4 / 34.8</td><td>7.7 / 34.5 / 37.7</td><td>难题吃 thinking budget，Non-think 几乎不够。</td></tr>
+          <tr><td>LiveCodeBench</td><td>55.2 / 88.4 / 91.6</td><td>56.8 / 89.8 / 93.5</td><td>代码推理随 effort 明显爬升。</td></tr>
+          <tr><td>Apex Shortlist</td><td>9.3 / 72.1 / 85.7</td><td>9.2 / 85.5 / 90.2</td><td>竞赛数学最依赖长思考。</td></tr>
+          <tr><td>Terminal Bench 2.0</td><td>49.1 / 56.6 / 56.9</td><td>59.1 / 63.3 / 67.9</td><td>agent 任务中 Pro 的规模优势更明显。</td></tr>
+          <tr><td>MRCR 1M</td><td>37.5 / 76.9 / 78.7</td><td>44.7 / 83.3 / 83.5</td><td>长上下文检索也受 thinking mode/context setting 影响。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">真实任务：中文写作、搜索、代码 agent</h3>
+    <div class="grid md:grid-cols-3 gap-4 mt-4">
+      <div class="callout cyan mini">
+        <h4 class="card-title">Chinese Writing</h4>
+        <p class="mt-2">功能写作对 Gemini-3.1-Pro：DeepSeek-V4-Pro 总体 win rate 62.65%，Gemini 34.10%。创意写作中，instruction following 为 60.03% vs 39.44%，writing quality 为 77.48% vs 22.35%。</p>
+        <p class="mt-2">但复杂指令和多轮写作对 Claude Opus 4.5 仍落后：45.9% vs 52.0%。</p>
+      </div>
+      <div class="callout mini">
+        <h4 class="card-title">Search</h4>
+        <p class="mt-2"><span class="glossary" data-glossary><button type="button" class="glossary-trigger" aria-expanded="false" aria-controls="g-rag">RAG</button><span id="g-rag" class="glossary-popover" role="tooltip"><span class="glossary-title">RAG: Retrieval-Augmented Generation</span>先检索相关资料，再把检索结果放进上下文生成答案。V4 报告中 Non-think 模式使用 RAG，thinking 模式使用 agentic search。</span></span> 对 V3.2：V4-Pro 总体 win 28.1%、V3.2 win 10.4%、tie 61.5%。Agentic search 对 RAG：agent win 61.7%、RAG win 18.3%。</p>
+        <p class="mt-2">Agentic search 平均 16.2 tool calls，prefill 13649 tokens、output 1526 tokens；RAG 是 10453 / 1308。</p>
+      </div>
+      <div class="callout cyan mini">
+        <h4 class="card-title">Code Agent</h4>
+        <p class="mt-2">内部 R&D coding benchmark：DeepSeek-V4-Pro-Max pass rate 67%，接近 Opus 4.5 的 70%，低于 Opus 4.6 Thinking 的 80%。</p>
+        <p class="mt-2">开发者调查中，52% 认为可作为默认主力 coding model，39% 倾向 yes，少于 9% no；主要问题是小错误、误解模糊 prompt、偶发过度思考。</p>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="risks" class="max-w-6xl mx-auto px-6 py-8">
+  <h2 class="section"><span class="num">04</span>限制与复现风险</h2>
+  <div class="grid md:grid-cols-2 gap-5 mt-4">
+    <article class="card p-5">
+      <h3 class="card-title text-xl">论文自己承认的问题</h3>
+      <ul class="cell-list mini mt-3">
+        <li>架构复杂：为降低风险保留了很多预验证组件和 tricks，未来需要更 principled 地蒸馏核心设计。</li>
+        <li>Anticipatory Routing 和 SwiGLU Clamping 机制未完全理解，目前是经验稳定技巧。</li>
+        <li>复杂中文多轮/强约束写作仍落后 Opus 4.5；Formatting Aesthetics 也有提升空间。</li>
+        <li>长上下文 MRCR 超过 128K 后仍有退化，1M 支持不是“无损长上下文”。</li>
+      </ul>
+    </article>
+    <article class="card p-5">
+      <h3 class="card-title text-xl">工程复现风险</h3>
+      <ul class="cell-list mini mt-3">
+        <li>论文没有公开完整训练数据配比、硬件规模、训练成本和全部后训练数据。</li>
+        <li>CSA/HCA 的收益依赖 kernel、cache layout、context parallelism、FP4/FP8 路径一起工作，单独复刻算法公式不等于复现性能。</li>
+        <li>Full-vocabulary OPD 对 teacher scheduling、hidden-state cache、prediction head 载入/卸载要求很高，小团队直接照搬成本很重。</li>
+        <li>内部评测如 Codeforces、R&D coding、白领任务、搜索问答不可完全外部复现，只能作为作者报告证据。</li>
+      </ul>
+    </article>
+  </div>
+  <article class="card p-5 mt-5">
+    <h3 class="card-title text-2xl">落地建议</h3>
+    <div class="overflow-x-auto mt-4">
+      <table class="layered">
+        <thead><tr><th>如果你关心</th><th>先读哪块</th><th>工程启发</th></tr></thead>
+        <tbody>
+          <tr><td>长上下文 serving</td><td>Hybrid CSA/HCA、KV cache layout、on-disk KV</td><td>长上下文效率不是只换 attention；cache 管理和 prefix reuse 是同等重要的系统问题。</td></tr>
+          <tr><td>大 MoE 训练稳定性</td><td>mHC、Muon、Anticipatory Routing、SwiGLU Clamping</td><td>稳定训练需要同时控制 residual、optimizer update、routing 和 activation outlier。</td></tr>
+          <tr><td>后训练合并</td><td>Specialist Training、GRM、OPD</td><td>先让专家在各自 reward 下变强，再用 full-vocab reverse KL 合并，比直接混合 RL 更可控。</td></tr>
+          <tr><td>Agentic AI</td><td>Interleaved thinking、DSML tool schema、DSec sandbox、rollout WAL</td><td>模型能力和 agent runtime 是一体设计；工具协议、上下文管理、沙箱复现都会影响最终效果。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
+
+<section id="sources" class="max-w-6xl mx-auto px-6 py-8">
+  <h2 class="section"><span class="num">05</span>来源与阅读说明</h2>
+  <div class="card p-5 mt-4 mini">
+    <ul class="source-list">
+      <li>官方 PDF：<a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/blob/main/DeepSeek_V4.pdf">DeepSeek_V4.pdf · DeepSeek-V4-Pro</a>。Hugging Face 页面显示技术报告文件 4.48 MB，SHA256 为 <span class="param">f4cbe4fcbd2888b25b2890a98cc6ef4ce0489df7c93e140b6f853c451d3f5c52</span>。</li>
+      <li>官方模型卡：<a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro">deepseek-ai/DeepSeek-V4-Pro</a> 与 <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash">deepseek-ai/DeepSeek-V4-Flash</a>。</li>
+      <li>DeepSeek-V4 原图：报告中的 Figure 2/3/4/6/7/9/10 裁自官方 PDF，并放在对应机制或结果段落中。</li>
+      <li>mHC 原论文：<a href="https://arxiv.org/abs/2512.24880">mHC: Manifold-Constrained Hyper-Connections</a>。报告中的 mHC 结构图取自该论文 Figure 1。</li>
+      <li>Muon 机制说明：<a href="https://kellerjordan.github.io/posts/muon/">Muon: An optimizer for hidden layers in neural networks</a> 与 <a href="https://github.com/KellerJordan/Muon">KellerJordan/Muon</a>。</li>
+      <li>阅读覆盖：abstract、introduction、architecture、general infrastructures、pre-training、post-training、standard benchmark、real-world tasks、limitations、appendix evaluation details。</li>
+      <li>图表处理：需要结构解释的位置优先插入论文原图；关键数值表格仍由 PDF/官方 model card 文本重构为 HTML 表，避免整页截图模糊和裁切不稳定。</li>
+      <li>可比性说明：闭源模型和内部任务对比均来自 DeepSeek 官方评测；不同 API 版本、reasoning effort、context window、工具 harness 会影响横向比较。</li>
+    </ul>
+  </div>
+</section>
+
+<script>
+  function closeGlossaries() {
+    document.querySelectorAll('[data-glossary].is-open').forEach((node) => {
+      node.classList.remove('is-open');
+      const trigger = node.querySelector('.glossary-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function positionGlossary(node) {
+    const trigger = node.querySelector('.glossary-trigger');
+    const popover = node.querySelector('.glossary-popover');
+    if (!trigger || !popover) return;
+    const triggerRect = trigger.getBoundingClientRect();
+    const width = Math.min(368, Math.floor(window.innerWidth * 0.78));
+    popover.style.width = width + 'px';
+    const popoverRect = popover.getBoundingClientRect();
+    const margin = 12;
+    let x = triggerRect.left + (triggerRect.width / 2) - (popoverRect.width / 2);
+    x = Math.max(margin, Math.min(x, window.innerWidth - popoverRect.width - margin));
+    const aboveY = triggerRect.top - popoverRect.height - 10;
+    const belowY = triggerRect.bottom + 10;
+    let y = aboveY >= margin ? aboveY : belowY;
+    y = Math.max(margin, Math.min(y, window.innerHeight - popoverRect.height - margin));
+    node.style.setProperty('--popover-x', `${Math.round(x)}px`);
+    node.style.setProperty('--popover-y', `${Math.round(y)}px`);
+  }
+
+  document.querySelectorAll('[data-glossary]').forEach((node) => {
+    const trigger = node.querySelector('.glossary-trigger');
+    if (!trigger) return;
+    trigger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const nextOpen = !node.classList.contains('is-open');
+      closeGlossaries();
+      node.classList.toggle('is-open', nextOpen);
+      trigger.setAttribute('aria-expanded', String(nextOpen));
+      if (nextOpen) positionGlossary(node);
+    });
+  });
+  document.addEventListener('click', () => {
+    closeGlossaries();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    closeGlossaries();
+  });
+  window.addEventListener('scroll', closeGlossaries, { passive: true });
+  window.addEventListener('resize', closeGlossaries);
+</script>
+</body>
+</html>
