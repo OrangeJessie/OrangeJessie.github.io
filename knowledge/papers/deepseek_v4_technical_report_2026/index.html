@@ -900,25 +900,11 @@
     }
   </style>
   <nav class="oj-blog-bridge" aria-label="博客导航">
-    <button type="button" data-oj-blog-back>&larr; 返回</button>
+    <a href="/knowledge/papers/">&larr; 返回</a>
     <a class="oj-blog-bridge__primary" href="/knowledge/papers/">论文解读</a>
     <a href="/knowledge/papers/#group-papers-language-model">语言模型</a>
     <a href="/">首页</a>
   </nav>
-  <script>
-    (function () {
-      var fallbackUrl = "/knowledge/papers/";
-      document.querySelectorAll("[data-oj-blog-back]").forEach(function (button) {
-        button.addEventListener("click", function () {
-          if (window.history.length > 1) {
-            window.history.back();
-          } else {
-            window.location.href = fallbackUrl;
-          }
-        });
-      });
-    })();
-  </script>
 
 </body>
 </html>

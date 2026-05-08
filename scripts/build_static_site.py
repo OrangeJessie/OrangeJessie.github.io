@@ -1027,25 +1027,11 @@ def inject_standalone_blog_bridge(document_html: str, post: Post) -> str:
     }}
   </style>
   <nav class="oj-blog-bridge" aria-label="博客导航">
-    <button type="button" data-oj-blog-back>&larr; 返回</button>
+    <a href="{html.escape(section_href)}">&larr; 返回</a>
     <a class="oj-blog-bridge__primary" href="{html.escape(section_href)}">{html.escape(post.section_label)}</a>
     <a href="{html.escape(group_href)}">{html.escape(post.group_label)}</a>
     <a href="/">首页</a>
   </nav>
-  <script>
-    (function () {{
-      var fallbackUrl = "{html.escape(section_href)}";
-      document.querySelectorAll("[data-oj-blog-back]").forEach(function (button) {{
-        button.addEventListener("click", function () {{
-          if (window.history.length > 1) {{
-            window.history.back();
-          }} else {{
-            window.location.href = fallbackUrl;
-          }}
-        }});
-      }});
-    }})();
-  </script>
 """
     if re.search(r"</body\s*>", document_html, flags=re.I):
         return re.sub(r"</body\s*>", bridge_html + "\n</body>", document_html, count=1, flags=re.I)
