@@ -620,10 +620,16 @@ pre {
 }
 
 .view-counter {
-  gap: 6px;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
 }
 
 .view-counter svg {
+  display: block;
   width: 15px;
   height: 15px;
   fill: none;
@@ -631,6 +637,10 @@ pre {
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.view-counter__value {
+  line-height: 1;
 }
 
 .page-hero {
