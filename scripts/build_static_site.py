@@ -564,6 +564,22 @@ def page_shell(page: Page) -> str:
 """
 
 
+def busuanzi_script() -> str:
+    return '<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>'
+
+
+def render_view_counter(class_name: str = "view-counter") -> str:
+    return f"""
+    <span class="{class_name}" id="busuanzi_container_page_pv" title="浏览次数">
+      <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M2.06 12.35a1 1 0 0 1 0-.7C3.72 7.64 7.62 5 12 5s8.28 2.64 9.94 6.65a1 1 0 0 1 0 .7C20.28 16.36 16.38 19 12 19s-8.28-2.64-9.94-6.65Z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      <span id="busuanzi_value_page_pv">--</span>
+    </span>
+    """
+
+
 def render_post_card(post: Post) -> str:
     tags = "".join(f"<span>{html.escape(tag)}</span>" for tag in post.tags)
     return f"""
@@ -934,6 +950,7 @@ def render_post(post: Post, previous_post: Post | None, next_post: Post | None) 
       <div class="report-meta">
         <span>{format_date(post.date)}</span>
         <span>{len(post.tags)} 个标签</span>
+        {render_view_counter()}
       </div>
       <div class="report-tags">{tag_html}</div>
     </section>
@@ -953,6 +970,7 @@ def render_post(post: Post, previous_post: Post | None, next_post: Post | None) 
             path=post.url,
             description=post.summary or post.subtitle,
             active_nav=section_url(post.section),
+            extra_head=busuanzi_script(),
             body_class="page-post",
         )
     )
@@ -1010,6 +1028,28 @@ def inject_standalone_blog_bridge(document_html: str, post: Post) -> str:
       background: #020617;
       color: #ffffff;
     }}
+    .oj-blog-bridge .oj-blog-bridge__views {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #334155;
+      font: 700 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+      white-space: nowrap;
+    }}
+    .oj-blog-bridge .oj-blog-bridge__views svg {{
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }}
     @media (max-width: 640px) {{
       .oj-blog-bridge {{
         left: 12px;
@@ -1030,8 +1070,10 @@ def inject_standalone_blog_bridge(document_html: str, post: Post) -> str:
     <a href="{html.escape(section_href)}">&larr; 返回</a>
     <a class="oj-blog-bridge__primary" href="{html.escape(section_href)}">{html.escape(post.section_label)}</a>
     <a href="{html.escape(group_href)}">{html.escape(post.group_label)}</a>
+    {render_view_counter("oj-blog-bridge__views")}
     <a href="/">首页</a>
   </nav>
+  {busuanzi_script()}
 """
     if re.search(r"</body\s*>", document_html, flags=re.I):
         return re.sub(r"</body\s*>", bridge_html + "\n</body>", document_html, count=1, flags=re.I)

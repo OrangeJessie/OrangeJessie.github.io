@@ -619,6 +619,20 @@ pre {
   color: var(--dark-gray);
 }
 
+.view-counter {
+  gap: 6px;
+}
+
+.view-counter svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .page-hero {
   padding: 12px 0 10px;
   text-align: center;

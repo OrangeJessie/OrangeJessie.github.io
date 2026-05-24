@@ -884,6 +884,28 @@ flowchart LR
       background: #020617;
       color: #ffffff;
     }
+    .oj-blog-bridge .oj-blog-bridge__views {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #334155;
+      font: 700 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+      white-space: nowrap;
+    }
+    .oj-blog-bridge .oj-blog-bridge__views svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
     @media (max-width: 640px) {
       .oj-blog-bridge {
         left: 12px;
@@ -904,8 +926,18 @@ flowchart LR
     <a href="/knowledge/papers/">&larr; 返回</a>
     <a class="oj-blog-bridge__primary" href="/knowledge/papers/">论文解读</a>
     <a href="/knowledge/papers/#group-papers-retrieval">召回</a>
+    
+    <span class="oj-blog-bridge__views" id="busuanzi_container_page_pv" title="浏览次数">
+      <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M2.06 12.35a1 1 0 0 1 0-.7C3.72 7.64 7.62 5 12 5s8.28 2.64 9.94 6.65a1 1 0 0 1 0 .7C20.28 16.36 16.38 19 12 19s-8.28-2.64-9.94-6.65Z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      <span id="busuanzi_value_page_pv">--</span>
+    </span>
+    
     <a href="/">首页</a>
   </nav>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 </body>
 </html>
