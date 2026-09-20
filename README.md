@@ -89,7 +89,19 @@ git commit -m "Update site"
 git push origin master
 ```
 
-## CI
+## 关于我页面的留言区
+
+`/aboutme/profile/#guestbook` 使用 [giscus](https://giscus.app/zh-CN) 接入本仓库的 GitHub Discussions：
+
+- 访客使用 GitHub 登录后留言，所有访客均可阅读公开留言。
+- 输入框在上方，留言列表在下方；留言较多时使用组件的分页继续查看。
+- 留言归档到 `Announcements` 分类，页面固定映射为 `/aboutme/profile/`，不受标题或预览地址变化影响。
+- 仓库维护者可在 GitHub Discussions 中管理留言。
+- 组件配置在 `assets/js/guestbook.js`，样式在 `assets/css/guestbook.css`；生成脚本负责输出留言区，重新构建不会丢失。
+- giscus GitHub App 只安装到 `OrangeJessie/OrangeJessie.github.io`；需要保持 Discussions 开启及 `Announcements` 分类存在。如重建分类，需更新脚本中的分类 ID。
+- 本站不保存访问令牌；网络异常时显示前往 GitHub 的入口。
+
+## CI 检查
 
 `.github/workflows/ci.yml` 会在 GitHub Actions 上：
 
