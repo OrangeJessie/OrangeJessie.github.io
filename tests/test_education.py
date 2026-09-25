@@ -73,7 +73,7 @@ class EducationTests(unittest.TestCase):
         page = render_module('interview-coaching', {'articles': []})
         self.assertIn('<details class="education-history">', page)
         self.assertNotIn('<details open', page)
-        self.assertEqual(page.count('<img '), 2)
+        self.assertEqual(page.count('<img '), 4)
         self.assertNotIn('data-unlock-form', page)
         self.assertNotIn('data-unlock-form', render_module('ai-tutorials', {'articles': []}))
 
