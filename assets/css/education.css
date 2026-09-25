@@ -38,3 +38,26 @@
   .education-module__heading h1 { font-size: 2rem; }
   .education-lesson { padding: 20px; }
 }
+
+.education-history { padding: 0 28px; border: 1px solid #e8dce9; border-radius: var(--radius-md); background: #fff; margin-bottom: 32px; }
+.education-history summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 0; cursor: pointer; list-style: none; }
+.education-history summary::-webkit-details-marker { display: none; }
+.education-history summary:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
+.education-history h2, .education-articles > h2 { margin: 0; color: var(--heading); font-size: 1.3rem; }
+.history-expand, .history-collapse { color: #76567f; font-size: .9rem; padding: 8px 14px; background: #f6edf8; border-radius: 999px; }
+.history-collapse, .education-history[open] .history-expand { display: none; }
+.education-history[open] .history-collapse { display: inline; }
+.education-history__gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding: 8px 0 28px; align-items: start; }
+.education-history figure { margin: 0; min-width: 0; }
+.education-history img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid #eee; }
+.education-history figcaption { text-align: center; margin-top: 12px; color: var(--dark-gray); font-size: .85rem; }
+.education-articles { padding-bottom: 32px; }
+.education-articles > h2 { margin-bottom: 20px; }
+.education-article-link { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 24px; margin-bottom: 16px; background: #fff; border: 1px solid #e8dce9; border-radius: var(--radius-sm); font-weight: 600; }
+.education-article-link > span:first-child { overflow-wrap: anywhere; }
+.education-article-link .education-badge { flex-shrink: 0; }
+@media (max-width: 640px) {
+  .education-history { padding: 0 20px; }
+  .education-history__gallery { grid-template-columns: 1fr; }
+  .education-article-link { padding: 20px; align-items: flex-start; flex-direction: column; gap: 12px; }
+}

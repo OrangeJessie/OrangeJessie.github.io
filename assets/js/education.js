@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const root = document.querySelector("[data-education-module]");
+  const root = document.querySelector("[data-education-article]");
   if (!root) return;
   const form = root.querySelector("[data-unlock-form]");
   const input = form.querySelector("input");
@@ -58,7 +58,7 @@
         material, { name: "AES-GCM", length: 256 }, false, ["decrypt"]
       );
       const plaintext = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: bytes(payload.iv), additionalData: encoder.encode(root.dataset.educationModule) },
+        { name: "AES-GCM", iv: bytes(payload.iv), additionalData: encoder.encode(root.dataset.educationArticle) },
         key, bytes(payload.ciphertext)
       );
       if (attempt !== generation) return;
@@ -71,12 +71,13 @@
       lock.focus();
       if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise([content]).catch(() => {});
     } catch (_) {
-      status.textContent = "密码不正确，请输入此模块对应的密码。";
+      if (attempt !== generation) return;
+      status.textContent = "密码不正确，请输入此文章对应的密码。";
       input.setAttribute("aria-invalid", "true");
       input.focus();
       input.select();
     } finally {
-      submit.disabled = false;
+      if (attempt === generation) submit.disabled = false;
     }
   });
 })();

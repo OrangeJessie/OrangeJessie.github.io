@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from education import MODULES, prepare_payloads, render_education, render_locked_module
+from education import MODULES, prepare_payloads, render_education, render_module, render_locked_article
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -1272,13 +1272,22 @@ def build() -> None:
     for key, module in MODULES.items():
         write_text(f"knowledge/ai-tools/{key}/index.html", page_shell(Page(
             title=f"{module['title']} | 橘子教育", subtitle="",
-            path=f"/knowledge/ai-tools/{key}/", description="请输入此模块的访问密码",
+            path=f"/knowledge/ai-tools/{key}/", description=module["description"],
             active_nav="/knowledge/ai-tools/", body_class="page-education",
-            body_html=render_locked_module(key, education_payloads[key]),
-            extra_head='<meta name="robots" content="noindex, nofollow">'
-                       '<link rel="stylesheet" href="/assets/css/education.css">'
-                       '<script defer src="/assets/js/education.js"></script>',
+            body_html=render_module(key, education_payloads[key]),
+            extra_head='<link rel="stylesheet" href="/assets/css/education.css">',
         )))
+        for article in education_payloads[key]["articles"]:
+            article_path = f"knowledge/ai-tools/{key}/{article['slug']}/index.html"
+            write_text(article_path, page_shell(Page(
+                title=f"{article['title']} | {module['title']}", subtitle="",
+                path="/" + article_path, description="请输入密码阅读文章",
+                active_nav="/knowledge/ai-tools/", body_class="page-education",
+                body_html=render_locked_article(key, article),
+                extra_head='<meta name="robots" content="noindex, nofollow">'
+                           '<link rel="stylesheet" href="/assets/css/education.css">'
+                           '<script defer src="/assets/js/education.js"></script>',
+            )))
     write_text(
         "knowledge/experience/index.html",
         render_section("experience", experience_page.meta, [p for p in posts if p.section == "experience"]),
