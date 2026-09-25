@@ -810,6 +810,29 @@ def render_section(section_key: str, page_meta: dict[str, object], posts: list[P
     )
 
 
+def render_guestbook() -> str:
+    return """
+    <section id="guestbook" class="site-shell guestbook" aria-labelledby="guestbook-title">
+      <div class="guestbook__heading">
+        <span class="eyebrow">GUESTBOOK</span>
+        <h2 id="guestbook-title">来都来了，留句话吧</h2>
+        <p>想交流的问题、读完的感受，或者简单打个招呼，都欢迎。</p>
+      </div>
+      <p class="guestbook__hint">使用 GitHub 登录后即可留言。留言会公开展示，所有来访的人都能看到。</p>
+      <div class="giscus" aria-label="留言输入框与公开留言列表"></div>
+      <p class="guestbook__status" role="status" data-guestbook-status>正在加载留言区…</p>
+      <p class="guestbook__fallback">如果留言区无法加载，可以<a href="https://github.com/OrangeJessie/OrangeJessie.github.io/discussions" target="_blank" rel="noopener noreferrer">前往 GitHub 查看与留言 ↗</a>。</p>
+      <noscript><p>请启用 JavaScript 加载留言区，或通过上面的 GitHub 链接留言。</p></noscript>
+    </section>
+    """.strip()
+
+
+def guestbook_head() -> str:
+    return ('<link rel="stylesheet" href="/assets/css/guestbook.css">'
+            '<meta name="giscus:backlink" content="https://orangejessie.github.io/aboutme/profile/">'
+            '<script defer src="/assets/js/guestbook.js"></script>')
+
+
 def render_prose_page(
     page_meta: dict[str, object],
     content_html: str,
@@ -829,6 +852,7 @@ def render_prose_page(
     <section class="site-shell prose-card">
       <article class="prose prose--about">{content_html}</article>
     </section>
+    {render_guestbook() if path == "/aboutme/profile/" else ""}
     """
     return page_shell(
         Page(
@@ -839,6 +863,7 @@ def render_prose_page(
             description=subtitle or "关于橘子豆的简介",
             active_nav=active_nav,
             body_class=body_class,
+            extra_head=guestbook_head() if path == "/aboutme/profile/" else "",
         )
     )
 
