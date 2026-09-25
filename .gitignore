@@ -6,3 +6,7 @@ ehthumbs.db
 .bundle/
 vendor/bundle/
 __pycache__/
+
+# Education source content stays local; only encrypted payloads are published.
+.private/
+content/knowledge/ai-tools/

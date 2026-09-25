@@ -48,6 +48,33 @@ python3 scripts/build_static_site.py
 
 ## 新建文章
 
+### 橘子教育（独立密码）
+
+`/knowledge/ai-tools/` 为公开入口，包含「面试辅导」和「AI教程」两个独立加密的模块。
+模块正文使用 PBKDF2-SHA256（600,000 次）和 AES-256-GCM 加密；密码不写入仓库或浏览器存储。
+刷新、离开页面或点击「锁定模块」后需要重新输入密码。
+
+教育内容只放在被 Git 忽略的本地目录：
+
+- `.private/education/interview-coaching/*.md`：面试辅导
+- `.private/education/ai-tutorials/*.md`：AI教程
+
+Markdown 可使用 `title` 元信息，同一模块的文章会合并为加密的学习内容。
+不要把正文、附件或密码放进公开的 `content/`、`assets/` 或 Git 历史；图片和下载链接指向的文件不会自动加密。
+请自行保留本地源文件备份，首次设置或更换密码前必须准备对应模块的源文件。
+
+设置或更换密码并生成网站（交互输入不回显）：
+
+```bash
+python3 -m pip install 'cryptography>=46,<47'
+python3 scripts/set_education_passwords.py
+```
+
+也可通过 `EDUCATION_INTERVIEW_PASSWORD`、`EDUCATION_AI_PASSWORD` 环境变量提供对应模块密码。
+公开仓库只提交 `assets/data/education-*.json` 密文和生成页面。普通构建及 CI 无须密码或加密依赖，
+会复用已有密文；本地内容变化但未提供密码时构建会终止，不会生成明文页面。
+这保护发布后的页面内容，无法撤回访客已经保存的内容或旧版本密文。
+
 默认可以直接交互式创建：
 
 ```bash

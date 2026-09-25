@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from education import MODULES, prepare_payloads, render_education, render_locked_module
+
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT_ROOT = ROOT / "content"
@@ -141,7 +143,7 @@ PAPER_SOURCES: dict[str, dict[str, str]] = {
 NAV = [
     ("首页", "/"),
     ("论文解读", "/knowledge/papers/"),
-    ("AI工具", "/knowledge/ai-tools/"),
+    ("橘子教育", "/knowledge/ai-tools/"),
     ("经验分享", "/knowledge/experience/"),
     ("游戏空间", "/knowledge/game-space/"),
     ("关于我", "/aboutme/"),
@@ -157,7 +159,8 @@ SECTION_GROUPS: dict[str, list[tuple[str, str]]] = {
         ("language-model", "语言模型"),
     ],
     "ai-tools": [
-        ("technical-research", "技术调研"),
+        ("interview-coaching", "面试辅导"),
+        ("ai-tutorials", "AI教程"),
     ],
     "experience": [
         ("projects", "项目实践"),
@@ -513,7 +516,7 @@ def page_shell(page: Page) -> str:
         active = ' class="is-active"' if href == page.active_nav else ""
         nav_html.append(f'<a href="{href}"{active}>{html.escape(label)}</a>')
 
-    return f"""<!DOCTYPE html>
+    rendered = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
@@ -534,7 +537,7 @@ def page_shell(page: Page) -> str:
       }}
     }};
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  {'' if page.body_class == 'page-education' else '<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>'}
   {page.extra_head}
 </head>
 <body class="{html.escape(page.body_class)}">
@@ -562,6 +565,10 @@ def page_shell(page: Page) -> str:
 </body>
 </html>
 """
+
+    if page.body_class == "page-education":
+        return "\n".join(line.rstrip() for line in rendered.splitlines()) + "\n"
+    return rendered
 
 
 def busuanzi_script() -> str:
@@ -1115,6 +1122,8 @@ def render_404() -> str:
 def load_posts() -> list[Post]:
     posts: list[Post] = []
     for path in sorted(CONTENT_KNOWLEDGE.glob("*/*.md")):
+        if path.parent.name == "ai-tools":
+            raise ValueError("教育内容请放在 .private/education/<模块>/，不能通过公开文章目录发布。")
         raw_text = path.read_text(encoding="utf-8")
         meta, markdown_body = parse_front_matter(raw_text)
         section_key = path.parent.relative_to(CONTENT_KNOWLEDGE).parts[0]
@@ -1185,6 +1194,8 @@ def build_search_documents(posts: list[Post]) -> list[dict[str, object]]:
 
 
 def build() -> None:
+    # Validate/encrypt before removing any existing output. CI reuses ciphertext.
+    education_payloads = prepare_payloads(ROOT, markdown_to_html, parse_front_matter)
     posts = load_posts()
     clean_generated_outputs(posts)
     about_page = load_markdown_page("about.md")
@@ -1226,8 +1237,23 @@ def build() -> None:
     )
     write_text(
         "knowledge/ai-tools/index.html",
-        render_section("ai-tools", ai_tools_page.meta, [p for p in posts if p.section == "ai-tools"]),
+        page_shell(Page(
+            title=f"橘子教育 | {SITE['title']}", subtitle="", path="/knowledge/ai-tools/",
+            description=str(ai_tools_page.meta["subtitle"]), active_nav="/knowledge/ai-tools/",
+            body_html=render_education(), body_class="page-education",
+            extra_head='<link rel="stylesheet" href="/assets/css/education.css">',
+        )),
     )
+    for key, module in MODULES.items():
+        write_text(f"knowledge/ai-tools/{key}/index.html", page_shell(Page(
+            title=f"{module['title']} | 橘子教育", subtitle="",
+            path=f"/knowledge/ai-tools/{key}/", description="请输入此模块的访问密码",
+            active_nav="/knowledge/ai-tools/", body_class="page-education",
+            body_html=render_locked_module(key, education_payloads[key]),
+            extra_head='<meta name="robots" content="noindex, nofollow">'
+                       '<link rel="stylesheet" href="/assets/css/education.css">'
+                       '<script defer src="/assets/js/education.js"></script>',
+        )))
     write_text(
         "knowledge/experience/index.html",
         render_section("experience", experience_page.meta, [p for p in posts if p.section == "experience"]),

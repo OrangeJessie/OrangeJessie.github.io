@@ -13,7 +13,7 @@ from build_static_site import CONTENT_KNOWLEDGE, SECTION_GROUPS
 
 SECTION_LABELS = {
     "papers": "论文解读",
-    "ai-tools": "AI工具",
+    "ai-tools": "橘子教育",
     "experience": "经验分享",
     "game-space": "游戏空间",
 }
@@ -185,6 +185,10 @@ def create_article(
     build_after: bool,
 ) -> Path:
     section_dir = CONTENT_KNOWLEDGE / section
+    if section == "ai-tools":
+        if group not in {key for key, _ in SECTION_GROUPS[section]}:
+            raise ValueError("请选择 interview-coaching（面试辅导）或 ai-tutorials（AI教程）")
+        section_dir = CONTENT_KNOWLEDGE.parent.parent / ".private" / "education" / group
     section_dir.mkdir(parents=True, exist_ok=True)
 
     now = datetime.now()
