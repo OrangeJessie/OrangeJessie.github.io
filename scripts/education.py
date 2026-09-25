@@ -104,7 +104,6 @@ def render_education() -> str:
     return f'''
     <section class="site-shell page-hero education-hero">
       <p class="eyebrow">ORANGE EDUCATION</p><h1>橘子教育</h1>
-      <p>从求职准备到 AI 实践，一起把知识变成能力。</p>
     </section>
     <section class="site-shell education-grid" aria-label="学习模块">{''.join(cards)}</section>
     <p class="education-note">两个学习模块分别使用独立的访问密码。</p>'''
