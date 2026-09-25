@@ -100,7 +100,7 @@ def render_education() -> str:
     for key, module in MODULES.items():
         cards.append(f'''
         <a class="education-card" href="/knowledge/ai-tools/{key}/">
-          <div class="education-card__top"><span>{module['number']}</span><span class="education-badge">学习模块</span></div>
+          <div class="education-card__top"><span>{module['number']}</span></div>
           <p class="eyebrow">{module['eyebrow']}</p>
           <h2>{module['title']}</h2><p>{module['description']}</p>
           <span class="education-card__link">进入学习 <span aria-hidden="true">↗</span></span>
