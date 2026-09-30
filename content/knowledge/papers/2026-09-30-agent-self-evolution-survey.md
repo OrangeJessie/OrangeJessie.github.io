@@ -1,5 +1,5 @@
 ---
-title: Agent 自进化技术综述
+title: agent自进化技术总结
 date: 2026-09-30 00:00:00
 subtitle: 18 篇研究与官方材料，梳理从经验积累到改进机制演化的主线
 section: papers
