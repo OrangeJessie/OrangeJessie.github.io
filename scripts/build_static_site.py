@@ -243,6 +243,24 @@ def post_url(section_key: str, slug: str) -> str:
     return f"{KNOWLEDGE_BASE_URL}/{section_key}/{slug}/"
 
 
+def render_redirect(target_url: str, title: str) -> str:
+    target = html.escape(target_url, quote=True)
+    return f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{html.escape(title)} · 地址已更新</title>
+  <meta name="robots" content="noindex,follow">
+  <link rel="canonical" href="{target}">
+  <script>window.location.replace({json.dumps(target_url)} + window.location.search + window.location.hash);</script>
+  <noscript><meta http-equiv="refresh" content="0; url={target}"></noscript>
+</head>
+<body><p>地址已更新，<a href="{target}">前往{html.escape(title)}</a>。</p></body>
+</html>
+"""
+
+
 def parse_front_matter(text: str) -> tuple[dict[str, object], str]:
     if not text.startswith("---\n"):
         return {}, text
@@ -1164,6 +1182,9 @@ def load_posts() -> list[Post]:
         raw_text = path.read_text(encoding="utf-8")
         meta, markdown_body = parse_front_matter(raw_text)
         section_key = path.parent.relative_to(CONTENT_KNOWLEDGE).parts[0]
+        slug = str(meta.get("slug", path.stem))
+        if "slug" in meta and not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]*", slug):
+            raise ValueError(f"Invalid post slug: {slug}")
         date_value = parse_post_datetime(meta.get("date"), path.stem)
         standalone_source = None
         standalone_html = str(meta.get("standalone_html", "")).strip()
@@ -1190,7 +1211,7 @@ def load_posts() -> list[Post]:
                 section_label=str(meta.get("section_label", section_key)),
                 group=group_key,
                 group_label=str(meta.get("group_label", group_key)),
-                url=post_url(section_key, path.stem),
+                url=post_url(section_key, slug),
                 source_path=path,
                 html=html_fragment,
                 toc=toc_html,
@@ -1238,6 +1259,13 @@ def build() -> None:
     # Validate/encrypt before removing any existing output. CI reuses ciphertext.
     education_payloads = prepare_payloads(ROOT, markdown_to_html, parse_front_matter)
     posts = load_posts()
+    urls = [post.url for post in posts]
+    if len(urls) != len(set(urls)):
+        raise ValueError("Duplicate post URL")
+    for post in posts:
+        old_url = post_url(post.section, post.source_path.stem)
+        if old_url != post.url and old_url in urls:
+            raise ValueError(f"Redirect would overwrite a post: {old_url}")
     clean_generated_outputs(posts)
     about_page = load_markdown_page("about.md")
     papers_page = load_markdown_page("papers.md")
@@ -1330,6 +1358,10 @@ def build() -> None:
             previous_post = posts[idx + 1] if idx + 1 < len(posts) else None
             next_post = posts[idx - 1] if idx - 1 >= 0 else None
             write_text(f"{post.url.strip('/')}/index.html", render_post(post, previous_post, next_post))
+
+        old_url = post_url(post.section, post.source_path.stem)
+        if old_url != post.url:
+            write_text(f"{old_url.strip('/')}/index.html", render_redirect(post.url, post.title))
 
     write_text(".nojekyll", "")
 

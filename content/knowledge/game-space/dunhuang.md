@@ -1,5 +1,6 @@
 ---
 title: 无名英雄
+slug: wuming-hero
 date: 2026-09-30 00:00:00
 subtitle: 第一幕 · 初识
 section: game-space

@@ -110,11 +110,12 @@ python3 scripts/new_article.py \
 ### 无名英雄试玩
 
 游戏空间的“无名英雄”入口位于 `/knowledge/game-space/`，完整试玩共用
-`/knowledge/game-space/dunhuang/` 一个地址，后续各幕在游戏内衔接。
+`/knowledge/game-space/wuming-hero/` 一个地址，后续各幕在游戏内衔接。
+旧的 `/knowledge/game-space/dunhuang/` 自动跳转，之前分享的链接仍可使用。
 
-- 入口元信息：`content/knowledge/game-space/dunhuang.md`
+- 入口元信息：`content/knowledge/game-space/dunhuang.md`（`slug: wuming-hero` 指定公开地址）
 - 游戏源文件：`content/knowledge/game-space/games/dunhuang.html`
-- 发布产物：`knowledge/game-space/dunhuang/index.html`
+- 发布产物：`knowledge/game-space/wuming-hero/index.html`
 
 更新时，用本地游戏项目新构建的 `敦煌英雄.html` 替换游戏源文件，再运行下面的网站构建流程。
 页面自带手机菜单、存档和返回游戏空间入口，无需额外嵌入框架或单独加载游戏脚本。
