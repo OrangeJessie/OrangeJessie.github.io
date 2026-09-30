@@ -131,6 +131,9 @@ a:focus-visible, button:focus-visible { outline:3px solid #8a402a; outline-offse
 .choices br { display:none; }
 .choices a, .chapter-transition a { display:block; box-sizing:border-box; min-height:48px; margin:.6em 0; padding:.7em .9em; border:1px solid #cdb995; border-radius:6px; background:#f8f0df; text-decoration:none; line-height:1.6; }
 .choices a:hover, .chapter-transition a:hover { background:#e2d0ad; color:#653321; border-color:#a77b45; }
+.replay-actions { margin:1.6em 0; }
+.replay-actions button { display:block; box-sizing:border-box; width:100%; min-height:48px; padding:.75em 1em; border:1px solid #704126; border-radius:6px; background:#704126; color:#fff8ea; font:inherit; line-height:1.6; }
+.replay-actions button:hover { background:#59321d; border-color:#59321d; }
 .eyebrow { color:#786955; font-size:.85em; }
 .scene-break { border:0; border-top:1px solid #d7cbb5; width:3em; margin:2em auto; }
 blockquote { margin:1.3em 0; padding-left:1.2em; border-left:2px solid #b69a72; }
@@ -248,7 +251,7 @@ $(document).one(":storyready", function () {
     $(document).on(":passagedisplay", updateChapter);
     updateChapter();
 });</script>
-<tw-passagedata pid="1" name="StoryInit" tags="" position="100,100" size="100,100">&lt;&lt;set $act = 1, $alive = true, $missionComplete = false, $allied = false, $zhangTrust = &quot;未定&quot;, $nextActEntry = &quot;&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="1" name="StoryInit" tags="" position="100,100" size="100,100">&lt;&lt;set $act = 1, $alive = true, $missionComplete = false, $allied = false, $zhangTrust = &quot;未定&quot;, $nextActEntry = &quot;&quot;, $dazanTrust = 0, $act2BaseZhangTrust = null, $wineChoice = &quot;&quot;, $crisisAdvice = &quot;&quot;, $dazanDecision = &quot;&quot;, $shangAdvice = &quot;&quot;&gt;&gt;</tw-passagedata>
 <tw-passagedata pid="2" name="StoryCaption" tags="" position="100,100" size="100,100">&lt;div class=&quot;eyebrow&quot;&gt;敦煌英雄&lt;/div&gt;
 &lt;&lt;if $act is 2&gt;&gt;&#x27;&#x27;第二幕&#x27;&#x27;
 
@@ -317,7 +320,9 @@ $(document).one(":storyready", function () {
 
 他叫人收走你的笔墨，撤了书吏的差事，又将你拖出去打了一顿。
 
-几日后，伤口红肿溃烂，你发起高热，夜里渐渐没了声息。</tw-passagedata>
+几日后，伤口红肿溃烂，你发起高热，夜里渐渐没了声息。
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="6" name="S02" tags="" position="600,400" size="100,100">你刚到此地，又有求于仓院，即使心有不忍，还是选择先观望。
 
 鞭子落在孩子身上，他痛得蜷起身子。监役吩咐人把他拖进仓院关起来，待还清偷盗的粮再放出来。
@@ -367,7 +372,9 @@ $(document).one(":storyready", function () {
 
 达赞撤了你的书吏差事，命人打了你一顿。
 
-伤口迟迟不见好，几日后溃烂流脓。你高烧不退，最终死在驻地。</tw-passagedata>
+伤口迟迟不见好，几日后溃烂流脓。你高烧不退，最终死在驻地。
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="8" name="S03" tags="" position="600,600" size="100,100">当晚，张议潮请熟识的看门人传话。过了一阵，阿禾母亲来到侧门。
 
 “收粮的事怎么会怪到你们身上？”张议潮问。
@@ -430,7 +437,9 @@ $(document).one(":storyready", function () {
 
 他撤了你的差事，命人拖出去打了一顿。
 
-几日后，你的伤口感染，接连几日发着高热，最终没能熬过去。</tw-passagedata>
+几日后，你的伤口感染，接连几日发着高热，最终没能熬过去。
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="10" name="S04" tags="" position="600,800" size="100,100">你担心管事不愿意卷入此事，因此说道：“我们将这麦子偷出去还给管事。”
 
 张议潮走到门边，往外看了看，四下无人，正是好时机。
@@ -464,7 +473,9 @@ $(document).one(":storyready", function () {
 
 达赞听说你粮没领到，反而在酒馆惹事入狱，认定你不堪任事，撤了你的差事，又命人打了你一顿。
 
-几日后，你的伤口感染溃烂，高热始终不退，最终死在驻地。</tw-passagedata>
+几日后，你的伤口感染溃烂，高热始终不退，最终死在驻地。
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="12" name="S05" tags="" position="600,1000" size="100,100">你灵机一动，说道：“一小贼偷藏，正好被我二人发现。”
 
 “贼呢？”
@@ -500,7 +511,9 @@ $(document).one(":storyready", function () {
 
 达赞听完经过，觉得你连这一趟差事也办不好，收走你的笔墨，撤了你的职位，命人打了你一顿。
 
-几日后，你伤口感染，发起高热，又拖了几日，最终死去。</tw-passagedata>
+几日后，你伤口感染，发起高热，又拖了几日，最终死去。
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="14" name="S06" tags="" position="600,1200" size="100,100">你心想，军灶那人既然把粮藏在柴火堆里，必然不敢把事情闹大，只能暗自吃下这个亏。待取粮流程一走完，你便会回到达赞的驻地，下一次来沙洲也不知道是何时了。
 
 于是主动在纸上写下事情的原委，并署上自己的名字。
@@ -545,7 +558,9 @@ $(document).one(":storyready", function () {
 
 达赞见你空手而归，又听说你在酒馆惹事入狱，认定你没有办事的本领，撤了你的书吏职位，命人打了你一顿。
 
-伤口感染，你几日高烧不退，最终死在驻地。</tw-passagedata>
+伤口感染，你几日高烧不退，最终死在驻地。
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="16" name="S07_accept" tags="" position="400,1400" size="100,100">&lt;&lt;set $alive = true, $missionComplete = true, $allied = true, $zhangTrust = 2, $nextActEntry = &quot;结盟&quot;&gt;&gt;
 张议潮举起酒杯，与你碰了碰：“我没看错，你果真是个好汉。”
 
@@ -575,11 +590,309 @@ $(document).one(":storyready", function () {
 
 &lt;div class=&quot;chapter-transition&quot;&gt;[[下一幕-&gt;ACT02]]&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="18" name="ACT02" tags="" position="600,1600" size="100,100">&lt;&lt;set $act = 2&gt;&gt;
+&lt;&lt;if $act2BaseZhangTrust == null&gt;&gt;&lt;&lt;set $act2BaseZhangTrust = $zhangTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;set $zhangTrust = $act2BaseZhangTrust, $dazanTrust = 0, $wineChoice = &quot;&quot;, $crisisAdvice = &quot;&quot;, $dazanDecision = &quot;&quot;, $shangAdvice = &quot;&quot;&gt;&gt;
+&lt;div class=&quot;eyebrow&quot;&gt;敦煌英雄 / 第二幕&lt;/div&gt;
 ! 第二幕
 
+粮草入库那日，达赞亲自来了一趟。
+
+他当着众人的面拍了拍你的肩：“做的不错。”
+
+你低头应了，心里松下一口气。路上反复核对过的那些数目，到此时才终于不必再想。
+
+此后，达赞交给你的差事渐渐多了。起先是核验各处送来的粮草，后来连给邻近驻军的回书，也会叫你先拟一份。有时部下前来议事，他见你正在帐里誊账，便让你留下听着。
+
+你与张议潮也一直有书信往来。
+
+商队经过沙州，你便托人捎信，写驻地新来了个会吹笛的老兵，写一匹总爱偷吃草料的马，偶尔抱怨风沙又吹坏了窗纸。张议潮回信，说布肆门前种的树活了，阿禾已能帮母亲跑腿，只是替人送东西时仍爱在街上贪玩。
+
+你们谁也没有再提酒席上的那番话。
+
+可夜深人静时，你常会想起那张临窗的桌子，想起张议潮放下酒杯，问你可愿与他一道。
+
+从前你只盼着把差事做好，能有自己的笔墨，不必再跟着人搬粮跑腿。如今这些都有了，达赞也越来越看重你，你却开始想，往后十年、二十年，自己究竟要怎样过，其他百姓又应该怎么过。
+
+转眼半年过去。这一天，一支商队来到驻地，又给你捎来张议潮的信。
+
+你忙完手里的账，回屋拆开。
+
+&lt;blockquote&gt;&lt;p&gt;沈砚吾友：&lt;/p&gt;&lt;p&gt;前信收到。你说那匹马趁人不备，将草料袋拖进了自己栏里，我读来笑了许久。看来它也知道，多备些吃食，日子才好过。&lt;/p&gt;&lt;p&gt;近日随相熟的商人出了一趟城，路过山口，遇上一窝狼。领路的人认得，说其中一头灰背老狼是狼王，这一带的狼都跟着它。那日它后腿上带着箭伤，走几步便要停下，群狼仍跟在身后，无一头越过它去。&lt;/p&gt;&lt;p&gt;我们不敢靠近，绕路走了。数日后回来，在山口歇脚，才听牧人说，那头狼王已经死了。&lt;/p&gt;&lt;p&gt;余下几头壮狼，都想占它原先卧着的高处。起初只是龇牙相逼，后来便咬在一处。有的咬断了同伴的腿，有的自己喉下也受了伤，血一路滴进石缝里。&lt;/p&gt;&lt;p&gt;谁也不肯先退，连过路的羊群都顾不上追。&lt;/p&gt;&lt;p&gt;牧人领我们远远看了一眼。坡下躺着两头死狼，石后的几头伤狼瘦得肋骨都露出来了。听说最后占住高处的那头，也没熬过几日。&lt;/p&gt;&lt;p&gt;想来初见时，它们还能一同逐羊，不过隔了数日，便谁也没有落得好下场。&lt;/p&gt;&lt;p&gt;此番进山风大，回来咳了两日，如今已经好了。你那里想来也渐冷，夜里记得添衣。&lt;/p&gt;&lt;p&gt;张议潮&lt;/p&gt;&lt;/blockquote&gt;
+
+你将信从头又看了一遍，正要折起，门外有人唤你。
+
+“达赞叫你过去。”
+
+帐中已摆着几件准备装箱的贺礼。达赞见你进来，指了指桌上的请帖。
+
+“首领过寿，各处将领都要去。你这半年办事不错，这回也跟我走一趟，见见人。”
+
+他让你回去准备，明日一早启程。
+
+&lt;div class=&quot;choices&quot;&gt;
+[[答应，随达赞赴宴。-&gt;A2_banquet]]
+[[装病，躲过这次寿宴。-&gt;A2_ill_pending]]
+&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="19" name="A2_banquet" tags="" position="600,1800" size="100,100">“我这就回去收拾。”
+
+次日，你随达赞带着贺礼出发，几日后来到首领驻营。
+
+营门外车马不断，各处将领带来的随从挤在门前。你们递过请帖，又等守卫逐一核对姓名，才被放了进去。随行部众另有安置，达赞只带你与几名近随赴宴。
+
+宴场设在主帐前的空地上。毡毯铺开，几排长案围着场中摆放，侍从穿行其间，替来客添酒。
+
+达赞刚坐下，邻席的将军便端杯过来。
+
+“听说你那里近来粮草齐备，日子过得不错。”
+
+“勉强够吃。”达赞笑着接过酒，“你若肯少向我借几匹马，我还能过得更好些。”
+
+众人笑起来，有人看向你：“新带来的人？从前没见过。”
+
+“替我管些粮账。”达赞道，“这回带他出来见见世面。”
+
+你起身行礼，陪着说了几句路上的见闻。席间不断有人来敬酒，问的却多是各处的兵马、粮草和驻地远近。你摸不清他们的用意，便只拣自己经手的寻常小事应答。
+
+午后，首领兴起，叫人撤开场中的几张矮案。
+
+“光坐着喝酒有什么意思？你们都带了好手来，让他们比一比。”
+
+各席纷纷应声，推人下场角力。
+
+达赞派出一名壮实的亲随。那人第一场便被对手抱住腰摔倒，挣了两次也没能起身，惹得邻席一阵大笑。
+
+达赞笑骂一句，摆手让亲随退下。
+
+余下的人你一个也不认识，看过几场便没了兴致。达赞正与人说话，你告了声退，沿毡毯边缘向外走去。
+
+走到侧面，你才发现这里的守卫比营门处还多。两顶帐篷之间不过十余步，便有人持刀站着；通往主帐的路口更横着长矛，连送菜的人也要停下验看。
+
+你想绕到帐后透气，一名守卫立即抬手拦住。
+
+“前头走，那边不许去。”
+
+你只好折回，从备酒的棚子旁经过。
+
+棚里有人用汉话催了一声：“快些，正宴要开了。”
+
+你循声望去，看见一个汉人侍从背对着外面，手中提着一只酒壶。他先向两旁看了看，随后将壶口掩在袖子下，另一只手从衣襟里取出什么，极快地往壶中倾了一下。
+
+你没看清那是什么。
+
+他收回手，将壶盖按好，混进了候着传酒的队伍。有人经过你面前，挡住了视线；等你再望过去，几只相似的酒壶已经摆到了一处。
+
+场中又传来一阵喝彩。达赞仍坐在原处，身旁围着几个人。
+
+&lt;div class=&quot;choices&quot;&gt;
+[[假装没有看到，回到席间。-&gt;A2_ignore]]
+[[立刻告诉达赞。-&gt;A2_report]]
+&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="20" name="A2_ignore" tags="" position="400,2000" size="100,100">&lt;&lt;set $wineChoice = &quot;ignore&quot;, $zhangTrust = $act2BaseZhangTrust + 1, $dazanTrust = 0&gt;&gt;
+你收回目光，沿着原路回到达赞身旁。
+
+他问你去了哪里，你只说四下走了走。场中的比试还没结束，他应了一声，又转头看了过去。
+
+傍晚，众人重新落座，正宴开了。
+
+酒壶一只只传上来。侍从替你斟满，你看着杯面晃动的灯影，没有去碰。邻座劝酒，你便推说腹中不适，举杯沾了沾唇，随即放下。
+
+首领却喝得尽兴。各处将领轮番上前祝寿，他来者不拒，后来连坐也坐不稳，仍拉着身边的人说话。
+
+散席时，几名侍卫扶他回了主帐。场边的火盆渐渐熄了，你等了许久，也没有听见什么异响。
+
+往后两日，营中也与平常无异。
+
+你渐渐疑心，或许自己在酒棚外看错了。
+
+第三日清晨，外头忽然乱起来。
+
+一名亲随掀帘冲进帐里，声音压得很低：“首领死了。”
+
+达赞猛地站起：“什么时候？”
+
+“今早发现的。主帐已经封了，谁也不让进。”
+
+达赞接连派了两拨人出去打听，带回的说法却各不相同。有人说是急病，有人说昨夜帐中便起过争执，还有人看见几位将军正在召集自己的部众。
+
+他将随行的人都叫进帐里，命人守住门口。
+
+“幼主还小，如今出了这事，不能没人主事。”达赞看过众人，“你们说，该怎么办？”
+
+几名亲随争着开口。有人要立刻去主帐护住幼主，也有人说先将营外的人马收拢，免得被旁人围住。
+
+达赞最后看向了你。
+
+&lt;div class=&quot;choices&quot;&gt;
+[[辅助幼主，先去主帐护住乞离胡。-&gt;A2_protect]]
+[[明哲保身，收拢部众返回驻地。-&gt;A2_withdraw_advice]]
+&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="21" name="A2_report" tags="" position="800,2000" size="100,100">&lt;&lt;set $wineChoice = &quot;report&quot;, $zhangTrust = $act2BaseZhangTrust - 1, $dazanTrust = 1&gt;&gt;
+你快步回到席边，俯身靠近达赞，将方才看见的事低声说了一遍。
+
+他脸上的笑意收了起来，起身走向首领，在首领耳边耳语一番。
+
+首领听完，脸色阴沉，不多时，守卫围住酒棚，将候着传酒的人全都扣了下来。
+
+有人跪下喊冤，说自己只是奉命传酒，根本不知出了什么事。首领没有再问，抬手叫来侍卫。
+
+“传酒的人，一个也不留。”
+
+一群人被拖了下去，求饶声渐渐远了。席间无人说话，首领却又端起重新送来的酒。
+
+“换酒，接着喝。”
+
+乐声重新响起，达赞也回到座上。
+
+正宴开后，歌姬入场献舞。几人踏着鼓点转身，一曲将尽，最前面的歌姬忽然甩开长袖，手里露出一柄短刃，直扑首领而去。
+
+她还没冲到跟前，首领身旁的两名侍卫如同预料到般迎上去。一人架住她的手臂，另一人将她踢倒，短刃落在毡毯上。
+
+席间有人惊叫起身，首领却面色如常：“慌什么，刺客拿住了！都坐下。”
+
+然而话音未落，身旁留守的一名侍卫忽然转身，将刀刺进了他的胸口。
+
+事发太快，一时之间无人敢动。那侍卫抽出刀，随即横过自己的颈前，倒在了首领脚边。
+
+喧嚣声又重新大起来，酒案翻倒，火盆被人踢开，方才还在同席饮酒的人纷纷往自己的部众身边退。
+
+你和达赞的其余亲随将他围起来，他望了一眼首领倒下的地方，又看向主帐，声音难得绷得很紧，像是在喃喃自语，又像在询问你们的意见：“幼主还在主帐，我们是撤还是留？”
+
+&lt;div class=&quot;choices&quot;&gt;
+[[辅助幼主，先去主帐护住乞离胡。-&gt;A2_protect]]
+[[明哲保身，收拢部众返回驻地。-&gt;A2_withdraw_advice]]
+&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="22" name="A2_withdraw_text" tags="" position="1400,1600" size="100,100">你想起了张议潮的信。
+
+那几头咬得遍体鳞伤的狼，谁也不肯先从高处退下来。
+
+“先走。”你抓住达赞的衣袖，“把我们的人带回驻地。”
+
+达赞盯着你：“首领刚死，你就叫我走？”
+
+“这里各处的人都有，谁听谁的？我们只带了这几个随从，就算冲到幼主身边，也未必护得住他。”
+
+又一张酒案被撞翻，有人从你们身旁挤过。亲随护着达赞退到一面毡墙旁，你跟过去，压低声音。
+
+“回去守住粮草，把部众收拢。手里有人、有粮，往后才有办法。若在这里折了，驻地那些人又该怎么办？”
+
+达赞没有立即答话。
+
+他望着主帐的方向，握刀的手松了又紧。你站在旁边等着，觉得过了许久，才听见他说：“叫人，走。”
+
+你们沿宴场边缘退了出去，与营外随行的部众会合。达赞命人清点人数，不再回客帐收拾，当即启程。</tw-passagedata>
+<tw-passagedata pid="23" name="A2_delayed_protect" tags="" position="1400,1800" size="100,100">“先去护住幼主。”你说，“主帐既已封了，总得弄清里面是谁。”
+
+达赞点头，提起放在身旁的刀。
+
+“首领待我们不薄。他不在了，也不能任由旁人欺负他的儿子。”
+
+他叫亲随去收拢人手，留下两人照看马匹，其余人随他前往主帐。你也被叫上，跟着出了帐门。</tw-passagedata>
+<tw-passagedata pid="24" name="A2_delayed_refusal" tags="" position="1400,2000" size="100,100">你想起张议潮信中的狼群，开口道：“不如先回驻地，收拢部众，保住粮草。这里情形不明，贸然卷进去，怕是……”
+
+“不必说了。”达赞打断了你。
+
+他提起刀，看向其余人。
+
+“我问的是怎样应付眼前的事，没叫你们只顾自己。首领刚死，幼主还在里面，我不能就这么走。”
+
+你还想再劝，他已叫亲随集合，命你随行。</tw-passagedata>
+<tw-passagedata pid="25" name="A2_immediate_protect" tags="" position="1400,2200" size="100,100">“去主帐，先护住幼主。”你说。
+
+在你的赞同声中，达赞仿佛下定决心地点点头：“我们冲进去。”
+
+他招呼亲随靠拢，拨开挡路的矮案，带着你们朝主帐冲去。</tw-passagedata>
+<tw-passagedata pid="26" name="A2_fight" tags="" position="1400,2400" size="100,100">通往主帐的路已经被人堵住了。
+
+几队军士挤在帐前，身上的服色各不相同。有人喊着奉命接管守卫，有人说谁也不准靠近，长矛横在一起，没人肯先退。
+
+达赞报出姓名，叫他们让路。
+
+“我们来护卫幼主！”
+
+没人应声，反而有一支长矛朝他递了过来。
+
+亲随拨开矛尖，两边立刻动起手。你被推得踉跄，肩头撞上帐柱，只得紧跟着达赞往前挤。刀刃从眼前掠过，一名亲随捂住手臂退下来，另一人补上他的空处。
+
+你们拼死杀到主帐前，挑开帐帘，里面却已空了大半。
+
+毡毯上散着衣物，矮榻翻在一旁。达赞连喊两声，没有人应。
+
+你在屏风后发现一个缩成一团的侍从，将他拉了出来。
+
+“幼主呢？”
+
+“被带走了。”他抖得说不清话，“方才来了一队兵，说是换地方护卫。乳母不肯，他们便把人一道拖走了。”
+
+“往哪里去了？”
+
+侍从只顾摇头。
+
+达赞从后帐追出去，绕过拴马的木桩，只看见几条通往营外的岔路。马蹄印交错在一起，早已分不清是哪一队留下的。
+
+身后的喊杀声越来越近。一名亲随赶来催促：“再不走，外面的路也要堵了。”
+
+达赞站了片刻，终于收回刀。
+
+“先回驻地，再设法打听。”
+
+你们扶起受伤的人，从帐后绕出去，找到留下看守的马匹，与随行部众会合，离开了驻营。</tw-passagedata>
+<tw-passagedata pid="27" name="A2_home" tags="" position="1400,2600" size="100,100">回到驻地，达赞还没来得及换下衣服，留守的管事便送来几份急报。
+
+你们这才知道，首领一死，大多数将军都已率部叛离，各自带走了所辖兵马。有的封住道路，有的占了邻近的粮仓，昨日还在寿宴上谈笑的人，如今连送信的使者也不肯放行。
+
+其中一份消息说，别将尚恐热也已叛变，自封宰相，正派人四处招降。
+
+达赞将那张纸翻来覆去看了几遍，让管事去叫各处领兵的人。
+
+不久，帐里挤满了人。
+
+“尚恐热的事，你们都听说了。”达赞将急报放在桌上，“他手里有兵，已有几处投了过去。我们若还各守各的，往后的粮道未必能保住。”
+
+一名部下道：“既然他势大，不如早些归附，也好占个位置。”
+
+另一人皱眉：“他才反了旧主，转头便要别人向他尽忠。我们真去了，他会怎么待我们？”
+
+两人争了起来。达赞抬手止住，目光从他们身上移开，落到你这里。
+
+“你也说说，该不该向尚恐热投诚？”
+
+&lt;div class=&quot;choices&quot;&gt;
+[[是，向尚恐热投诚。-&gt;A2_submit_pending]]
+[[否，不向尚恐热投诚。-&gt;A2_refuse_pending]]
+&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="28" name="A2_protect" tags="" position="400,2200" size="100,100">&lt;&lt;set $crisisAdvice = &quot;protect&quot;, $dazanDecision = &quot;protect&quot;&gt;&gt;
+&lt;&lt;if $wineChoice is &quot;ignore&quot;&gt;&gt;&lt;&lt;include &quot;A2_delayed_protect&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;include &quot;A2_immediate_protect&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;
+
+&lt;&lt;include &quot;A2_fight&quot;&gt;&gt;
+
+&lt;hr class=&quot;scene-break&quot;&gt;
+
+&lt;&lt;include &quot;A2_home&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="29" name="A2_withdraw_advice" tags="" position="800,2200" size="100,100">&lt;&lt;set $crisisAdvice = &quot;withdraw&quot;&gt;&gt;
+&lt;&lt;if $dazanTrust is 1&gt;&gt;&lt;&lt;set $dazanDecision = &quot;withdraw&quot;&gt;&gt;&lt;&lt;include &quot;A2_withdraw_text&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;set $dazanDecision = &quot;protect&quot;&gt;&gt;&lt;&lt;if $wineChoice is &quot;ignore&quot;&gt;&gt;&lt;&lt;include &quot;A2_delayed_refusal&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;
+
+&lt;&lt;include &quot;A2_fight&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;
+
+&lt;hr class=&quot;scene-break&quot;&gt;
+
+&lt;&lt;include &quot;A2_home&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="30" name="A2_ill_pending" tags="" position="1000,1800" size="100,100">后续剧情正在编写，试玩暂到这里。
+
+&lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="31" name="A2_submit_pending" tags="" position="400,2400" size="100,100">&lt;&lt;set $shangAdvice = &quot;submit&quot;&gt;&gt;
 后续剧情正在编写，试玩暂到这里。
 
-&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;</tw-passagedata>
+&lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="32" name="A2_refuse_pending" tags="" position="800,2400" size="100,100">&lt;&lt;set $shangAdvice = &quot;refuse&quot;&gt;&gt;
+（待续。）
+
+&lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
 </tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
 	/*! SugarCube JS */
