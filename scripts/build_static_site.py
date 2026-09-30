@@ -616,7 +616,7 @@ def render_post_list_item(post: Post) -> str:
         heading = (
             '<div class="article-list-item__heading">'
             f'{heading}'
-            f'<a class="button button--primary" href="{html.escape(post.url)}">开始试玩</a>'
+            f'<a class="button button--primary" href="{html.escape(post.url)}">开始游戏</a>'
             '</div>'
         )
     return f"""
