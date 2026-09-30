@@ -107,6 +107,18 @@ python3 scripts/new_article.py \
 
 ## 更新流程
 
+### 敦煌英雄试玩
+
+游戏空间的“敦煌英雄”入口位于 `/knowledge/game-space/`，完整试玩共用
+`/knowledge/game-space/dunhuang/` 一个地址，后续各幕在游戏内衔接。
+
+- 入口元信息：`content/knowledge/game-space/dunhuang.md`
+- 游戏源文件：`content/knowledge/game-space/games/dunhuang.html`
+- 发布产物：`knowledge/game-space/dunhuang/index.html`
+
+更新时，用本地游戏项目新构建的 `敦煌英雄.html` 替换游戏源文件，再运行下面的网站构建流程。
+页面自带手机菜单、存档和返回游戏空间入口，无需额外嵌入框架或单独加载游戏脚本。
+
 1. 修改 `content/` 下的 Markdown 内容和页面元信息
 2. 执行构建脚本
 3. 提交生成后的静态页面

@@ -611,6 +611,11 @@ def render_post_list_item(post: Post) -> str:
         if tags
         else ""
     )
+    play_link = (
+        f'\n      <a class="button button--primary" href="{html.escape(post.url)}">开始试玩</a>'
+        if post.section == "game-space" and post.standalone_source is not None
+        else ""
+    )
     return f"""
     <article class="article-list-item">
       <div class="article-list-item__meta">
@@ -618,7 +623,7 @@ def render_post_list_item(post: Post) -> str:
         {meta_tail}
       </div>
       <h2><a href="{post.url}">{html.escape(post.title)}</a></h2>
-      <p>{html.escape(post.summary)}</p>
+      <p>{html.escape(post.summary)}</p>{play_link}
     </article>
     """
 
@@ -1011,6 +1016,10 @@ def render_post(post: Post, previous_post: Post | None, next_post: Post | None) 
 
 
 def inject_standalone_blog_bridge(document_html: str, post: Post) -> str:
+    # Interactive games provide their own navigation; a fixed blog toolbar
+    # would cover choices and compete with their mobile menu.
+    if post.section == "game-space":
+        return document_html
     section_href = section_url(post.section)
     group_href = f"{section_href}#group-{post.section}-{post.group}"
     bridge_html = f"""
@@ -1200,7 +1209,11 @@ def load_markdown_page(source_file: str) -> MarkdownPage:
 def build_search_documents(posts: list[Post]) -> list[dict[str, object]]:
     documents: list[dict[str, object]] = []
     for post in posts:
-        content_text = normalize_plain_text(strip_tags(post.html))
+        content_text = (
+            normalize_plain_text(f"{post.title} {post.subtitle} {post.summary}")
+            if post.section == "game-space" and post.standalone_source is not None
+            else normalize_plain_text(strip_tags(post.html))
+        )
         documents.append(
             {
                 "id": post.url.strip("/"),
