@@ -121,6 +121,18 @@ a:focus-visible, button:focus-visible { outline:3px solid #8a402a; outline-offse
 #ui-bar-body { margin-top:4rem; height:calc(100% - 5rem); overscroll-behavior:contain; }
 #menu ul, #menu li:not(:first-child) { border-color:#b69a72; }
 #menu li a { padding:.8em; min-height:44px; box-sizing:border-box; }
+#game-community { margin:1.4rem 0 1rem; }
+.game-views { display:flex; align-items:center; justify-content:center; gap:.75rem; padding:.75rem .5rem; border:1px solid #b69a72; border-radius:6px; font-size:.9rem; color:#655440; }
+.game-views strong { font:600 1.35rem/1.4 "PingFang SC",system-ui,sans-serif; color:#704126; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.game-stats-status, .game-share-status { margin:.5rem 0 0; font-size:.8rem; line-height:1.6; color:#655440; }
+.game-stats-status:empty { display:none; }
+#game-sharing { margin:1rem 0; }
+#game-share-button { display:block; width:100%; box-sizing:border-box; min-height:48px; padding:.7rem; border:1px solid #704126; border-radius:6px; background:#704126; color:#fff8ea; font:inherit; }
+#game-share-button:hover { background:#59321d; border-color:#59321d; }
+#game-share-button:disabled { opacity:.65; cursor:wait; }
+.game-share-status { min-height:1.6em; }
+.game-share-link { box-sizing:border-box; width:100%; margin-top:.5rem; padding:.6rem; border:1px solid #b69a72; background:#f8f0df; color:#302b25; font-size:16px; }
+.game-share-link[hidden] { display:none; }
 #story { box-sizing:border-box; max-width:860px; margin:5vh 2rem 8vh 20rem; padding:0 2rem; }
 #ui-bar.stowed ~ #story { margin-left:auto; margin-right:auto; padding-left:4.5rem; }
 .passage { font-size:19px; line-height:1.95; overflow-wrap:break-word; }
@@ -184,6 +196,7 @@ blockquote { margin:1.3em 0; padding-left:1.2em; border-left:2px solid #b69a72; 
 }</style>
 <script role="script" id="twine-user-script" type="text/twine-javascript">Config.saves.id = "dunhuang-chushi-manuscript-v1";
 Config.saves.descriptions = function () {
+    if (State.variables.act === 3) { return "第三幕 · 行旅记录"; }
     return State.variables.act === 2 ? "分裂 · 行旅记录" : "初识 · 行旅记录";
 };
 Config.ui.stowBarInitially = 900;
@@ -233,7 +246,7 @@ $(document).one(":storyready", function () {
         toggle.focus({ preventScroll: true });
     }
     function updateChapter() {
-        header.querySelector("small").textContent = State.variables.act === 2 ? "第二幕 · 分裂" : "第一幕 · 初识";
+        header.querySelector("small").textContent = State.variables.act === 3 ? "第三幕" : State.variables.act === 2 ? "第二幕 · 分裂" : "第一幕 · 初识";
         if (mobile.matches) { UIBar.stow(); }
         syncMenu();
     }
@@ -250,17 +263,116 @@ $(document).one(":storyready", function () {
     });
     $(document).on(":passagedisplay", updateChapter);
     updateChapter();
-});</script>
+});
+
+setup.communityConfig = {"gameUrl": "https://orangejessie.github.io/knowledge/game-space/dunhuang/"};
+(function () {
+    "use strict";
+    var config = setup.communityConfig;
+
+    function loadViews(panel) {
+        var status = panel.querySelector(".game-stats-status");
+        if (window.location.origin !== new URL(config.gameUrl).origin) {
+            status.textContent = "浏览量仅在线上统计";
+            return;
+        }
+        var value = document.getElementById("busuanzi_value_page_pv");
+        var timeout;
+        var observer = new MutationObserver(function () {
+            var raw = value.textContent.trim();
+            if (!/^\d+$/.test(raw)) { return; }
+            var count = Number(raw);
+            if (!Number.isSafeInteger(count) || count < 0) { return; }
+            clearTimeout(timeout);
+            observer.disconnect();
+            value.textContent = count.toLocaleString("zh-CN");
+            status.textContent = "";
+        });
+        observer.observe(value, { childList: true, subtree: true, characterData: true });
+        timeout = setTimeout(function () { status.textContent = "浏览量暂不可用"; }, 10000);
+        var script = document.createElement("script");
+        script.src = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+        script.async = true;
+        script.referrerPolicy = "no-referrer-when-downgrade";
+        script.onerror = function () {
+            clearTimeout(timeout);
+            status.textContent = "浏览量暂不可用";
+        };
+        // Load once per page, so changing passages or opening the menu adds no views.
+        document.head.appendChild(script);
+    }
+
+    function legacyCopy(text) {
+        var input = document.createElement("textarea");
+        input.value = text;
+        input.setAttribute("readonly", "");
+        input.style.cssText = "position:fixed;left:-9999px;top:0;font-size:16px";
+        document.body.appendChild(input);
+        input.select();
+        input.setSelectionRange(0, input.value.length);
+        var copied = false;
+        try { copied = document.execCommand("copy"); } catch (_) { /* Offer selectable text below. */ }
+        input.remove();
+        return copied;
+    }
+
+    $(document).one(":storyready", function () {
+        var panel = document.createElement("section");
+        panel.id = "game-community";
+        panel.setAttribute("aria-label", "游戏浏览量");
+        panel.innerHTML = '<div class="game-views" title="浏览次数，重复访问会累计">' +
+            '<span>浏览量</span><span id="busuanzi_container_page_pv">' +
+            '<strong id="busuanzi_value_page_pv">—</strong> 次</span></div>' +
+            '<p class="game-stats-status" role="status"></p>';
+        var menu = document.getElementById("menu");
+        menu.before(panel);
+        var sharing = document.createElement("div");
+        sharing.id = "game-sharing";
+        sharing.innerHTML = '<button type="button" id="game-share-button">分享游戏</button>' +
+            '<p class="game-share-status" role="status" aria-live="polite"></p>' +
+            '<input class="game-share-link" aria-label="游戏分享链接" readonly hidden>';
+        menu.after(sharing);
+        var shareButton = sharing.querySelector("button");
+        shareButton.addEventListener("click", async function () {
+            shareButton.disabled = true;
+            var copied = false;
+            var status = sharing.querySelector(".game-share-status");
+            var input = sharing.querySelector("input");
+            input.hidden = true;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(config.gameUrl);
+                    copied = true;
+                }
+            } catch (_) { /* Try clipboard support in older browsers. */ }
+            if (!copied) { copied = legacyCopy(config.gameUrl); }
+            shareButton.disabled = false;
+            if (copied) {
+                status.textContent = "链接已复制，可以分享给朋友了";
+                shareButton.focus({ preventScroll: true });
+            } else {
+                status.textContent = "请长按或选中下方链接复制";
+                input.hidden = false;
+                input.value = config.gameUrl;
+                input.focus();
+                input.select();
+            }
+        });
+        loadViews(panel);
+    });
+})();</script>
 <tw-passagedata pid="1" name="StoryInit" tags="" position="100,100" size="100,100">&lt;&lt;set $act = 1, $alive = true, $missionComplete = false, $allied = false, $zhangTrust = &quot;未定&quot;, $nextActEntry = &quot;&quot;, $dazanTrust = 0, $act2BaseZhangTrust = null, $wineChoice = &quot;&quot;, $crisisAdvice = &quot;&quot;, $crisisBaseDazanTrust = null, $dazanDecision = &quot;&quot;, $shangAdvice = &quot;&quot;, $warBaseDazanTrust = null, $reliefBaseDazanTrust = null, $battleSurvived = false, $reliefChoice = &quot;&quot;, $reliefOutcome = &quot;&quot;&gt;&gt;</tw-passagedata>
 <tw-passagedata pid="2" name="StoryCaption" tags="" position="100,100" size="100,100">&lt;div class=&quot;eyebrow&quot;&gt;无名英雄&lt;/div&gt;
-&lt;&lt;if $act is 2&gt;&gt;&#x27;&#x27;第二幕 · 分裂&#x27;&#x27;
+&lt;&lt;if $act is 3&gt;&gt;&#x27;&#x27;第三幕&#x27;&#x27;
+
+沈砚 · 书吏&lt;&lt;else&gt;&gt;&lt;&lt;if $act is 2&gt;&gt;&#x27;&#x27;第二幕 · 分裂&#x27;&#x27;
 
 沈砚 · 书吏&lt;&lt;else&gt;&gt;&#x27;&#x27;第一幕 · 初识&#x27;&#x27;
 
 841年，沙州
 
 沈砚 · 书吏
-来沙州领粮。&lt;&lt;/if&gt;&gt;</tw-passagedata>
+来沙州领粮。&lt;&lt;/if&gt;&gt;&lt;&lt;/if&gt;&gt;</tw-passagedata>
 <tw-passagedata pid="3" name="StoryMenu" tags="" position="100,100" size="100,100">&lt;&lt;if window.location.protocol !== &quot;file:&quot;&gt;&gt;&lt;a href=&quot;/knowledge/game-space/&quot;&gt;返回游戏空间&lt;/a&gt;&lt;&lt;/if&gt;&gt;</tw-passagedata>
 <tw-passagedata pid="4" name="S01" tags="" position="600,200" size="100,100">&lt;div class=&quot;eyebrow&quot;&gt;第一幕 / 841年&lt;/div&gt;
 ! 初识
@@ -1010,11 +1122,7 @@ $(document).one(":storyready", function () {
 
 &lt;&lt;if $zhangTrust &gt;= 2&gt;&gt;&lt;&lt;include &quot;A2_relief_aid&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;if $zhangTrust is 1&gt;&gt;&lt;&lt;include &quot;A2_relief_raid&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;include &quot;A2_relief_denied&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;&lt;&lt;/if&gt;&gt;
 
-后续剧情正在编写，试玩暂到这里。
-
-&lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
-
-&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
+&lt;div class=&quot;chapter-transition&quot;&gt;[[下一幕-&gt;ACT03]]&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="38" name="A2_relief_silent" tags="" position="800,3400" size="100,100">&lt;&lt;if $reliefBaseDazanTrust == null&gt;&gt;&lt;&lt;set $reliefBaseDazanTrust = $dazanTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
 &lt;&lt;set $reliefChoice = &quot;silent&quot;, $reliefOutcome = &quot;silent&quot;, $dazanTrust = $reliefBaseDazanTrust&gt;&gt;
 你将摸到的旧信重新按回衣襟，没有提起张议潮。
@@ -1025,11 +1133,7 @@ $(document).one(":storyready", function () {
 
 &lt;&lt;include &quot;A2_rationing&quot;&gt;&gt;
 
-后续剧情正在编写，试玩暂到这里。
-
-&lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
-
-&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
+&lt;div class=&quot;chapter-transition&quot;&gt;[[下一幕-&gt;ACT03]]&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="39" name="A2_relief_aid" tags="" position="1400,3400" size="100,100">&lt;&lt;set $reliefOutcome = &quot;aid&quot;, $dazanTrust = $reliefBaseDazanTrust + 2&gt;&gt;
 送信的人终于回来了，同行的还有几辆盖着毡布的车。
 
@@ -1049,7 +1153,7 @@ $(document).one(":storyready", function () {
 
 新收的人该如何安置，粮草能供多少日，下一处驻地该往哪里找，他都先听你的意见。有时部下递来急信，你不在帐中，他便让人去寻你。
 
-从前你只需等他吩咐，将定好的事记在纸上；如今许多事尚未决定，便已先交到你手里。
+从前你是等他吩咐，将定好的事记在纸上；如今许多事尚未决定，便已先交到你手里。
 
 你成了他最信任的人。</tw-passagedata>
 <tw-passagedata pid="40" name="A2_relief_raid" tags="" position="1400,3600" size="100,100">&lt;&lt;set $reliefOutcome = &quot;raid&quot;, $dazanTrust = $reliefBaseDazanTrust + 1&gt;&gt;
@@ -1102,7 +1206,16 @@ $(document).one(":storyready", function () {
 后来，又有小股人马听到消息，带着各自剩下的兵器和粮食来投。营里的帐篷渐渐多了，原先缺人的岗哨也重新站上了人。
 
 你替这些人登记姓名、清点口粮，常常忙到夜里。再抬头时，帐外已不只有伤兵的咳嗽声，也有人在说笑、磨刀，或牵着马慢慢走过。</tw-passagedata>
-<tw-passagedata pid="44" name="StoryDisplayTitle" tags="" position="100,100" size="100,100">无名英雄</tw-passagedata>
+<tw-passagedata pid="44" name="ACT03" tags="" position="600,4000" size="100,100">&lt;&lt;set $act = 3&gt;&gt;
+&lt;div class=&quot;eyebrow&quot;&gt;无名英雄 / 第三幕&lt;/div&gt;
+! 第三幕
+
+第三幕的故事正在编写。
+
+&lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回第二幕&quot;&gt;&gt;&lt;/div&gt;
+
+&lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="45" name="StoryDisplayTitle" tags="" position="100,100" size="100,100">无名英雄</tw-passagedata>
 </tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
 	/*! SugarCube JS */
