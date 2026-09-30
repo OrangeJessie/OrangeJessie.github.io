@@ -611,19 +611,22 @@ def render_post_list_item(post: Post) -> str:
         if tags
         else ""
     )
-    play_link = (
-        f'\n      <a class="button button--primary" href="{html.escape(post.url)}">开始试玩</a>'
-        if post.section == "game-space" and post.standalone_source is not None
-        else ""
-    )
+    heading = f'<h2><a href="{post.url}">{html.escape(post.title)}</a></h2>'
+    if post.section == "game-space" and post.standalone_source is not None:
+        heading = (
+            '<div class="article-list-item__heading">'
+            f'{heading}'
+            f'<a class="button button--primary" href="{html.escape(post.url)}">开始试玩</a>'
+            '</div>'
+        )
     return f"""
     <article class="article-list-item">
       <div class="article-list-item__meta">
         <time datetime="{post.date.date().isoformat()}">{format_date(post.date)}</time>
         {meta_tail}
       </div>
-      <h2><a href="{post.url}">{html.escape(post.title)}</a></h2>
-      <p>{html.escape(post.summary)}</p>{play_link}
+      {heading}
+      <p>{html.escape(post.summary)}</p>
     </article>
     """
 

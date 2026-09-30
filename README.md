@@ -107,9 +107,9 @@ python3 scripts/new_article.py \
 
 ## 更新流程
 
-### 敦煌英雄试玩
+### 无名英雄试玩
 
-游戏空间的“敦煌英雄”入口位于 `/knowledge/game-space/`，完整试玩共用
+游戏空间的“无名英雄”入口位于 `/knowledge/game-space/`，完整试玩共用
 `/knowledge/game-space/dunhuang/` 一个地址，后续各幕在游戏内衔接。
 
 - 入口元信息：`content/knowledge/game-space/dunhuang.md`
