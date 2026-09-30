@@ -184,7 +184,7 @@ blockquote { margin:1.3em 0; padding-left:1.2em; border-left:2px solid #b69a72; 
 }</style>
 <script role="script" id="twine-user-script" type="text/twine-javascript">Config.saves.id = "dunhuang-chushi-manuscript-v1";
 Config.saves.descriptions = function () {
-    return State.variables.act === 2 ? "第二幕 · 行旅记录" : "初识 · 行旅记录";
+    return State.variables.act === 2 ? "分裂 · 行旅记录" : "初识 · 行旅记录";
 };
 Config.ui.stowBarInitially = 900;
 Object.assign(l10nStrings, {
@@ -233,7 +233,7 @@ $(document).one(":storyready", function () {
         toggle.focus({ preventScroll: true });
     }
     function updateChapter() {
-        header.querySelector("small").textContent = State.variables.act === 2 ? "第二幕" : "第一幕 · 初识";
+        header.querySelector("small").textContent = State.variables.act === 2 ? "第二幕 · 分裂" : "第一幕 · 初识";
         if (mobile.matches) { UIBar.stow(); }
         syncMenu();
     }
@@ -251,9 +251,9 @@ $(document).one(":storyready", function () {
     $(document).on(":passagedisplay", updateChapter);
     updateChapter();
 });</script>
-<tw-passagedata pid="1" name="StoryInit" tags="" position="100,100" size="100,100">&lt;&lt;set $act = 1, $alive = true, $missionComplete = false, $allied = false, $zhangTrust = &quot;未定&quot;, $nextActEntry = &quot;&quot;, $dazanTrust = 0, $act2BaseZhangTrust = null, $wineChoice = &quot;&quot;, $crisisAdvice = &quot;&quot;, $dazanDecision = &quot;&quot;, $shangAdvice = &quot;&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="1" name="StoryInit" tags="" position="100,100" size="100,100">&lt;&lt;set $act = 1, $alive = true, $missionComplete = false, $allied = false, $zhangTrust = &quot;未定&quot;, $nextActEntry = &quot;&quot;, $dazanTrust = 0, $act2BaseZhangTrust = null, $wineChoice = &quot;&quot;, $crisisAdvice = &quot;&quot;, $crisisBaseDazanTrust = null, $dazanDecision = &quot;&quot;, $shangAdvice = &quot;&quot;, $warBaseDazanTrust = null, $reliefBaseDazanTrust = null, $battleSurvived = false, $reliefChoice = &quot;&quot;, $reliefOutcome = &quot;&quot;&gt;&gt;</tw-passagedata>
 <tw-passagedata pid="2" name="StoryCaption" tags="" position="100,100" size="100,100">&lt;div class=&quot;eyebrow&quot;&gt;无名英雄&lt;/div&gt;
-&lt;&lt;if $act is 2&gt;&gt;&#x27;&#x27;第二幕&#x27;&#x27;
+&lt;&lt;if $act is 2&gt;&gt;&#x27;&#x27;第二幕 · 分裂&#x27;&#x27;
 
 沈砚 · 书吏&lt;&lt;else&gt;&gt;&#x27;&#x27;第一幕 · 初识&#x27;&#x27;
 
@@ -591,9 +591,9 @@ $(document).one(":storyready", function () {
 &lt;div class=&quot;chapter-transition&quot;&gt;[[下一幕-&gt;ACT02]]&lt;/div&gt;</tw-passagedata>
 <tw-passagedata pid="18" name="ACT02" tags="" position="600,1600" size="100,100">&lt;&lt;set $act = 2&gt;&gt;
 &lt;&lt;if $act2BaseZhangTrust == null&gt;&gt;&lt;&lt;set $act2BaseZhangTrust = $zhangTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
-&lt;&lt;set $zhangTrust = $act2BaseZhangTrust, $dazanTrust = 0, $wineChoice = &quot;&quot;, $crisisAdvice = &quot;&quot;, $dazanDecision = &quot;&quot;, $shangAdvice = &quot;&quot;&gt;&gt;
+&lt;&lt;set $zhangTrust = $act2BaseZhangTrust, $dazanTrust = 0, $wineChoice = &quot;&quot;, $crisisAdvice = &quot;&quot;, $crisisBaseDazanTrust = null, $dazanDecision = &quot;&quot;, $shangAdvice = &quot;&quot;, $warBaseDazanTrust = null, $reliefBaseDazanTrust = null, $battleSurvived = false, $reliefChoice = &quot;&quot;, $reliefOutcome = &quot;&quot;&gt;&gt;
 &lt;div class=&quot;eyebrow&quot;&gt;无名英雄 / 第二幕&lt;/div&gt;
-! 第二幕
+! 分裂
 
 粮草入库那日，达赞亲自来了一趟。
 
@@ -687,7 +687,7 @@ $(document).one(":storyready", function () {
 [[假装没有看到，回到席间。-&gt;A2_ignore]]
 [[立刻告诉达赞。-&gt;A2_report]]
 &lt;/div&gt;</tw-passagedata>
-<tw-passagedata pid="20" name="A2_ignore" tags="" position="400,2000" size="100,100">&lt;&lt;set $wineChoice = &quot;ignore&quot;, $zhangTrust = $act2BaseZhangTrust + 1, $dazanTrust = 0&gt;&gt;
+<tw-passagedata pid="20" name="A2_ignore" tags="" position="400,2000" size="100,100">&lt;&lt;set $wineChoice = &quot;ignore&quot;, $zhangTrust = $act2BaseZhangTrust + 1, $dazanTrust = 0, $crisisBaseDazanTrust = 0&gt;&gt;
 你收回目光，沿着原路回到达赞身旁。
 
 他问你去了哪里，你只说四下走了走。场中的比试还没结束，他应了一声，又转头看了过去。
@@ -726,7 +726,7 @@ $(document).one(":storyready", function () {
 [[辅助幼主，先去主帐护住乞离胡。-&gt;A2_protect]]
 [[明哲保身，收拢部众返回驻地。-&gt;A2_withdraw_advice]]
 &lt;/div&gt;</tw-passagedata>
-<tw-passagedata pid="21" name="A2_report" tags="" position="800,2000" size="100,100">&lt;&lt;set $wineChoice = &quot;report&quot;, $zhangTrust = $act2BaseZhangTrust - 1, $dazanTrust = 1&gt;&gt;
+<tw-passagedata pid="21" name="A2_report" tags="" position="800,2000" size="100,100">&lt;&lt;set $wineChoice = &quot;report&quot;, $zhangTrust = $act2BaseZhangTrust - 1, $dazanTrust = 1, $crisisBaseDazanTrust = 1&gt;&gt;
 你快步回到席边，俯身靠近达赞，将方才看见的事低声说了一遍。
 
 他脸上的笑意收了起来，起身走向首领，在首领耳边耳语一番。
@@ -805,9 +805,7 @@ $(document).one(":storyready", function () {
 
 几队军士挤在帐前，身上的服色各不相同。有人喊着奉命接管守卫，有人说谁也不准靠近，长矛横在一起，没人肯先退。
 
-达赞报出姓名，叫他们让路。
-
-“我们来护卫幼主！”
+达赞报出姓名，叫他们让路：“我们来护卫幼主！”
 
 没人应声，反而有一支长矛朝他递了过来。
 
@@ -831,9 +829,7 @@ $(document).one(":storyready", function () {
 
 身后的喊杀声越来越近。一名亲随赶来催促：“再不走，外面的路也要堵了。”
 
-达赞站了片刻，终于收回刀。
-
-“先回驻地，再设法打听。”
+达赞站了片刻，终于收回刀：“先回驻地，再设法打听。”
 
 你们扶起受伤的人，从帐后绕出去，找到留下看守的马匹，与随行部众会合，离开了驻营。</tw-passagedata>
 <tw-passagedata pid="27" name="A2_home" tags="" position="1400,2600" size="100,100">回到驻地，达赞还没来得及换下衣服，留守的管事便送来几份急报。
@@ -842,25 +838,30 @@ $(document).one(":storyready", function () {
 
 其中一份消息说，别将尚恐热也已叛变，自封宰相，正派人四处招降。
 
-达赞将那张纸翻来覆去看了几遍，让管事去叫各处领兵的人。
+达赞将那张纸翻来覆去看了几遍，最终还是扔进了火盆。
 
+接下来的一段时间，达赞派人打听幼主下落，却始终没有消息。
+
+随着投奔尚恐热的增多，驻地的情绪越发焦躁。这日，达赞让管事去叫各处领兵和后勤的人。
+
+&lt;&lt;include &quot;A2_shang_council&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="28" name="A2_shang_council" tags="" position="1400,2800" size="100,100">&lt;&lt;set $warBaseDazanTrust = $dazanTrust, $shangAdvice = &quot;&quot;, $battleSurvived = false, $reliefBaseDazanTrust = null, $reliefChoice = &quot;&quot;, $reliefOutcome = &quot;&quot;&gt;&gt;
 不久，帐里挤满了人。
 
-“尚恐热的事，你们都听说了。”达赞将急报放在桌上，“他手里有兵，已有几处投了过去。我们若还各守各的，往后的粮道未必能保住。”
+“尚恐热的事，你们都听说了。”达赞将急报放在桌上，“他手里兵力最盛，一路打过来，不断有驻地在投过去。我们若还各守各的，往后的粮道未必能保住。”
 
 一名部下道：“既然他势大，不如早些归附，也好占个位置。”
 
-另一人皱眉：“他才反了旧主，转头便要别人向他尽忠。我们真去了，他会怎么待我们？”
+另一人反驳：“他才反了旧主，转头便要别人向他尽忠。”
 
-两人争了起来。达赞抬手止住，目光从他们身上移开，落到你这里。
-
-“你也说说，该不该向尚恐热投诚？”
+屋里一片争执之声。达赞皱紧眉头，目光在屋内逡巡，落到你这里。
 
 &lt;div class=&quot;choices&quot;&gt;
 [[是，向尚恐热投诚。-&gt;A2_submit_pending]]
 [[否，不向尚恐热投诚。-&gt;A2_refuse_pending]]
 &lt;/div&gt;</tw-passagedata>
-<tw-passagedata pid="28" name="A2_protect" tags="" position="400,2200" size="100,100">&lt;&lt;set $crisisAdvice = &quot;protect&quot;, $dazanDecision = &quot;protect&quot;&gt;&gt;
+<tw-passagedata pid="29" name="A2_protect" tags="" position="400,2200" size="100,100">&lt;&lt;if $crisisBaseDazanTrust == null&gt;&gt;&lt;&lt;set $crisisBaseDazanTrust = $dazanTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;set $crisisAdvice = &quot;protect&quot;, $dazanDecision = &quot;protect&quot;, $dazanTrust = $crisisBaseDazanTrust + 1&gt;&gt;
 &lt;&lt;if $wineChoice is &quot;ignore&quot;&gt;&gt;&lt;&lt;include &quot;A2_delayed_protect&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;include &quot;A2_immediate_protect&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;
 
 &lt;&lt;include &quot;A2_fight&quot;&gt;&gt;
@@ -868,7 +869,8 @@ $(document).one(":storyready", function () {
 &lt;hr class=&quot;scene-break&quot;&gt;
 
 &lt;&lt;include &quot;A2_home&quot;&gt;&gt;</tw-passagedata>
-<tw-passagedata pid="29" name="A2_withdraw_advice" tags="" position="800,2200" size="100,100">&lt;&lt;set $crisisAdvice = &quot;withdraw&quot;&gt;&gt;
+<tw-passagedata pid="30" name="A2_withdraw_advice" tags="" position="800,2200" size="100,100">&lt;&lt;if $crisisBaseDazanTrust == null&gt;&gt;&lt;&lt;set $crisisBaseDazanTrust = $dazanTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;set $crisisAdvice = &quot;withdraw&quot;, $dazanTrust = $crisisBaseDazanTrust&gt;&gt;
 &lt;&lt;if $dazanTrust is 1&gt;&gt;&lt;&lt;set $dazanDecision = &quot;withdraw&quot;&gt;&gt;&lt;&lt;include &quot;A2_withdraw_text&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;set $dazanDecision = &quot;protect&quot;&gt;&gt;&lt;&lt;if $wineChoice is &quot;ignore&quot;&gt;&gt;&lt;&lt;include &quot;A2_delayed_refusal&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;
 
 &lt;&lt;include &quot;A2_fight&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;
@@ -876,24 +878,231 @@ $(document).one(":storyready", function () {
 &lt;hr class=&quot;scene-break&quot;&gt;
 
 &lt;&lt;include &quot;A2_home&quot;&gt;&gt;</tw-passagedata>
-<tw-passagedata pid="30" name="A2_ill_pending" tags="" position="1000,1800" size="100,100">后续剧情正在编写，试玩暂到这里。
+<tw-passagedata pid="31" name="A2_ill_pending" tags="" position="1000,1800" size="100,100">&lt;&lt;set $wineChoice = &quot;skipped&quot;, $dazanTrust = 0, $zhangTrust = $act2BaseZhangTrust&gt;&gt;
+你让来人给达赞带话，说连日腹痛，多宿未睡，实在骑不得马。
 
-&lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
+达赞叫你留下歇着，带其余人去了。
+
+你在屋里躺了半日，听见外头车马声渐渐远了，才起身去倒水。
+
+过了些日子，先回来的却是首领身亡的消息。传话的人说不清经过，只说各处将军都在调兵，连原先常走的路也不太平了。
+
+达赞随后回到驻地。他没有细说寿宴上的事，但驻地里是前所未有的紧张氛围。
+
+又过了一段时间，你听说尚恐热就快要打过来了，大家都被叫过去议事。
+
+&lt;&lt;include &quot;A2_shang_council&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="32" name="A2_submit_pending" tags="" position="400,2400" size="100,100">&lt;&lt;if $warBaseDazanTrust == null&gt;&gt;&lt;&lt;set $warBaseDazanTrust = $dazanTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;set $shangAdvice = &quot;submit&quot;, $dazanTrust = $warBaseDazanTrust + 0, $battleSurvived = false, $reliefBaseDazanTrust = null, $reliefChoice = &quot;&quot;, $reliefOutcome = &quot;&quot;&gt;&gt;
+“眼下各处都乱，单靠我们自己，恐怕撑不了多久。”你说，“不如先归附尚恐热，保住驻地再说。”
+
+达赞没有说话，他麾下众人又议了一阵，最后长叹一声，终究还是叫你取来纸笔，写了归附的信件。
+
+此时尚恐热正准备率大军进攻河州，收到信件后派人送来了一份军令，命你们即刻与大部汇合，共同攻打河州。
+
+达赞将军令收起，吩咐清点兵马、备足行粮。你也随军出发，照看运粮的车队。
+
+你跟着运粮队赶了三日左右，望见了尚恐热的大军，河州方向的道路上挤满了兵马，旗帜从近处的土坡一直连到远方。
+
+&lt;&lt;include &quot;A2_war_common&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="33" name="A2_refuse_pending" tags="" position="800,2400" size="100,100">&lt;&lt;if $warBaseDazanTrust == null&gt;&gt;&lt;&lt;set $warBaseDazanTrust = $dazanTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;set $shangAdvice = &quot;refuse&quot;, $dazanTrust = $warBaseDazanTrust + 1, $battleSurvived = false, $reliefBaseDazanTrust = null, $reliefChoice = &quot;&quot;, $reliefOutcome = &quot;&quot;&gt;&gt;
+“不能投。”你说，“他自封宰相，还要各部归附。我们若去了，这些人马往后还由得自己做主么？”
+
+达赞抬起头，看了你一眼：“我也有这个顾虑。”
+
+他皱着眉头思考了一阵，最终还是没有写下归附的信件，而是命令手下开始整顿人马。
+
+三日后，尚恐热传来最后的通牒，他的大军就驻扎在二十公里之外，来的人远比你们想象的还要多，他来信使称再不归附，就要踏平你们的驻地。
+
+达赞无法，只得写去归附的信件。
+
+&lt;&lt;include &quot;A2_war_common&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="34" name="A2_war_common" tags="" position="1400,3000" size="100,100">入营后，你才发现这些人远没有看起来那样齐整。有的穿着铁甲，有的只套一件磨破的皮甲，手里的刀、矛、弓也各不相同。你向旁边的人打听，才知道其中大多与你们一样，是从别处驻地归附来的，仍各自跟着原来的将领。
+
+尚恐热派人将这些新附的部众统一编为前锋，达赞部也在其中。军令一到，你们便跟着前面的队伍开拔，粮车紧随其后。
+
+行至河州以南，路渐渐窄了。两侧山坡陡起，低处长着成片的柳树，长长的队伍被挤进山谷，只能依次往前走。
+
+没走多久，两侧出现了一队敌骑，隔着山坡放箭，你们迅速组织弓箭手进行还击。
+
+没交手多久，对方似是不敌，向后退去，途中不断有人从马上跌落。
+
+中军发来了乘胜追击的命令，你们跟着转过一道山坡，身后却突然涌出大队人马，将退路截断；两侧坡上也涌现更多的弓箭手，一齐射了下来。
+
+正要掉转车头，谷里猛地刮起狂风。沙土扑在脸上，你连眼睛也睁不开，只能攥住车沿。号令声被风吹散，身边的人各喊各的，谁也不知道该往哪里去。
+
+山沟里的水也涨了起来，浑水夹着碎石冲过道路。前面的骑兵折回来，后面的粮车却还堵着，队伍挤成一团。
+
+伏兵趁乱从两侧压下来。你们撑不住，山口外的大队人马也被败兵冲散。尚恐热的旗子不知去了哪里，满谷都是丢下的兵器和无人牵领的马。
+
+溃兵很快涌到粮车旁，有的丢了盾，有的连马也没了。押车的军士跑去拦，反被撞得站不住脚。
+
+你刚解开拴马的绳，一支箭便射中了马颈。马猛地往旁边倒，你躲闪不及，被掀翻在地，右腿压在了翻倒的车辕下面。
+
+你使劲往外抽腿，车上的粮袋跟着滑下来，反而压得更紧。
+
+败退的人从你身边跑过，没有人多看你一眼。
+
+你边吼叫着四处张望，边把腿往外拔，恰好看到达赞骑马往这个方向飞奔而来，你拼命向他挥手想让他救救你。
+
+&lt;&lt;if $dazanTrust &gt;= 2&gt;&gt;&lt;&lt;include &quot;A2_war_saved&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;include &quot;A2_war_dead&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="35" name="A2_war_dead" tags="" position="1800,3200" size="100,100">&lt;&lt;set $alive = false, $battleSurvived = false, $nextActEntry = &quot;&quot;&gt;&gt;
+达赞看也不看你，径直飞快地略过去，他身后还跟着一支二十多人的小队，他们路过的风刮着散落的粮食扑在你的脸上。
+
+你咳嗽了几声，然后继续呼喊达赞的名字，却还是无济于事。
+
+敌兵绕过翻倒的粮车。你松开车辕，伸手去摸腰间的短刀，刀还未拔出，长矛便刺了过来。
+
+你倒在散落的粮食里，再没有起来。
 
 &lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
-<tw-passagedata pid="31" name="A2_submit_pending" tags="" position="400,2400" size="100,100">&lt;&lt;set $shangAdvice = &quot;submit&quot;&gt;&gt;
+<tw-passagedata pid="36" name="A2_war_saved" tags="" position="1400,3200" size="100,100">&lt;&lt;set $alive = true, $battleSurvived = true, $reliefBaseDazanTrust = $dazanTrust&gt;&gt;
+看到你被压在车底，达赞“吁”地一声停下马，吩咐身后的亲随将你拉出来带走。
+
+两名亲随折回来，一人挡住追近的敌兵，一人跳下马帮你抬车辕，你们一同用力，终于将压住你的车给挪开。
+
+你挣出来，右腿痛得站不住。其中一名亲随拽住你的腰带，将你托上马背，自己随后翻身上来。
+
+马冲下土坡时，你险些栽下去，急忙抓紧鞍前的皮带。
+
+身后的追兵越来越远，你才发现自己的两只手一直在抖。
+
+&lt;hr class=&quot;scene-break&quot;&gt;
+
+这一战过后，达赞身边只剩下一支残部。粮车几乎全丢了，回驻地的路也已被截断。
+
+他清点完人手，便带着你们离开战场，往偏僻处走。
+
+你们一直避着各处交战的军队。听说前方有兵，便换一条路；刚寻到能歇脚的地方，往往住不了几日，又得拔营。
+
+终于拖拖拉拉行了半个月军后回到了原先的驻地。
+
+可是粮却越来越少，最初还能给每人分足一日的口粮，后来改成半份，再后来，连熬粥的人也要先问今天放多少米。
+
+那晚，你将最后一袋粮提进了达赞的房间。
+
+“还能吃多久？”
+
+“照眼下这样分，不到十日。”
+
+达赞坐着没动。
+
+你忽然想起张议潮。
+
+当初在沙州，正是他托相熟的管粮小吏说话，你才办成了领粮的差事。他熟悉城里的粮务，也认识往来运粮的人，或许能帮你们寻条出路。
+
+你摸了摸收在怀里的旧信，抬头看向达赞。
+
+&lt;div class=&quot;choices&quot;&gt;
+[[告诉达赞，张议潮或许能帮忙。-&gt;A2_relief_tell]]
+[[不告诉达赞。-&gt;A2_relief_silent]]
+&lt;/div&gt;</tw-passagedata>
+<tw-passagedata pid="37" name="A2_relief_tell" tags="" position="400,3400" size="100,100">&lt;&lt;if $reliefBaseDazanTrust == null&gt;&gt;&lt;&lt;set $reliefBaseDazanTrust = $dazanTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;set $reliefChoice = &quot;tell&quot;&gt;&gt;
+“我在沙州认识一个人。”你说，“上回领粮，多亏他从中帮忙。他有相熟的管粮人，也知道些粮草往来的消息。”
+
+达赞不说信，也不说不信，只让你写信问问.
+
+你当夜写了信，将你们最近发生的事，一一写明，包括需要多少粮草。次日，达赞找来可靠的人，带着信去了沙州。
+
+此后几日，每逢营外有马蹄声，你都要出去看看。
+
+&lt;&lt;if $zhangTrust &gt;= 2&gt;&gt;&lt;&lt;include &quot;A2_relief_aid&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;if $zhangTrust is 1&gt;&gt;&lt;&lt;include &quot;A2_relief_raid&quot;&gt;&gt;&lt;&lt;else&gt;&gt;&lt;&lt;include &quot;A2_relief_denied&quot;&gt;&gt;&lt;&lt;/if&gt;&gt;&lt;&lt;/if&gt;&gt;
+
 后续剧情正在编写，试玩暂到这里。
 
 &lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
 
 &lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
-<tw-passagedata pid="32" name="A2_refuse_pending" tags="" position="800,2400" size="100,100">&lt;&lt;set $shangAdvice = &quot;refuse&quot;&gt;&gt;
-（待续。）
+<tw-passagedata pid="38" name="A2_relief_silent" tags="" position="800,3400" size="100,100">&lt;&lt;if $reliefBaseDazanTrust == null&gt;&gt;&lt;&lt;set $reliefBaseDazanTrust = $dazanTrust&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;set $reliefChoice = &quot;silent&quot;, $reliefOutcome = &quot;silent&quot;, $dazanTrust = $reliefBaseDazanTrust&gt;&gt;
+你将摸到的旧信重新按回衣襟，没有提起张议潮。
+
+达赞等了一会儿，见你没有别的话，便让你去叫管事。
+
+“从今日起，每人分的粮再减一半。”
+
+&lt;&lt;include &quot;A2_rationing&quot;&gt;&gt;
+
+后续剧情正在编写，试玩暂到这里。
 
 &lt;div class=&quot;chapter-transition&quot;&gt;&lt;&lt;back &quot;返回上一节&quot;&gt;&gt;&lt;/div&gt;
 
 &lt;div class=&quot;replay-actions&quot;&gt;&lt;&lt;button &quot;重玩一次&quot;&gt;&gt;&lt;&lt;run Engine.restart()&gt;&gt;&lt;&lt;/button&gt;&gt;&lt;/div&gt;</tw-passagedata>
-<tw-passagedata pid="33" name="StoryDisplayTitle" tags="" position="100,100" size="100,100">无名英雄</tw-passagedata>
+<tw-passagedata pid="39" name="A2_relief_aid" tags="" position="1400,3400" size="100,100">&lt;&lt;set $reliefOutcome = &quot;aid&quot;, $dazanTrust = $reliefBaseDazanTrust + 2&gt;&gt;
+送信的人终于回来了，同行的还有几辆盖着毡布的车。
+
+你迎上去，送粮人说，信送到后，张议潮便去找相熟的人打听，又联络了几户手里尚有余粮的商人，替你们凑出这一批。
+
+达赞带人过来，当着你的面向送粮人道谢，又让你将钱粮逐笔记清。
+
+粮袋搬进营地，灶上的粥重新熬稠了。
+
+达赞对你道：“这回能带回粮，多亏了你。”
+
+接下来的日子里，张议潮又替你们联络了几次粮食买卖，你们总算撑过了这场断粮的危机。
+
+&lt;&lt;include &quot;A2_rebuild&quot;&gt;&gt;
+
+往后，达赞议事总会叫上你。
+
+新收的人该如何安置，粮草能供多少日，下一处驻地该往哪里找，他都先听你的意见。有时部下递来急信，你不在帐中，他便让人去寻你。
+
+从前你只需等他吩咐，将定好的事记在纸上；如今许多事尚未决定，便已先交到你手里。
+
+你成了他最信任的人。</tw-passagedata>
+<tw-passagedata pid="40" name="A2_relief_raid" tags="" position="1400,3600" size="100,100">&lt;&lt;set $reliefOutcome = &quot;raid&quot;, $dazanTrust = $reliefBaseDazanTrust + 1&gt;&gt;
+送信的人回来时，带回一封张议潮的信。
+
+信上说，眼下各处都在催粮，他无力替你们筹出所需的数目。不过，有两个不大部落，三日前刚领过一批粮，粮大抵还在路上，他又将路线猜测告诉了你。
+
+信末还写了几句沿路听来的消息，哪里还能通行，哪里已被军队封住。他让你们自己斟酌。
+
+达赞接过信，反复看了两遍。
+
+“粮还在路上。”他将纸按在案上，“不能再等了。”
+
+他挑出还能作战的人，亲自带队出去。你留在营里等了两日，第三天傍晚，看见他们赶着几辆粮车回来。
+
+车上的绳结被砍断了，袋口还印着别部的记号。一名亲随告诉你，他们截住了那支运粮队，将粮抢了过来。
+
+达赞叫人立刻分粮：“消息来得及时。这一趟，总算没白跑。”
+
+&lt;&lt;include &quot;A2_rebuild&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="41" name="A2_relief_denied" tags="" position="1400,3800" size="100,100">&lt;&lt;set $reliefOutcome = &quot;denied&quot;, $dazanTrust = $reliefBaseDazanTrust&gt;&gt;
+送信的人独自回来了。
+
+张议潮在回信中说，筹粮一事帮不上忙，他那边也是一片混乱，请你另想办法。
+
+达赞听你读完，让你将信收起来，又叫人把余粮搬出来重新清点。
+
+&lt;&lt;include &quot;A2_rationing&quot;&gt;&gt;</tw-passagedata>
+<tw-passagedata pid="42" name="A2_rationing" tags="" position="1800,3600" size="100,100">每人分到的粮又少了一半。
+
+灶里每天只熬两锅稀粥，能走动的人便到附近挖些野菜，一起煮进去。你常听见肚子叫，已然分不清是自己的，还是别人的。
+
+又过了几日，达赞叫人牵来一匹战马。
+
+养马的老兵拉着缰绳不肯松手：“还好好的，往后打仗用得着。”
+
+“先让人活下来。”达赞说。
+
+马鞍被卸下来，放在地上。你转过头，听见身后一阵挣动，随后安静了。
+
+马肉分给伤兵，其余的切成细条留着。后来又杀了几匹，每少一匹，你便在马册上划去一道名字。
+
+你们靠着这些肉、野菜和省下的零星谷物，一日一日撑着。
+
+一个多月后，上一批田里的粮食收成了，众人总算缓过一口气。</tw-passagedata>
+<tw-passagedata pid="43" name="A2_rebuild" tags="" position="1800,3800" size="100,100">这期间，陆续有别处的败兵流落到附近。
+
+有的只剩三五个人，有的还护着受伤的同伴，随身带着已经卷破的旗子。达赞将他们留下，能作战的重新编入队伍，伤重的先分粮养着。
+
+后来，又有小股人马听到消息，带着各自剩下的兵器和粮食来投。营里的帐篷渐渐多了，原先缺人的岗哨也重新站上了人。
+
+你替这些人登记姓名、清点口粮，常常忙到夜里。再抬头时，帐外已不只有伤兵的咳嗽声，也有人在说笑、磨刀，或牵着马慢慢走过。</tw-passagedata>
+<tw-passagedata pid="44" name="StoryDisplayTitle" tags="" position="100,100" size="100,100">无名英雄</tw-passagedata>
 </tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
 	/*! SugarCube JS */
