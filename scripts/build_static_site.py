@@ -870,7 +870,22 @@ def render_prose_page(
 ) -> str:
     title = str(page_meta.get("title", "页面"))
     subtitle = str(page_meta.get("subtitle", ""))
-    body = f"""
+    heading = f"""
+      <div class="about-card__heading">
+        <span class="eyebrow">{html.escape(eyebrow)}</span>
+        <h1>{html.escape(title)}</h1>
+      </div>
+    """.strip()
+    if path == "/aboutme/profile/":
+        body = f"""
+    <section class="site-shell prose-card about-card">
+      {heading}
+      <article class="prose prose--about">{content_html}</article>
+    </section>
+    {render_guestbook()}
+    """
+    else:
+        body = f"""
     <section class="site-shell page-hero">
       <div class="eyebrow">{html.escape(eyebrow)}</div>
       <h1>{html.escape(title)}</h1>
@@ -878,7 +893,6 @@ def render_prose_page(
     <section class="site-shell prose-card">
       <article class="prose prose--about">{content_html}</article>
     </section>
-    {render_guestbook() if path == "/aboutme/profile/" else ""}
     """
     return page_shell(
         Page(

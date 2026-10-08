@@ -8,6 +8,7 @@
   scroll-margin-top: 96px;
 }
 
+.about-card__heading h1,
 .guestbook__heading h2 {
   margin: 8px 0 12px;
   color: var(--heading);
@@ -50,4 +51,14 @@
 
 .about-profile + .guestbook {
   width: min(100% - 32px, 920px);
+}
+
+.prose-card.about-card {
+  padding: clamp(22px, 4vw, 36px);
+  text-align: left;
+}
+
+.about-card .prose {
+  max-width: none;
+  margin: 0;
 }
