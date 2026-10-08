@@ -753,6 +753,26 @@ pre {
   color: inherit;
 }
 
+.article-list-item__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 14px 0;
+}
+
+.article-list-item .article-list-item__heading h2 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.article-list-item__heading .button {
+  flex: 0 0 auto;
+  width: auto;
+  white-space: nowrap;
+}
+
 .article-list-item p {
   margin: 0;
   max-width: 760px;
