@@ -58,7 +58,8 @@
   text-align: left;
 }
 
-.about-card .prose {
+.about-card .prose--about {
+  width: 100%;
   max-width: none;
   margin: 0;
 }

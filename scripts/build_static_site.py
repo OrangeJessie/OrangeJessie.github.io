@@ -842,7 +842,6 @@ def render_guestbook() -> str:
       <div class="guestbook__heading">
         <span class="eyebrow">GUESTBOOK</span>
         <h2 id="guestbook-title">来都来了，留句话吧</h2>
-        <p>想交流的问题、读完的感受，或者简单打个招呼，都欢迎。</p>
       </div>
       <p class="guestbook__hint">使用 GitHub 登录后即可留言。留言会公开展示，所有来访的人都能看到。</p>
       <div class="giscus" aria-label="留言输入框与公开留言列表"></div>
@@ -854,7 +853,7 @@ def render_guestbook() -> str:
 
 
 def guestbook_head() -> str:
-    return ('<link rel="stylesheet" href="/assets/css/guestbook.css">'
+    return ('<link rel="stylesheet" href="/assets/css/guestbook.css?v=20261008-align">'
             '<meta name="giscus:backlink" content="https://orangejessie.github.io/aboutme/profile/">'
             '<script defer src="/assets/js/guestbook.js"></script>')
 
